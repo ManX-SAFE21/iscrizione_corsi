@@ -1,0 +1,26 @@
+manifestVersion: 1
+id: corsibtc-iscrizioni
+category: automation
+name: Iscrizioni Corsi
+version: "1.0.0"
+tagline: Iscrizioni ai corsi con soglia minima e date indicative
+description: >-
+  Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
+  Ogni corso ha un numero minimo e massimo di iscritti e delle fasce orarie
+  indicative. Quando si raggiunge il minimo ricevi un avviso su Telegram e
+  scegli la data in base alle disponibilità. La pagina pubblica mostra solo
+  l'elenco dei corsi e il modulo di iscrizione; il pannello di gestione è
+  separato e raggiungibile solo dalla tua rete (porta 9150).
+developer: Manuxxx
+website: ""
+dependencies: []
+repo: ""
+support: ""
+port: 9160
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+releaseNotes: ""
+submitter: Manuxxx
+submission: ""
