@@ -262,17 +262,35 @@ th{color:var(--mut);font-weight:500}
 .nav{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:.95rem}
 .mono{font-family:'Space Mono',ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;word-break:break-all;color:var(--title)}
 footer{margin-top:40px;color:var(--mut);font-size:.85rem}
+main.wide{max-width:1040px}
+.hero{max-width:640px;margin:16px 0 32px}
+.hero h1{font-size:clamp(2rem,5vw,2.75rem);margin:0 0 .3em}
+.hero p{font-size:1.1rem;color:var(--mut);margin:0}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:24px;margin:0 0 40px;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);counter-reset:passo}
+.steps li{counter-increment:passo;display:flex;gap:12px;font-size:.95rem;color:var(--mut)}
+.steps li::before{content:counter(passo);flex:none;width:28px;height:28px;border-radius:50%;background:var(--soft);color:var(--teal);font-weight:600;font-size:.875rem;display:flex;align-items:center;justify-content:center}
+.steps b{display:block;color:var(--title);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:20px}
+.course{display:flex;flex-direction:column;margin:0;padding:24px}
+.course-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}
+.course-head .badge::before{content:none}
+.course-level{color:var(--teal);font-weight:600}
+.course h2{font-size:1.35rem;margin:10px 0 2px}
+.course-city{color:var(--mut);margin:0 0 16px}
+.course-slots{margin:0 0 20px}
+.course-progress{margin-top:auto}
+.course .btn{display:block;text-align:center;margin-top:18px}
 @media print{.nav,button,.btn{display:none}body{background:#fff}}
 `;
 
-function page(title, body, { admin = false } = {}) {
+function page(title, body, { admin = false, wide = false } = {}) {
   const nav = admin
     ? `<div class="nav"><a href="/">Corsi</a><a href="/corso/nuovo">+ Nuovo corso</a><a href="/impostazioni">Impostazioni</a>
        <form method="post" action="/logout" style="margin-left:auto"><button class="sec" style="padding:4px 12px">Esci</button></form></div>`
     : '';
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>${esc(title)}</title><style>${CSS}</style></head><body><main>${nav}${body}</main></body></html>`;
+<title>${esc(title)}</title><style>${CSS}</style></head><body><main${wide ? ' class="wide"' : ''}>${nav}${body}</main></body></html>`;
 }
 
 function qrSvg(url) {
@@ -303,18 +321,23 @@ function renderList() {
   const courses = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed') ORDER BY created_at DESC").all();
   const cards = courses.map((c) => {
     const n = countRegs(c.id);
-    return `<div class="card">
-      <div class="row"><span class="badge">${esc(LEVELS[c.level])}</span> ${statusBadge(c, n)}</div>
-      <h2 style="margin-top:.4em">${esc(courseName(c))}</h2>
-      <div class="sub" style="margin:0">${esc(c.city)}</div>
-      ${slotsOf(c).length ? `<div style="margin:8px 0">${slotsOf(c).map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
-      ${counter(c, n)}
-      <p style="margin:12px 0 0"><a class="btn" href="/c/${c.slug}">${n >= c.max_n ? 'Dettagli' : 'Dettagli e iscrizione'}</a></p>
-    </div>`;
+    return `<article class="card course">
+      <div class="course-head"><span class="badge course-level">Livello ${esc(LEVELS[c.level])}</span> ${statusBadge(c, n)}</div>
+      <h2>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</h2>
+      <p class="course-city">${esc(c.city)}</p>
+      ${slotsOf(c).length ? `<div class="course-slots">${slotsOf(c).map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
+      <div class="course-progress">${counter(c, n)}</div>
+      <a class="btn" href="/c/${c.slug}">${n >= c.max_n ? 'Dettagli' : 'Dettagli e iscrizione'}</a>
+    </article>`;
   }).join('');
-  return page('Corsi Bitcoin', `<h1>Corsi Bitcoin</h1>
-    <p class="sub">Scegli il corso, indica quando potresti esserci e iscriviti. Il corso parte quando si raggiunge il numero minimo di iscritti: la data definitiva viene decisa dopo, in base alle disponibilità.</p>
-    ${cards || '<div class="card">Al momento non ci sono corsi aperti. Torna a trovarci presto.</div>'}`);
+  return page('Corsi Bitcoin', `<header class="hero"><h1>Corsi Bitcoin</h1>
+    <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello e dicci quando potresti esserci.</p></header>
+    <ol class="steps">
+      <li><span><b>Scegli il corso</b>Base, medio o avanzato, nella città più comoda.</span></li>
+      <li><span><b>Indica quando puoi</b>Seleziona tutte le fasce che vanno bene.</span></li>
+      <li><span><b>Ti scriviamo noi</b>Raggiunto il minimo di iscritti, scegliamo la data in base alle disponibilità.</span></li>
+    </ol>
+    ${cards ? `<div class="grid">${cards}</div>` : '<div class="card">Al momento non ci sono corsi aperti. Torna a trovarci presto.</div>'}`, { wide: true });
 }
 
 function renderCourse(c, { error = '', ok = false, values = {} } = {}) {
