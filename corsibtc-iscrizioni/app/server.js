@@ -381,6 +381,8 @@ const ICONS = {
   wallet: '<path d="M20 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-4a2 2 0 0 0 0 4h4v3a1 1 0 0 1-1 1H5a2 2 0 0 1-2-2V5"/>',
   note: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
   food: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>',
+  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  briefcase: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
 };
 const icon = (n, cls = '') => `<svg class="i${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
 // livello: tre barrette, piene in base al livello
@@ -479,23 +481,68 @@ tr:last-child td{border-bottom:0}
 .qr{width:180px;height:180px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
 .qr svg{width:100%;height:100%;display:block}
 .mono{font-family:'Space Mono',ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;word-break:break-all;color:var(--title)}
-.hero{max-width:640px;margin:16px 0 32px}
-.hero h1{font-size:clamp(2rem,5vw,2.75rem);margin:0 0 .3em}
-.hero p{font-size:1.1rem;color:var(--mut);margin:0}
-.steps{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:24px;margin:0 0 40px;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);counter-reset:passo}
-.steps li{counter-increment:passo;display:flex;gap:12px;font-size:.95rem;color:var(--mut)}
-.steps li::before{content:counter(passo);flex:none;width:28px;height:28px;border-radius:50%;background:var(--tsoft);color:var(--teal);font-weight:600;font-size:.875rem;display:flex;align-items:center;justify-content:center}
-.steps b{display:block;color:var(--title);font-weight:600}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:20px}
-.course{display:flex;flex-direction:column;margin:0;padding:24px}
-.course-head{display:flex;flex-wrap:wrap;gap:6px}
-.course h2{font-size:1.35rem;margin:12px 0 4px;display:block}
-.course-meta{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--mut);margin:0 0 16px;font-size:.95rem}
-.course-meta span{display:inline-flex;align-items:center;gap:5px}
-.course-meta .i{color:var(--teal)}
-.course-slots{margin:0 0 20px}
+.lv-base{--lv:#0A7568;--lv2:#17A08C}
+.lv-medio{--lv:#1D5C96;--lv2:#3F88C9}
+.lv-avanzato{--lv:#2C3359;--lv2:#5762A8}
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:34px 32px;margin:4px 0 22px;background:linear-gradient(120deg,#0A7568,#0E8678 60%,#13988A);color:#fff}
+.hero::before,.hero::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero::before{width:280px;height:280px;right:-70px;top:-110px}
+.hero::after{width:180px;height:180px;right:90px;bottom:-110px}
+.hero>*{position:relative}
+.hero h1{color:#fff;font-size:clamp(2rem,5vw,2.8rem);margin:0 0 .3em}
+.hero p{margin:0;max-width:560px;font-size:1.08rem;color:rgba(255,255,255,.9)}
+.hero .stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.hero .pill{background:rgba(255,255,255,.16);color:#fff;font-size:.85rem}
+.hero .pill .i{color:#fff}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:12px;margin:0 0 8px;padding:0}
+.steps li{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.steps .ic{flex:none;width:38px;height:38px;border-radius:10px;background:var(--tsoft);color:var(--teal);display:flex;align-items:center;justify-content:center}
+.steps .ic .i{width:19px;height:19px;vertical-align:0}
+.steps b{display:block;color:var(--title);font-weight:600;line-height:1.3}
+.steps .t{display:block;font-size:.9rem;color:var(--mut);line-height:1.45;margin-top:2px}
+.gh{margin:32px 0 14px}
+.gh .pill{margin-left:4px;background:var(--soft);color:var(--mut)}
+.empty{display:flex;gap:14px;align-items:center;color:var(--mut)}
+.empty .i{width:28px;height:28px;color:var(--teal)}
+.empty p{margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:22px}
+.media{position:relative;height:168px;overflow:hidden;flex:none;background:linear-gradient(135deg,var(--lv),var(--lv2))}
+.media img.cover{display:block;width:100%;height:100%;object-fit:cover}
+.media .deco{position:absolute;right:-18px;bottom:-34px;width:150px;height:150px;color:rgba(255,255,255,.17)}
+.media .deco .i{width:100%;height:100%;vertical-align:0}
+.media .pills{position:absolute;left:12px;top:12px;right:12px;display:flex;flex-wrap:wrap;gap:6px}
+.media .pill{background:rgba(255,255,255,.96);color:var(--title);box-shadow:0 1px 3px rgba(10,15,28,.18)}
+.media .pill .i{color:var(--lv)}
+.media .pill.ok,.media .pill.on{color:var(--teald)}
+.course{position:relative;display:flex;flex-direction:column;margin:0;padding:0;overflow:hidden;transition:transform .15s,box-shadow .15s,border-color .15s}
+.course:hover{transform:translateY(-2px);border-color:#B9C6D6;box-shadow:0 2px 4px rgba(10,15,28,.06),0 14px 30px rgba(10,15,28,.09)}
+.course .body{display:flex;flex-direction:column;flex:1;padding:18px 20px 20px}
+.course h2{font-size:1.3rem;margin:0 0 10px;display:block}
+.course-meta{display:grid;gap:6px;color:var(--body);margin:0 0 14px;font-size:.95rem}
+.course-meta span{display:flex;align-items:center;gap:8px}
+.course-meta .i{color:var(--lv,var(--teal))}
+.course-slots{margin:0 0 14px}
 .course-progress{margin-top:auto}
-.course .btn{display:flex;margin-top:18px}
+.course .btn{display:flex;margin-top:16px}
+.course .btn::after{content:'';position:absolute;inset:0}
+.media.big{height:150px;border-radius:16px;margin:0 0 18px}
+.media.big.has-cover{height:auto;background:var(--soft)}
+.media.big img.cover{height:auto;max-height:380px}
+.media.big .deco{width:200px;height:200px;right:-20px;bottom:-56px}
+.ch{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.15rem)}
+.pr{margin:0 0 12px}
+.course-meta.row2{display:flex;flex-wrap:wrap;gap:6px 20px;margin:0 0 22px;font-size:1rem}
+.cwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.cmain>:first-child{margin-top:0}
+.aside{margin:0;padding:18px 20px}
+.aside h2{margin:0 0 6px;font-size:1.05rem}
+.aside .dl{display:flex;gap:8px;align-items:center;color:var(--mut);font-size:.92rem;margin:10px 0 0}
+.aside .dl .i{color:var(--lv,var(--teal))}
+.btn.big,button.big{width:100%;padding:13px 20px;font-size:1rem}
+.aside .btn.big{margin-top:14px}
+@media (min-width:940px){.cwrap{grid-template-columns:minmax(0,1fr) 320px;gap:36px;align-items:start}.aside{grid-column:2;grid-row:1;position:sticky;top:18px}.cmain{grid-column:1;grid-row:1}}
+.foot{display:flex;gap:8px;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:.85rem;margin-top:44px;padding-top:18px;border-top:1px solid var(--line)}
+.foot .i{color:var(--teal);flex:none}
 .intro{font-size:1.1rem;color:var(--body);margin:4px 0 20px;white-space:pre-wrap}
 .facts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr));gap:18px 24px}
 .fact{display:flex;gap:12px;align-items:flex-start}
@@ -515,9 +562,9 @@ tr:last-child td{border-bottom:0}
 .prog h3:first-child{margin-top:0}
 .prog ul{margin:.2em 0 .6em;padding-left:1.3em}.prog li{margin:3px 0}
 .pre{white-space:pre-wrap}
-.paywrap{display:none;margin:4px 0 0 30px}
+.paywrap{display:none;margin:14px 0 0}
 form:has(#pay-pre:checked) .paywrap{display:block}
-.srcwrap{display:none;margin:0 0 0 30px}
+.srcwrap{display:none;margin:10px 0 0}
 form:has(#src-other:checked) .srcwrap{display:block}
 .paybox{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--bg)}
 .pay-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:16px}
@@ -529,13 +576,41 @@ fieldset.fs:first-child{border-top:0;margin-top:0}
 .fs legend .i{color:var(--teal)}
 .contact{display:flex;align-items:center;gap:8px;color:var(--mut);margin-top:28px}
 .ql{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
-.cover{display:block;width:100%;max-height:320px;object-fit:cover;border-radius:12px;border:1px solid var(--line);margin:4px 0 18px;background:var(--soft)}
-.course .cover{width:calc(100% + 48px);max-height:180px;margin:-24px -24px 18px;border:0;border-bottom:1px solid var(--line);border-radius:12px 12px 0 0}
-.cover-now{margin:0 0 10px}.cover-now .cover{max-height:160px;margin:0 0 4px}
+.cover{display:block;width:100%;object-fit:cover;background:var(--soft)}
+.cover-now{margin:0 0 10px}.cover-now .cover{max-height:160px;margin:0 0 4px;border:1px solid var(--line);border-radius:10px}
 input[type=file]{font:inherit;color:var(--mut);max-width:100%}
-@media (max-width:480px){.paywrap{margin-left:0}main{padding-top:4px}}
+.enroll{scroll-margin-top:16px}
+.enrollform{padding:22px}
+.fgrid{display:grid;grid-template-columns:1fr;gap:0 16px}
+@media (min-width:640px){.fgrid{grid-template-columns:1fr 1fr}.fgrid .full{grid-column:1/-1}}
+.fld label{margin:14px 0 6px;font-size:.93rem}
+.fld .opt{font-weight:400;color:var(--mut);font-size:.78rem;margin-left:8px;background:var(--soft);border-radius:999px;padding:1px 9px}
+.star{color:var(--teal)}
+.inp{position:relative}
+.inp>.i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7C8BA1;width:18px;height:18px;pointer-events:none}
+.inp:focus-within>.i{color:var(--teal)}
+.inp input{padding-left:40px}
+.hint{margin:5px 0 0;font-size:.82rem;color:var(--mut)}
+fieldset.qs{border:0;padding:0;margin:24px 0 0;min-width:0}
+.qs legend{padding:0;margin:0 0 10px;font-weight:600;color:var(--title)}
+.qs legend small{display:block;font-weight:400;color:var(--mut);font-size:.85rem}
+.tiles{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr))}
+.tiles.sm{grid-template-columns:repeat(auto-fit,minmax(min(165px,100%),1fr))}
+.tile{display:flex;gap:10px;align-items:flex-start;margin:0;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-weight:400;color:var(--body);transition:border-color .12s,background .12s}
+.tile:hover{border-color:#9FB0C4}
+.tile input{width:18px;height:18px;margin:3px 0 0;flex:none;accent-color:var(--teal)}
+.tile b{display:block;color:var(--title);font-weight:600}
+.tile small{display:block;color:var(--mut);font-weight:400}
+.tile:has(input:checked){border-color:var(--teal);background:var(--tsoft);box-shadow:0 0 0 1px var(--teal) inset}
+.consent{display:flex;gap:12px;align-items:flex-start;margin:26px 0 0;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:400;font-size:.9rem;color:var(--mut)}
+.consent input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--teal)}
+.enrollform .btn.big{margin-top:18px}
+@media (max-width:640px){.steps{gap:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}.steps li{border:0;border-radius:0;padding:11px 14px;align-items:center}.steps li+li{border-top:1px solid var(--line)}.steps .ic{width:34px;height:34px}.steps .t{font-size:.85rem}.gh{margin-top:26px}}
+@media (max-width:480px){main{padding-top:4px}.hero{padding:26px 20px}.hero h1{font-size:2rem}.enrollform{padding:18px}}
 @media print{.top,.nav,button,.btn,.back,.maplink{display:none}body{background:#fff}.card{box-shadow:none}}
 `;
+
+const FOOT = `<footer class="foot">${icon('shield')}<span>I dati degli iscritti non vengono ceduti a terzi e vengono cancellati dopo il corso.</span></footer>`;
 
 function page(title, body, { admin = false, wide = false } = {}) {
   const brand = `<a class="brand" href="/"><span class="mark">${icon('btc')}</span>Corsi Bitcoin${admin ? '<small>· Admin</small>' : ''}</a>`;
@@ -545,7 +620,7 @@ function page(title, body, { admin = false, wide = false } = {}) {
     : '';
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
-<title>${esc(title)}</title><style>${CSS}</style></head><body><main${wide ? ' class="wide"' : ''}><header class="top">${brand}${nav}</header>${body}</main></body></html>`;
+<title>${esc(title)}</title><style>${CSS}</style></head><body><main${wide ? ' class="wide"' : ''}><header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main></body></html>`;
 }
 
 function qrSvg(url) {
@@ -577,28 +652,54 @@ function statusBadge(c, n, withDate = true) {
 }
 
 /* ---------- pagine pubbliche ---------- */
-function renderList() {
-  const courses = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed') ORDER BY created_at DESC").all();
-  const cards = courses.map((c) => {
-    const n = countRegs(c.id);
-    return `<article class="card course">
-      ${c.cover ? `<img class="cover" src="/img/${esc(c.cover)}" alt="">` : ''}
-      <div class="course-head">${levelPill(c)}${statusBadge(c, n, false)}</div>
+// classe di colore in base al livello (base = verde, medio = blu, avanzato = blu notte)
+const levelClass = (c) => `lv-${LEVELS[c.level] ? c.level : 'base'}`;
+
+// immagine in alto: la copertina se c'è, altrimenti una fascia colorata con il simbolo del livello
+// con la copertina le etichette stanno sotto l'immagine (per non coprire le scritte); sulla fascia colorata stanno sopra
+function mediaBlock(c, n, big = false) {
+  const inner = c.cover
+    ? `<img class="cover" src="/img/${esc(c.cover)}" alt="">`
+    : `<span class="deco">${levelIcon(c.level)}</span><div class="pills">${levelPill(c)}${statusBadge(c, n, false)}</div>`;
+  return `<div class="media${big ? ' big' : ''}${c.cover ? ' has-cover' : ''}">${inner}</div>`;
+}
+const pillsRow = (c, n) => (c.cover ? `<div class="row pr">${levelPill(c)}${statusBadge(c, n, false)}</div>` : '');
+
+function courseCard(c) {
+  const n = countRegs(c.id);
+  const slots = slotsOf(c);
+  return `<article class="card course ${levelClass(c)}">
+    ${mediaBlock(c, n)}
+    <div class="body">
+      ${pillsRow(c, n)}
       <h2>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</h2>
-      <p class="course-meta"><span>${icon('pin')}${esc(c.city)}</span>${c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}${c.deadline && !expired(c) ? `<span>${icon('hourglass')}entro il ${fmtDay(c.deadline)}</span>` : ''}</p>
-      ${slotsOf(c).length ? `<div class="course-slots">${slotsOf(c).map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
+      <p class="course-meta"><span>${icon('pin')}${esc(c.city)}</span>${c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}${c.deadline && !expired(c) ? `<span>${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</span>` : ''}</p>
+      ${slots.length ? `<div class="course-slots">${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
       <div class="course-progress">${counter(c, n)}</div>
       <a class="btn" href="/c/${c.slug}">${n >= c.max_n ? 'Dettagli' : 'Dettagli e iscrizione'}${icon('arrow')}</a>
-    </article>`;
-  }).join('');
+    </div>
+  </article>`;
+}
+
+function renderList() {
+  const all = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed') ORDER BY created_at DESC").all();
+  const confirmed = all.filter((c) => c.status === 'confirmed');
+  const open = all.filter((c) => c.status !== 'confirmed');
+  const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
+  const group = (title, ic, list) => (list.length
+    ? `<h2 class="gh">${icon(ic)}${title}<span class="pill">${list.length}</span></h2><div class="grid">${list.map(courseCard).join('')}</div>` : '');
+  const steps = [
+    ['list', 'Scegli il corso', 'Il livello e la città più comodi per te.'],
+    ['calendar', 'Indica quando puoi', 'Seleziona tutte le fasce che vanno bene.'],
+    ['mail', 'Ti scriviamo noi', 'Raggiunto il minimo, scegliamo la data in base alle disponibilità.'],
+  ];
   return page('Corsi Bitcoin', `<header class="hero"><h1>Corsi Bitcoin</h1>
-    <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello e dicci quando potresti esserci.</p></header>
-    <ol class="steps">
-      <li><span><b>Scegli il corso</b>Base, medio o avanzato, nella città più comoda.</span></li>
-      <li><span><b>Indica quando puoi</b>Seleziona tutte le fasce che vanno bene.</span></li>
-      <li><span><b>Ti scriviamo noi</b>Raggiunto il minimo di iscritti, scegliamo la data in base alle disponibilità.</span></li>
-    </ol>
-    ${cards ? `<div class="grid">${cards}</div>` : '<div class="card">Al momento non ci sono corsi aperti. Torna a trovarci presto.</div>'}`, { wide: true });
+    <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello e dicci quando potresti esserci.</p>
+    ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} ${cities === 1 ? 'città' : 'città'}</span></div>` : ''}</header>
+    <ol class="steps">${steps.map(([ic, t, d]) => `<li><span class="ic">${icon(ic)}</span><span><b>${t}</b><span class="t">${d}</span></span></li>`).join('')}</ol>
+    ${all.length
+      ? group('Corsi confermati', 'checkc', confirmed) + group('Iscrizioni aperte', 'pen', open)
+      : `<div class="card empty">${icon('calendar')}<p>Al momento non ci sono corsi aperti. Torna a trovarci presto.</p></div>`}`, { wide: true });
 }
 
 const payItem = (label, ic, addr, uri) => `<div class="pay"><b>${icon(ic)}${label}</b><div class="qr">${qrSvg(uri)}</div><div class="mono">${esc(addr)}</div></div>`;
@@ -662,56 +763,70 @@ function renderCourse(c, { error = '', ok = false, paid = false, values = {} } =
   const chosen = values.slots || [];
   const reqs = linesOf(c.requirements);
   const stop = closed ? 'Le iscrizioni per questo corso sono chiuse.' : full ? 'Il corso è al completo.' : late ? `Le prenotazioni si sono chiuse il ${fmtDay(c.deadline)}.` : '';
-  const form = stop ? msg('warn', stop) : `
+  const srcSel = String(values.source || '').startsWith('Altro') ? 'Altro' : values.source;
+  const srcOther = values.source_other || String(values.source || '').replace(/^Altro:\s*/, '').replace(/^Altro$/, '');
+  // campo di testo con icona: etichetta, casella, suggerimento
+  const fld = (id, label, ic, input, hint = '', optional = false, cls = '') =>
+    `<div class="fld${cls ? ' ' + cls : ''}"><label for="${id}">${label}${optional ? '<span class="opt">facoltativo</span>' : ' <b class="star">*</b>'}</label><div class="inp">${icon(ic)}${input}</div>${hint ? `<p class="hint">${hint}</p>` : ''}</div>`;
+  const form = `
   ${h2('Iscriviti', 'pen')}
-  <form method="post" action="/c/${c.slug}" class="card" autocomplete="on">
-    <label for="email">Email *</label>
-    <input type="email" id="email" name="email" required maxlength="120" value="${esc(values.email)}">
-    <label for="name">Nome e cognome (o nickname) * <small>rispettiamo la tua privacy</small></label>
-    <input type="text" id="name" name="name" required maxlength="80" value="${esc(values.name)}">
-    ${c.phone_required
-      ? `<label for="phone">Telefono * <small>per confermarti il corso</small></label>
-    <input type="tel" id="phone" name="phone" required maxlength="30" value="${esc(values.phone)}">`
-      : `<label for="phone">Telefono <small>facoltativo, solo per contattarti via WhatsApp</small></label>
-    <input type="tel" id="phone" name="phone" maxlength="30" value="${esc(values.phone)}">`}
-    <label for="city">Città <small>facoltativo: se vieni da lontano possiamo consigliarti corsi più vicini</small></label>
-    <input type="text" id="city" name="city" maxlength="80" value="${esc(values.city)}">
-    ${c.ask_company ? `<label for="company">Azienda <small>facoltativo: possiamo indicarti opportunità per la tua attività</small></label>
-    <input type="text" id="company" name="company" maxlength="80" value="${esc(values.company)}">` : ''}
-    ${c.ask_source ? `<label>Come hai conosciuto questo corso? *</label>
-      ${SOURCES.map((s) => `<label class="check"><input type="radio" name="source" value="${esc(s)}" required ${s === 'Altro' ? 'id="src-other"' : ''} ${values.source === s ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}
-      <div class="srcwrap"><input type="text" name="source_other" maxlength="80" placeholder="Scrivi qui" aria-label="Altro: specifica" value="${esc(values.source_other)}"></div>` : ''}
-    ${slots.length ? `<label>Quando potresti esserci? * <small>scegli tutte le fasce che vanno bene</small></label>
-      ${slots.map((s) => `<label class="check"><input type="checkbox" name="slot" value="${esc(s)}" ${chosen.includes(s) ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}` : ''}
-    ${prepayOn(c) ? `<label>Contributo *</label>
-      <label class="check"><input type="radio" name="payment" value="corso" ${values.payment !== 'anticipo' ? 'checked' : ''}><span>Pago il giorno del corso, all'accoglienza</span></label>
-      <label class="check"><input type="radio" name="payment" id="pay-pre" value="anticipo" ${values.payment === 'anticipo' ? 'checked' : ''}><span>Pago in anticipo e blocco il posto</span></label>
-      <div class="paywrap">${payBox(c)}</div>` : ''}
-    <label class="check"><input type="checkbox" name="consent" required><span>Acconsento al trattamento dei miei dati (email, nome, telefono, città${c.ask_company ? ', azienda' : ''}) al solo scopo di organizzare il corso. I dati non vengono ceduti a terzi e vengono cancellati dopo il corso. *</span></label>
+  <form method="post" action="/c/${c.slug}#iscrizione" class="card enrollform" autocomplete="on">
+    <div class="fgrid">
+      ${fld('email', 'Email', 'mail', `<input type="email" id="email" name="email" required maxlength="120" value="${esc(values.email)}" autocomplete="email">`)}
+      ${fld('name', 'Nome e cognome (o nickname)', 'user', `<input type="text" id="name" name="name" required maxlength="80" value="${esc(values.name)}" autocomplete="name">`, 'Rispettiamo la tua privacy.')}
+      ${c.phone_required
+        ? fld('phone', 'Telefono', 'phone', `<input type="tel" id="phone" name="phone" required maxlength="30" value="${esc(values.phone)}" autocomplete="tel">`, 'Ci serve per confermarti il corso.')
+        : fld('phone', 'Telefono', 'phone', `<input type="tel" id="phone" name="phone" maxlength="30" value="${esc(values.phone)}" autocomplete="tel">`, 'Solo per contattarti via WhatsApp.', true)}
+      ${fld('city', 'Città', 'pin', `<input type="text" id="city" name="city" maxlength="80" value="${esc(values.city)}" autocomplete="address-level2">`, 'Se vieni da lontano possiamo consigliarti corsi più vicini.', true)}
+      ${c.ask_company ? fld('company', 'Azienda', 'briefcase', `<input type="text" id="company" name="company" maxlength="80" value="${esc(values.company)}" autocomplete="organization">`, 'Possiamo indicarti opportunità per la tua attività.', true, 'full') : ''}
+    </div>
+    ${slots.length ? `<fieldset class="qs"><legend>Quando potresti esserci? <b class="star">*</b><small>Scegli tutte le fasce che vanno bene.</small></legend>
+      <div class="tiles">${slots.map((s) => `<label class="tile"><input type="checkbox" name="slot" value="${esc(s)}" ${chosen.includes(s) ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}</div></fieldset>` : ''}
+    ${prepayOn(c) ? `<fieldset class="qs"><legend>Come preferisci pagare il contributo? <b class="star">*</b></legend>
+      <div class="tiles">
+        <label class="tile"><input type="radio" name="payment" value="corso" ${values.payment !== 'anticipo' ? 'checked' : ''}><span><b>Il giorno del corso</b><small>Pago all'accoglienza</small></span></label>
+        <label class="tile"><input type="radio" name="payment" id="pay-pre" value="anticipo" ${values.payment === 'anticipo' ? 'checked' : ''}><span><b>In anticipo</b><small>Blocco subito il posto</small></span></label>
+      </div>
+      <div class="paywrap">${payBox(c)}</div></fieldset>` : ''}
+    ${c.ask_source ? `<fieldset class="qs"><legend>Come hai conosciuto questo corso? <b class="star">*</b></legend>
+      <div class="tiles sm">${SOURCES.map((s) => `<label class="tile"><input type="radio" name="source" value="${esc(s)}" required ${s === 'Altro' ? 'id="src-other"' : ''} ${srcSel === s ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}</div>
+      <div class="srcwrap"><input type="text" name="source_other" maxlength="80" placeholder="Scrivi qui" aria-label="Altro: specifica" value="${esc(srcOther)}"></div></fieldset>` : ''}
+    <label class="consent"><input type="checkbox" name="consent" required><span>Acconsento al trattamento dei miei dati (email, nome, telefono, città${c.ask_company ? ', azienda' : ''}) al solo scopo di organizzare il corso. I dati non vengono ceduti a terzi e vengono cancellati dopo il corso. *</span></label>
     <div class="hp" aria-hidden="true"><label>Non compilare<input type="text" name="sito" tabindex="-1" autocomplete="off"></label></div>
     <input type="hidden" name="t" value="${timeToken()}">
-    <p><button type="submit">${icon('send')}Invia iscrizione</button></p>
+    <button type="submit" class="btn big">${icon('send')}Invia iscrizione</button>
   </form>`;
+  const done = `${msg('ok', `<b>Iscrizione ricevuta, grazie!</b> ${c.status === 'confirmed'
+    ? 'Ti aspettiamo al corso: dai un\'occhiata ai requisiti prima di partire.'
+    : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}`)}
+    ${paid && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
+    <p><a class="btn sec" href="/">${icon('back')}Tutti i corsi</a></p>`;
+  const enroll = ok ? done : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;
   return page(courseName(c), `
+    <div class="${levelClass(c)}">
     <a class="back" href="/">${icon('back')}Tutti i corsi</a>
-    ${c.cover ? `<img class="cover" src="/img/${esc(c.cover)}" alt="">` : ''}
-    <div class="row">${levelPill(c)}${statusBadge(c, n, false)}</div>
-    <h1>${esc(courseName(c))}</h1>
-    <p class="course-meta"><span>${icon('pin')}${esc(c.city)}</span>${c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}</p>
-    ${ok ? msg('ok', `<b>Iscrizione ricevuta, grazie!</b> ${c.status === 'confirmed'
-      ? 'Ti aspettiamo al corso: dai un\'occhiata ai requisiti prima di partire.'
-      : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}`) : ''}
-    ${ok && paid && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
-    ${error ? msg('err', esc(error)) : ''}
-    ${c.description ? `<p class="intro">${esc(c.description)}</p>` : ''}
-    <div class="card">${courseFacts(c)}</div>
-    ${slots.length && c.status !== 'confirmed' ? `${h2('Date indicative', 'calendar')}<p class="sub">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
-    ${reqs.length ? `${h2('Requisiti per partecipare', 'list')}<div class="card"><ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol></div>` : ''}
-    ${c.program ? `${h2('Programma', 'book')}<div class="card">${renderProgram(c.program)}</div>` : ''}
-    ${h2('Iscritti', 'users')}
-    ${counter(c, n)}
-    ${form}
-    ${c.contact_email ? `<p class="contact">${icon('mail')}<span>Per informazioni scrivi a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</span></p>` : ''}`);
+    ${mediaBlock(c, n, true)}
+    ${pillsRow(c, n)}
+    <h1 class="ch">${esc(courseName(c))}</h1>
+    <p class="course-meta row2"><span>${icon('pin')}${esc(c.city)}</span>${c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}</p>
+    <div class="cwrap">
+      <aside class="aside card">
+        <h2>${icon('users')}Iscrizioni</h2>
+        ${counter(c, n)}
+        ${c.deadline && !late ? `<p class="dl">${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</p>` : ''}
+        ${ok || stop ? '' : `<a class="btn big" href="#iscrizione">${icon('pen')}Iscriviti ora</a>`}
+      </aside>
+      <div class="cmain">
+        ${c.description ? `<p class="intro">${esc(c.description)}</p>` : ''}
+        <div class="card">${courseFacts(c)}</div>
+        ${slots.length && c.status !== 'confirmed' ? `${h2('Date indicative', 'calendar')}<p class="sub">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
+        ${reqs.length ? `${h2('Requisiti per partecipare', 'list')}<div class="card"><ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol></div>` : ''}
+        ${c.program ? `${h2('Programma', 'book')}<div class="card">${renderProgram(c.program)}</div>` : ''}
+        <section id="iscrizione" class="enroll">${enroll}</section>
+        ${c.contact_email ? `<p class="contact">${icon('mail')}<span>Per informazioni scrivi a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</span></p>` : ''}
+      </div>
+    </div>
+    </div>`, { wide: true });
 }
 
 async function handlePublic(req, res) {

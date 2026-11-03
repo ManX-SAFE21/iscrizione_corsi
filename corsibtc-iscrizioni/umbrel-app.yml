@@ -2,7 +2,8 @@ manifestVersion: 1
 id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
-version: "1.2.0"
+icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
+version: "1.3.0"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -21,6 +22,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Pagina del corso completa come un modulo Google (orari, contributo, requisiti, programma, link alla mappa), pagamento in anticipo in Bitcoin o Lightning, immagine di copertina, domande facoltative su azienda e su come ci hanno conosciuto, Duplica corso, segna pagato ed elenco iscritti per Excel. Grafica con icone."
+releaseNotes: "Nuova grafica: pagina iniziale con i corsi, pagina del corso con riquadro iscrizioni e modulo più chiaro, icona dell'app."
 submitter: Manuxxx
 submission: ""
