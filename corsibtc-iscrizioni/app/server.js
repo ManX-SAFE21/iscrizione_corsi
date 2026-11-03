@@ -433,8 +433,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .sub{color:var(--mut);margin:0 0 1.2em}
 .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;padding:10px 0 14px;margin-bottom:22px;border-bottom:1px solid var(--line)}
 .brand{display:inline-flex;align-items:center;gap:10px;font:600 1.05rem 'Space Grotesk',Inter,sans-serif;color:var(--title);text-decoration:none}
-.brand .mark{width:30px;height:30px;border-radius:9px;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;flex:none}
-.brand .mark .i{width:17px;height:17px;vertical-align:0}
+.brand .mark{width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid var(--line);overflow:hidden;display:inline-flex;flex:none}
+.brand .mark img{width:100%;height:100%;display:block}
 .brand small{font-weight:500;color:var(--mut);margin-left:2px}
 .nav{display:flex;gap:2px;flex-wrap:wrap;align-items:center}
 .nav a,.nav button{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;color:var(--body);background:none;border:0;font:500 .93rem/1.4 Inter,'Segoe UI',Arial,sans-serif;text-decoration:none;cursor:pointer}
@@ -610,16 +610,24 @@ fieldset.qs{border:0;padding:0;margin:24px 0 0;min-width:0}
 @media print{.top,.nav,button,.btn,.back,.maplink{display:none}body{background:#fff}.card{box-shadow:none}}
 `;
 
+const ICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 256\" width=\"256\" height=\"256\">\n  <rect width=\"256\" height=\"256\" fill=\"#FFFFFF\"/>\n  <g transform=\"translate(128 128) scale(.96) translate(-128 -131)\" fill=\"none\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n    <g stroke=\"#0D9488\">\n      <rect x=\"58\" y=\"62\" width=\"140\" height=\"168\" rx=\"12\"/>\n      <rect x=\"91\" y=\"32\" width=\"74\" height=\"52\" rx=\"14\" fill=\"#FFFFFF\"/>\n      <rect x=\"108\" y=\"50\" width=\"40\" height=\"20\" rx=\"9\"/>\n    </g>\n    <g stroke=\"#FF6F1F\" transform=\"translate(122.5 162)\">\n      <path d=\"M-20 -36V36\"/>\n      <path d=\"M-20 -36H8a17 17 0 0 1 0 34H-20\"/>\n      <path d=\"M-20 -2H12a19 19 0 0 1 0 38H-20\"/>\n      <path d=\"M-8 -36V-48M8 -36V-48M-8 36V48M8 36V48\"/>\n    </g>\n  </g>\n</svg>\n";
+function serveIcon(res, p) {
+  if (p !== '/icon.svg') return false;
+  res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
+  res.end(ICON_SVG);
+  return true;
+}
+
 const FOOT = `<footer class="foot">${icon('shield')}<span>I dati degli iscritti non vengono ceduti a terzi e vengono cancellati dopo il corso.</span></footer>`;
 
 function page(title, body, { admin = false, wide = false } = {}) {
-  const brand = `<a class="brand" href="/"><span class="mark">${icon('btc')}</span>Corsi Bitcoin${admin ? '<small>· Admin</small>' : ''}</a>`;
+  const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg" alt="" width="34" height="34"></span>Corsi Bitcoin${admin ? '<small>· Admin</small>' : ''}</a>`;
   const nav = admin
     ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo corso</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
        <form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form></nav>`
     : '';
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg">
 <title>${esc(title)}</title><style>${CSS}</style></head><body><main${wide ? ' class="wide"' : ''}><header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main></body></html>`;
 }
 
@@ -833,7 +841,7 @@ async function handlePublic(req, res) {
   const url = new URL(req.url, 'http://x');
   const p = url.pathname;
   if (p === '/health') return send(res, 200, 'ok', { 'Content-Type': 'text/plain' });
-  if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p))) return;
+  if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p) || serveIcon(res, p))) return;
   if (req.method === 'GET' && p === '/') return send(res, 200, renderList());
 
   const m = p.match(/^\/c\/([0-9a-f]{10})$/);
@@ -1126,7 +1134,7 @@ async function handleAdmin(req, res) {
   }
 
   if (p === '/health') return send(res, 200, 'ok', { 'Content-Type': 'text/plain' });
-  if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p))) return; // le copertine sono comunque pubbliche
+  if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p) || serveIcon(res, p))) return; // le copertine sono comunque pubbliche
 
   if (p === '/login') {
     if (req.method === 'GET') return send(res, 200, loginPage());
