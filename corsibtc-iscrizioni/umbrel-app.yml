@@ -3,15 +3,16 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.5.1"
+version: "1.6.0"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
   Ogni corso ha un numero minimo e massimo di iscritti e delle fasce orarie
   indicative. Quando si raggiunge il minimo ricevi un avviso su Telegram e
   scegli la data in base alle disponibilità. La pagina pubblica mostra solo
-  l'elenco dei corsi e il modulo di iscrizione; il pannello di gestione è
-  separato e raggiungibile solo dalla tua rete (porta 9150).
+  l'elenco dei corsi e il modulo di iscrizione (raggiungibile con un tunnel
+  Cloudflare); l'icona dell'app apre il pannello di gestione, protetto dal
+  login di Umbrel.
 developer: Manuxxx
 website: ""
 dependencies: []
@@ -22,6 +23,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Ora Aggiorna installa anche il programma nuovo. Home più ordinata: corsi in righe compatte divise per livello, con filtri. Locandina del corso (PDF o immagine) da scaricare. Pulsanti Condividi e anteprima del link sui social."
+releaseNotes: "L'icona dell'app ora apre il pannello di gestione, con il login di Umbrel e senza altre password. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""

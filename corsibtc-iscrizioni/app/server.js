@@ -8,6 +8,8 @@ const http = require('node:http');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const net = require('node:net');
+const dns = require('node:dns');
+const { AsyncLocalStorage } = require('node:async_hooks');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 const qrcode = require('./lib/qrcode.js');
@@ -695,7 +697,7 @@ function page(title, body, { admin = false, wide = false, head = '' } = {}) {
   const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg" alt="" width="34" height="34"></span>Corsi Bitcoin${admin ? '<small>· Admin</small>' : ''}</a>`;
   const nav = admin
     ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo corso</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
-       <form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form></nav>`
+       ${adminCtx.getStore()?.umbrel ? '' : `<form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form>`}</nav>`
     : '';
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg">${head}
@@ -1031,6 +1033,21 @@ async function handlePublic(req, res) {
 }
 
 /* ---------- admin ---------- */
+// L'icona di Umbrel apre il pannello passando dal suo app_proxy, che chiede il login di Umbrel
+// (PROXY_AUTH_ADD). Le richieste che arrivano da quel container non chiedono la password dell'app.
+// Il container si riconosce dall'indirizzo vero della connessione, mai da intestazioni come X-Forwarded-For.
+const TRUSTED_PROXY_HOST = process.env.TRUSTED_PROXY_HOST || '';
+let proxyIp = { at: 0, ips: [] };
+async function fromUmbrel(req) {
+  if (!TRUSTED_PROXY_HOST) return false;
+  if (Date.now() - proxyIp.at > 60000) {
+    try { proxyIp = { at: Date.now(), ips: (await dns.promises.lookup(TRUSTED_PROXY_HOST, { all: true })).map((a) => a.address) }; } catch { proxyIp = { at: Date.now(), ips: [] }; }
+  }
+  const ip = String(req.socket.remoteAddress || '').replace(/^::ffff:/, '');
+  return proxyIp.ips.includes(ip);
+}
+const adminCtx = new AsyncLocalStorage(); // { umbrel: true } durante le richieste arrivate dall'icona di Umbrel
+
 const MIN_PW = 10;
 const sessions = new Map();
 const SESSION_MS = 12 * 3600 * 1000;
@@ -1256,14 +1273,24 @@ function settingsPage(flash = '', kind = 'ok') {
 }
 
 async function handleAdmin(req, res) {
+  const umbrel = await fromUmbrel(req);
+  return adminCtx.run({ umbrel }, () => adminRoutes(req, res, umbrel));
+}
+async function adminRoutes(req, res, umbrel) {
   const url = new URL(req.url, 'http://x');
   const p = url.pathname;
 
   if (req.method === 'POST') {
     const origin = req.headers.origin;
-    if (origin && origin !== 'null') {
+    // dietro il proxy di Umbrel l'indirizzo visto dal browser può essere riscritto: lì vale Sec-Fetch-Site,
+    // che il browser manda da solo e indica se il modulo viene dalla stessa pagina
+    const site = umbrel ? req.headers['sec-fetch-site'] : '';
+    if (site) {
+      if (site !== 'same-origin') return send(res, 403, 'Origine non consentita', { 'Content-Type': 'text/plain' });
+    } else if (origin && origin !== 'null') {
+      const host = (umbrel && req.headers['x-forwarded-host']) || req.headers.host;
       let ok = false;
-      try { ok = new URL(origin).host === req.headers.host; } catch { ok = false; }
+      try { ok = new URL(origin).host === host; } catch { ok = false; }
       if (!ok) return send(res, 403, 'Origine non consentita', { 'Content-Type': 'text/plain' });
     }
   }
@@ -1271,9 +1298,10 @@ async function handleAdmin(req, res) {
   if (p === '/health') return send(res, 200, 'ok', { 'Content-Type': 'text/plain' });
   if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p) || serveIcon(res, p))) return; // le copertine sono comunque pubbliche
 
+  if (umbrel && (p === '/login' || p === '/logout')) return redirect(res, '/'); // dall'icona di Umbrel si è già dentro
   if (p === '/login') {
     if (req.method === 'GET') return send(res, 200, loginPage());
-    // il pannello admin non sta dietro un proxy: si usa solo l'indirizzo vero della connessione,
+    // qui si arriva solo dalla porta 9150 (diretta, senza proxy): si usa l'indirizzo vero della connessione,
     // mai X-Forwarded-For (altrimenti cambiandolo si aggirerebbe il blocco dopo 5 tentativi)
     const ip = req.socket.remoteAddress || 'unknown';
     const f = await readForm(req);
@@ -1292,7 +1320,7 @@ async function handleAdmin(req, res) {
     return redirect(res, '/', { 'Set-Cookie': cookie(sid, SESSION_MS / 1000) });
   }
 
-  const sid = sessionOf(req);
+  const sid = umbrel ? 'umbrel' : sessionOf(req);
   if (!sid) return redirect(res, '/login');
   if (p === '/logout' && req.method === 'POST') { sessions.delete(sid); return redirect(res, '/login', { 'Set-Cookie': cookie('', 0) }); }
 

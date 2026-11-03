@@ -3,7 +3,7 @@
 App self-hosted per gestire le iscrizioni ai corsi (base, medio, avanzato) in varie città.
 
 - **Pagina pubblica**: elenco corsi in righe compatte diviso per livello (con filtri Base, Medio, Avanzato), date indicative, contatore "5 su 8", modulo di iscrizione. Nessun nome visibile al pubblico.
-- **Pannello admin** (solo rete di casa, porta **9150**): crei i corsi, vedi chi si è iscritto e quante persone sono disponibili per ogni fascia, confermi la data.
+- **Pannello admin**: si apre dall'icona dell'app su Umbrel, con il login di Umbrel e senza altre password (oppure da `http://umbrel.local:9150`, solo rete di casa, con la password dell'app): crei i corsi, vedi chi si è iscritto e quante persone sono disponibili per ogni fascia, confermi la data.
 - **Avviso Telegram** quando si raggiunge il minimo (e quando i posti sono esauriti).
 - Dati in un file SQLite sul tuo Umbrel, QR code e caratteri in locale. Unici servizi esterni: Cloudflare Tunnel per raggiungere la pagina e Telegram per gli avvisi.
 
@@ -29,9 +29,12 @@ L'app è stata provata in locale con Node 22 (58 controlli automatici, più la p
 2. Incolla l'URL del repository GitHub → **Aggiungi**.
 3. Apri lo store "Corsi Bitcoin" e installa **Iscrizioni Corsi**.
 
-Porte usate: **9160** (pagina pubblica, quella dell'icona Umbrel) e **9150** (admin). Se 9150 o 9160 sono occupate, cambiale in `docker-compose.yml` (riga `ports`) e in `umbrel-app.yml` (riga `port`).
+Porte usate: **9160** (l'icona di Umbrel: apre il pannello admin, protetto dal login di Umbrel) e **9150** (pannello admin con la password dell'app). La pagina pubblica non ha una porta sull'Umbrel: ci arriva solo il tunnel (punto 5). Se 9150 o 9160 sono occupate, cambiale in `docker-compose.yml` (riga `ports`) e in `umbrel-app.yml` (riga `port`).
 
 ### 3. Prima volta nel pannello admin
+Clicca l'icona dell'app su Umbrel: entri subito, perché ti sei già identificato con il login di Umbrel.
+
+Per entrare anche da `http://umbrel.local:9150/` (senza passare da Umbrel):
 1. Apri `http://umbrel.local:9150/`.
 2. Scegli una password (minimo 10 caratteri). Fallo **subito dopo l'installazione**: chi apre per primo questa pagina sceglie la password. Dopo 5 tentativi sbagliati l'accesso si blocca per 10 minuti.
 
@@ -42,7 +45,7 @@ Porte usate: **9160** (pagina pubblica, quella dell'icona Umbrel) e **9150** (ad
 4. Nel pannello: **Impostazioni** → incolla token e chat ID → Salva → **Invia messaggio di prova**.
 
 ### 5. Rendere la pagina raggiungibile da tutti (Cloudflare Tunnel)
-Usa `cloudflared`, già installato sull'Umbrel: aggiungi un indirizzo pubblico che punta **solo alla porta pubblica 9160**. **Mai** alla 9150.
+Usa `cloudflared`, già installato sull'Umbrel: aggiungi un indirizzo pubblico (Public Hostname) con servizio **`http://corsibtc-iscrizioni_web_1:3000`** (la pagina pubblica). **Mai** alla porta 9150 o 9160: da lì si apre il pannello admin.
 
 Le visite passano da Cloudflare, che vede l'indirizzo e il traffico verso la pagina; i dati degli iscritti restano salvati solo sull'Umbrel.
 

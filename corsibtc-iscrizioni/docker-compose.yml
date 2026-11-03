@@ -1,13 +1,13 @@
 version: "3.7"
 
 services:
-  # Ingresso PUBBLICO (modulo iscrizioni). Senza login Umbrel, perché deve
-  # essere visibile a chiunque abbia il link. Il pannello admin NON passa da qui.
+  # L'icona di Umbrel apre il PANNELLO DI GESTIONE, protetto dal login di Umbrel:
+  # le richieste che arrivano da questo proxy non chiedono la password dell'app.
   app_proxy:
     environment:
       APP_HOST: corsibtc-iscrizioni_web_1
-      APP_PORT: 3000
-      PROXY_AUTH_ADD: "false"
+      APP_PORT: 3001
+      PROXY_AUTH_ADD: "true"
 
   web:
     image: node:22-alpine
@@ -19,10 +19,13 @@ services:
       PUBLIC_PORT: 3000
       ADMIN_PORT: 3001
       DATA_DIR: /data
+      # il container del proxy di Umbrel: solo da qui si entra senza password
+      TRUSTED_PROXY_HOST: corsibtc-iscrizioni_app_proxy_1
     volumes:
       - ${APP_DATA_DIR}/app:/app:ro
       - ${APP_DATA_DIR}/data:/data
     ports:
-      # Pannello ADMIN: http://umbrel.local:9150  (solo rete di casa).
-      # Non puntare mai il tunnel Cloudflare su questa porta.
+      # Pannello ADMIN anche su http://umbrel.local:9150 (solo rete di casa, con la password dell'app).
+      # La pagina PUBBLICA non ha porte: il tunnel Cloudflare punta a http://corsibtc-iscrizioni_web_1:3000.
+      # Non puntare mai il tunnel sulla 9150 né sulla 9160 (quella dell'icona, che ora è il pannello).
       - "9150:3001"
