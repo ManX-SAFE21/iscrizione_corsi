@@ -464,7 +464,7 @@ const mapLink = (q) => `<a class="maplink" href="https://www.google.com/maps/sea
 const CSS = `
 @font-face{font-family:Roboto;src:url(/fonts/roboto-latin-wght-normal.woff2) format('woff2');font-weight:100 900;font-display:swap}
 @font-face{font-family:'Space Mono';src:url(/fonts/space-mono-latin-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
-:root{--bg:#F4F6F9;--panel:#FFFFFF;--line:#D3DBE6;--title:#0A0F1C;--body:#1E2735;--mut:#54637A;--teal:#0A7568;--teald:#085E54;--tsoft:#E1F2EE;--soft:#E8EDF4;--err:#B3261E;--esoft:#FBECEA;--warn:#8A5200;--wsoft:#FBF2E3;--shadow:0 1px 2px rgba(10,15,28,.05),0 6px 18px rgba(10,15,28,.04)}
+:root{--bg:#F1EFE9;--panel:#FCFBF8;--line:#DCD8CE;--title:#0A0F1C;--body:#1E2735;--mut:#54637A;--teal:#3D8477;--teald:#30695E;--tsoft:#E4EEEA;--soft:#EAE7DF;--err:#B3261E;--esoft:#FBECEA;--warn:#8A5200;--wsoft:#FBF2E3;--shadow:none}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 Roboto,'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased}
 main{max-width:720px;margin:0 auto;padding:12px 16px 64px}
@@ -535,19 +535,19 @@ tr:last-child td{border-bottom:0}
 .qr{width:180px;height:180px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
 .qr svg{width:100%;height:100%;display:block}
 .mono{font-family:'Space Mono',ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;word-break:break-all;color:var(--title)}
-.lv-base{--lv:#0A7568;--lv2:#17A08C}
-.lv-medio{--lv:#1D5C96;--lv2:#3F88C9}
-.lv-avanzato{--lv:#2C3359;--lv2:#5762A8}
-.hero{position:relative;overflow:hidden;border-radius:16px;padding:34px 32px;margin:4px 0 22px;background:linear-gradient(120deg,#0A7568,#0E8678 60%,#13988A);color:#fff}
-.hero::before,.hero::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,.07)}
+.lv-base{--lv:#3D8477;--lv2:#5FA092}
+.lv-medio{--lv:#4A79A6;--lv2:#6E9BC4}
+.lv-avanzato{--lv:#565E8A;--lv2:#7A82B2}
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:34px 32px;margin:4px 0 22px;background:linear-gradient(120deg,#DDE9E4,#E6EFEA 60%,#EEF3F0);color:var(--body);border:1px solid var(--line)}
+.hero::before,.hero::after{content:'';position:absolute;border-radius:50%;background:rgba(61,132,119,.08)}
 .hero::before{width:280px;height:280px;right:-70px;top:-110px}
 .hero::after{width:180px;height:180px;right:90px;bottom:-110px}
 .hero>*{position:relative}
-.hero h1{color:#fff;font-size:clamp(2rem,5vw,2.8rem);margin:0 0 .3em}
-.hero p{margin:0;max-width:560px;font-size:1.08rem;color:rgba(255,255,255,.9)}
+.hero h1{color:var(--title);font-size:clamp(2rem,5vw,2.8rem);margin:0 0 .3em}
+.hero p{margin:0;max-width:560px;font-size:1.08rem;color:var(--body)}
 .hero .stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
-.hero .pill{background:rgba(255,255,255,.16);color:#fff;font-size:.85rem}
-.hero .pill .i{color:#fff}
+.hero .pill{background:rgba(255,255,255,.7);color:var(--title);font-size:.85rem}
+.hero .pill .i{color:var(--teal)}
 .gh{margin:28px 0 10px;font-size:1.15rem;color:var(--lv,var(--title))}
 .gh .i{color:var(--lv,var(--teal))}
 .gh .pill{margin-left:4px;background:var(--soft);color:var(--mut)}
@@ -561,22 +561,55 @@ tr:last-child td{border-bottom:0}
 .filters a:hover{border-color:var(--lv,var(--teal))}
 .filters a.sel{background:var(--lv,var(--teal));border-color:var(--lv,var(--teal));color:#fff}
 .filters a.sel .i,.filters a.sel small{color:#fff}
-.clist{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
-.crow{display:grid;grid-template-columns:auto minmax(0,1fr) 170px auto;gap:16px;align-items:center;padding:13px 18px 13px 16px;border-left:4px solid var(--lv);color:inherit;text-decoration:none;transition:background .12s}
-.crow+.crow{border-top:1px solid var(--line)}
-.crow:hover{background:#F7F9FB}
-.crow .cic{width:38px;height:38px;border-radius:10px;background:var(--lv);color:#fff;display:flex;align-items:center;justify-content:center}
-.crow .cic .i{width:20px;height:20px;vertical-align:0}
-.crow .cic img{width:100%;height:100%;object-fit:cover;border-radius:10px}
-.crow b{display:block;color:var(--title);font-weight:600;font-size:1.02rem;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.crow .cmeta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:3px;font-size:.88rem;color:var(--mut)}
-.crow .cmeta>span{display:inline-flex;align-items:center;gap:5px}
-.crow .cmeta .i{color:var(--lv)}
-.crow .cmeta .pill{padding:1px 9px;font-size:.78rem}
-.crow .cseat .bar{margin:0 0 4px}
-.crow .cseat .bar>i{background:var(--lv)}
-.crow .cseat small{display:block;font-size:.8rem;color:var(--mut);white-space:nowrap}
-.crow .cgo{color:var(--lv)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
+.ccard{display:flex;flex-direction:column;gap:10px;padding:18px 20px 16px;background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--lv);border-radius:12px;color:inherit;text-decoration:none;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.ccard:hover{border-color:#C5CFDC}
+.ccard .chead{display:flex;align-items:center;gap:10px}
+.ccard .cic{width:42px;height:42px;border-radius:10px;background:var(--lv);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden}
+.ccard .cic .i{width:22px;height:22px;vertical-align:0}
+.ccard .cic img{width:100%;height:100%;object-fit:cover}
+.ccard .pill.lvl{border-color:var(--lv);color:var(--lv)}.ccard .pill.lvl .i{color:var(--lv)}
+.ccard b{display:block;color:var(--title);font-weight:600;font-size:1.15rem;line-height:1.3}
+.ccard .cmeta{display:grid;gap:5px;font-size:.95rem;color:var(--body)}
+.ccard .cmeta>span{display:flex;align-items:center;gap:8px}
+.ccard .cmeta .i{color:var(--lv)}
+.ccard .cseat{margin-top:auto}
+.ccard .cseat .bar{margin:0 0 4px}.ccard .cseat .bar>i{background:var(--lv)}
+.ccard .cseat small{display:block;font-size:.85rem;color:var(--mut)}
+.ccard .cfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:12px;border-top:1px solid var(--line)}
+.ccard .cgo{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--lv)}
+/* sezioni apribili con un clic (senza script): dettagli, requisiti, programma, corsi fatti */
+details.sec{margin:14px 0}
+.sec summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:14px 18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);font-size:1.1rem;font-weight:500;color:var(--title)}
+.sec summary::-webkit-details-marker{display:none}
+.sec summary .i{color:var(--lv,var(--teal))}
+.sec summary small{color:var(--mut);font-weight:400}
+.sec summary .tg{margin-left:auto;font-size:.88rem;color:var(--lv,var(--teal));font-weight:500;white-space:nowrap}
+.sec summary .tg::after{content:'Mostra'}.sec[open] summary .tg::after{content:'Nascondi'}
+.sec[open] summary{border-radius:12px 12px 0 0}
+.sec .card{margin:0;border-radius:0 0 12px 12px;border-top:0}
+.sec.past{margin-top:36px}
+.secs{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:14px 0}
+.secs .sec{margin:0}.secs .sec summary{border:0;border-radius:0;background:none}
+.secs .sec+.sec{border-top:1px solid var(--line)}
+.secs .sec .card{border:0;border-radius:0;background:var(--bg);border-top:1px solid var(--line)}
+.pl{list-style:none;margin:0;padding:0}
+.pl li{display:flex;gap:14px;align-items:center;padding:12px 0}
+.pl li+li{border-top:1px solid var(--line)}
+.pl a{color:inherit;text-decoration:none;min-width:0}
+.pl a:hover b{color:var(--lv)}
+.pl b{display:block;color:var(--title);font-weight:600}
+.pl .cmeta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.9rem;color:var(--mut)}
+.pl .cmeta span{display:inline-flex;align-items:center;gap:5px}.pl .cmeta .i{color:var(--lv)}
+.pl .pill.lvl{flex:none}
+/* pagina corso: i 3-4 riquadri in alto */
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px 24px;margin:0 0 26px}
+.key{display:flex;gap:12px;align-items:center;padding:4px 0;min-width:0}
+.key .ic{flex:none;width:40px;height:40px;border-radius:10px;background:var(--lv,var(--teal));color:#fff;display:flex;align-items:center;justify-content:center}
+.key .ic .i{width:20px;height:20px;vertical-align:0}
+.key b{display:block;font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:600}
+.key .v{display:block;color:var(--title);font-weight:600;font-size:1.02rem;line-height:1.3;overflow-wrap:anywhere;white-space:pre-line}
+@media (max-width:640px){.keys{grid-template-columns:1fr 1fr;gap:8px}.key:last-child:nth-child(odd){grid-column:1/-1}.key{gap:10px}.key .ic{width:34px;height:34px}.key .ic .i{width:17px;height:17px}.key .v{font-size:.95rem}}
 .media{position:relative;height:168px;overflow:hidden;flex:none;background:linear-gradient(135deg,var(--lv),var(--lv2))}
 .media img.cover{display:block;width:100%;height:100%;object-fit:cover}
 .media .deco{position:absolute;right:-18px;bottom:-34px;width:150px;height:150px;color:rgba(255,255,255,.17)}
@@ -586,7 +619,7 @@ tr:last-child td{border-bottom:0}
 .media .pill .i{color:var(--lv)}
 .media .pill.ok,.media .pill.on{color:var(--teald)}
 .course{position:relative;display:flex;flex-direction:column;margin:0;padding:0;overflow:hidden;transition:transform .15s,box-shadow .15s,border-color .15s}
-.course:hover{transform:translateY(-2px);border-color:#B9C6D6;box-shadow:0 2px 4px rgba(10,15,28,.06),0 14px 30px rgba(10,15,28,.09)}
+.course:hover{border-color:#C5CFDC}
 .course .body{display:flex;flex-direction:column;flex:1;padding:18px 20px 20px}
 .course h2{font-size:1.3rem;margin:0 0 10px;display:block}
 .course-meta{display:grid;gap:6px;color:var(--body);margin:0 0 14px;font-size:.95rem}
@@ -619,7 +652,7 @@ tr:last-child td{border-bottom:0}
 .share a:hover{border-color:var(--lv,var(--teal));color:var(--lv,var(--teal))}
 .share .mono{margin:10px 0 0;font-size:.78rem;color:var(--mut);user-select:all}
 .aside .btn.big{margin-top:14px}
-@media (min-width:940px){.cwrap{grid-template-columns:minmax(0,1fr) 320px;gap:36px;align-items:start}.aside{grid-column:2;grid-row:1;position:sticky;top:18px}.cmain{grid-column:1;grid-row:1}}
+@media (min-width:940px){.cwrap{grid-template-columns:minmax(0,1fr) 320px;gap:36px;align-items:start}.aside{grid-column:2;grid-row:1}.cmain{grid-column:1;grid-row:1}}
 .foot{display:flex;gap:8px;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:.85rem;margin-top:44px;padding-top:18px;border-top:1px solid var(--line)}
 .foot .i{color:var(--teal);flex:none}
 .intro{font-size:1.1rem;color:var(--body);margin:4px 0 20px;white-space:pre-wrap}
@@ -660,17 +693,26 @@ fieldset.fs:first-child{border-top:0;margin-top:0}
 input[type=file]{font:inherit;color:var(--mut);max-width:100%}
 .enroll{scroll-margin-top:16px}
 .enrollform{padding:22px}
-.fgrid{display:grid;grid-template-columns:1fr;gap:0 16px}
-@media (min-width:640px){.fgrid{grid-template-columns:1fr 1fr}.fgrid .full{grid-column:1/-1}}
-.fld label{margin:14px 0 6px;font-size:.93rem}
+.fgrid{display:grid;grid-template-columns:1fr}
+.fld label{margin:14px 0 6px;font-size:.97rem}
+.fld:first-child label{margin-top:0}
+.step{padding:22px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0;padding-top:0}
+.sl{display:flex;align-items:flex-start;gap:12px;margin:0 0 10px}
+.sn{flex:none;width:34px;height:34px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:1.05rem;display:flex;align-items:center;justify-content:center}
+.sl h3{margin:4px 0 0;font-size:1.15rem;font-weight:600;color:var(--title)}
+.sl small{display:block;font-weight:400;color:var(--mut);font-size:.92rem;margin-top:2px}
+.sb{padding-left:46px}
+@media (max-width:480px){.sb{padding-left:0}}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .fld .opt{font-weight:400;color:var(--mut);font-size:.78rem;margin-left:8px;background:var(--soft);border-radius:999px;padding:1px 9px}
 .star{color:var(--teal)}
 .inp{position:relative}
 .inp>.i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#7C8BA1;width:18px;height:18px;pointer-events:none}
 .inp:focus-within>.i{color:var(--teal)}
-.inp input{padding-left:40px}
+.inp input{padding:12px 12px 12px 42px;font-size:1.02rem}
 .hint{margin:5px 0 0;font-size:.82rem;color:var(--mut)}
-fieldset.qs{border:0;padding:0;margin:24px 0 0;min-width:0}
+fieldset.qs{border:0;padding:0;margin:0;min-width:0}
 .qs legend{padding:0;margin:0 0 10px;font-weight:600;color:var(--title)}
 .qs legend small{display:block;font-weight:400;color:var(--mut);font-size:.85rem}
 .tiles{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr))}
@@ -681,10 +723,9 @@ fieldset.qs{border:0;padding:0;margin:24px 0 0;min-width:0}
 .tile b{display:block;color:var(--title);font-weight:600}
 .tile small{display:block;color:var(--mut);font-weight:400}
 .tile:has(input:checked){border-color:var(--teal);background:var(--tsoft);box-shadow:0 0 0 1px var(--teal) inset}
-.tiles.pay .tile:has(input:checked){box-shadow:0 0 0 2px var(--teal) inset}.consent{display:flex;gap:12px;align-items:flex-start;margin:26px 0 0;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:400;font-size:.9rem;color:var(--mut)}
+.tiles.pay .tile:has(input:checked){box-shadow:0 0 0 2px var(--teal) inset}.consent{display:flex;gap:12px;align-items:flex-start;margin:0;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:400;font-size:.9rem;color:var(--mut)}
 .consent input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--teal)}
-.enrollform .btn.big{margin-top:18px}
-@media (max-width:640px){.crow{grid-template-columns:auto minmax(0,1fr);gap:12px;padding:12px 14px 12px 12px}.crow .cseat{grid-column:2}.crow .cgo{display:none}.crow b{white-space:normal}.crow .cic{width:34px;height:34px}}
+.enrollform .btn.big{margin-top:16px;font-size:1.08rem;padding:15px 20px}
 @media (max-width:480px){main{padding-top:4px}.hero{padding:26px 20px}.hero h1{font-size:2rem}.enrollform{padding:18px}}
 @media print{.top,.nav,button,.btn,.back,.maplink{display:none}body{background:#fff}.card{box-shadow:none}}
 `;
@@ -732,6 +773,7 @@ function counter(c, n) {
 
 // withDate=false sulle pagine pubbliche, dove la data confermata è già scritta accanto alla città
 function statusBadge(c, n, withDate = true) {
+  if (c.status === 'done') return pill('Concluso', 'off', 'checkc');
   if (c.status === 'closed') return pill('Chiuso', 'off', 'lock');
   if (n >= c.max_n) return pill('Completo', 'off', 'users');
   if (expired(c)) return pill('Prenotazioni chiuse', 'off', 'hourglass');
@@ -767,18 +809,26 @@ function courseRow(c) {
   const n = countRegs(c.id);
   const wait = n >= c.max_n && c.ask_waitlist && !expired(c) && c.status !== 'closed';
   const when = c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>`
-    : c.deadline && !expired(c) ? `<span>${icon('hourglass')}Entro il ${fmtDay(c.deadline)}</span>` : '';
-  return `<a class="crow ${levelClass(c)}" href="/c/${c.slug}">
-    <span class="cic">${c.cover ? `<img src="/img/${esc(c.cover)}" alt="">` : levelIcon(c.level)}</span>
-    <span><b>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</b>
-      <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${when}${wait ? pill("Lista d'attesa aperta", 'on', 'users') : statusBadge(c, n, false)}</span></span>
+    : slotsOf(c).length ? `<span>${icon('calendar')}Data da scegliere insieme</span>` : '';
+  const dl = c.deadline && !expired(c) ? `<span>${icon('hourglass')}Iscrizioni entro il ${fmtDay(c.deadline)}</span>` : '';
+  return `<a class="ccard ${levelClass(c)}" href="/c/${c.slug}">
+    <span class="chead"><span class="cic">${c.cover ? `<img src="/img/${esc(c.cover)}" alt="">` : levelIcon(c.level)}</span>${levelPill(c)}</span>
+    <b>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</b>
+    <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${when}${dl}</span>
     <span class="cseat">${seatsShort(c, n)}</span>
-    <span class="cgo">${icon('arrow')}</span>
+    <span class="cfoot">${wait ? pill("Lista d'attesa aperta", 'on', 'users') : statusBadge(c, n, false)}<span class="cgo">Vedi il corso${icon('arrow')}</span></span>
   </a>`;
+}
+
+// corso già fatto: una riga nell'elenco in fondo alla pagina, con il link alla sua pagina (senza modulo)
+function pastRow(c) {
+  return `<li class="${levelClass(c)}">${levelPill(c)}<a href="/c/${c.slug}"><b>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</b>
+    <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${c.confirmed_date ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}</span></a></li>`;
 }
 
 function renderList(only = '') {
   const all = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed') ORDER BY created_at DESC").all();
+  const past = getSetting('show_past', '1') === '1' ? db.prepare("SELECT * FROM courses WHERE status = 'done' ORDER BY created_at DESC").all() : [];
   const lv = (c) => (LEVELS[c.level] ? c.level : 'base');
   const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
   const levels = Object.keys(LEVELS).filter((k) => all.some((c) => lv(c) === k));
@@ -789,13 +839,14 @@ function renderList(only = '') {
   const filters = levels.length > 1
     ? `<nav class="filters">${chip('', 'Tutti', all.length)}${levels.map((k) => chip(k, LEVELS[k], byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
   const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}Livello ${LEVELS[k]}</h2>
-    <div class="clist">${byLevel(k).map(courseRow).join('')}</div></section>`;
+    <div class="cgrid">${byLevel(k).map(courseRow).join('')}</div></section>`;
   return page('Corsi Bitcoin', `<header class="hero"><h1>Corsi Bitcoin</h1>
     <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello giusto per te.</p>
     ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</header>
     ${all.length
       ? filters + (only ? [only] : levels).map(group).join('')
-      : `<div class="card empty">${icon('calendar')}<p>Al momento non ci sono corsi aperti. Torna a trovarci presto.</p></div>`}`, { wide: true });
+      : `<div class="card empty">${icon('calendar')}<p>Al momento non ci sono corsi aperti. Torna a trovarci presto.</p></div>`}
+    ${past.length ? `<details class="sec past"><summary>${icon('checkc')}Corsi già fatti <small>${past.length}</small><span class="tg"></span></summary><div class="card"><ul class="pl">${past.map(pastRow).join('')}</ul></div></details>` : ''}`, { wide: true });
 }
 
 const payItem = (label, ic, addr, uri) => `<div class="pay"><b>${icon(ic)}${label}</b><div class="qr">${qrSvg(uri)}</div><div class="mono">${esc(addr)}</div></div>`;
@@ -873,57 +924,65 @@ function shareBox(c) {
   return `<div class="share"><b>${icon('send')}Condividi</b><div>${a(`https://wa.me/?text=${encodeURIComponent(text + ' ' + link)}`, 'WhatsApp')}${a(`https://t.me/share/url?url=${u}&amp;text=${t}`, 'Telegram')}${a(`https://www.facebook.com/sharer/sharer.php?u=${u}`, 'Facebook')}${a(`https://x.com/intent/post?url=${u}&amp;text=${t}`, 'X')}</div><p class="mono">${esc(link)}</p></div>`;
 }
 
+// sezione apribile con un clic: icona, titolo, eventuale numero, contenuto dentro una scheda
+const sec = (ic, title, html, count = 0) => `<details class="sec"><summary>${icon(ic)}${title}${count ? `<small>${count}</small>` : ''}<span class="tg"></span></summary><div class="card">${html}</div></details>`;
+
 function renderCourse(c, { error = '', ok = false, paid = false, wait = false, values = {} } = {}) {
   const n = countRegs(c.id);
   const full = n >= c.max_n;
   const closed = c.status === 'closed';
+  const done = c.status === 'done';
   const late = expired(c);
   const slots = slotsOf(c);
   const chosen = values.slots || [];
   const reqs = linesOf(c.requirements);
   // a posti esauriti, se il corso lo prevede, ci si può mettere in lista d'attesa
   const canWait = full && !closed && !late && !!c.ask_waitlist;
-  const stop = closed ? 'Le iscrizioni per questo corso sono chiuse.' : (full && !canWait) ? 'Il corso è al completo.' : late ? `Le prenotazioni si sono chiuse il ${fmtDay(c.deadline)}.` : '';
+  const stop = done ? `Questo corso si è già svolto${c.confirmed_date ? ' il ' + esc(c.confirmed_date) : ''}. Dai un'occhiata ai <a href="/">prossimi corsi</a>.` : closed ? 'Le iscrizioni per questo corso sono chiuse.' : (full && !canWait) ? 'Il corso è al completo.' : late ? `Le prenotazioni si sono chiuse il ${fmtDay(c.deadline)}.` : '';
   const srcSel = String(values.source || '').startsWith('Altro') ? 'Altro' : values.source;
   const srcOther = values.source_other || String(values.source || '').replace(/^Altro:\s*/, '').replace(/^Altro$/, '');
   // campo di testo con icona: etichetta, casella, suggerimento
   const fld = (id, label, ic, input, hint = '', optional = false, cls = '') =>
     `<div class="fld${cls ? ' ' + cls : ''}"><label for="${id}">${label}${optional ? '<span class="opt">facoltativo</span>' : ' <b class="star">*</b>'}</label><div class="inp">${icon(ic)}${input}</div>${hint ? `<p class="hint">${hint}</p>` : ''}</div>`;
-  const form = `
-  ${h2(canWait ? "Lista d'attesa" : 'Iscriviti', canWait ? 'users' : 'pen')}
-  ${canWait ? msg('warn', "<b>Il corso è al completo.</b> Puoi metterti in lista d'attesa prioritaria: avrai la precedenza se si libera un posto o per il prossimo corso.") : ''}
-  <form method="post" action="/c/${c.slug}#iscrizione" class="card enrollform" autocomplete="on">
-    <div class="fgrid">
+  // tappe del modulo: titolo, riga di spiegazione, contenuto; le tappe assenti (fasce, pagamento, fonte) non vengono contate
+  const steps = [
+    ['I tuoi dati', 'Ci servono solo per confermarti il corso.', `<div class="fgrid">
       ${fld('email', 'Email', 'mail', `<input type="email" id="email" name="email" required maxlength="120" value="${esc(values.email)}" autocomplete="email">`)}
       ${fld('name', 'Nome e cognome (o nickname)', 'user', `<input type="text" id="name" name="name" required maxlength="80" value="${esc(values.name)}" autocomplete="name">`, 'Rispettiamo la tua privacy.')}
       ${c.phone_required
         ? fld('phone', 'Telefono', 'phone', `<input type="tel" id="phone" name="phone" required maxlength="30" value="${esc(values.phone)}" autocomplete="tel">`, 'Ci serve per confermarti il corso.')
         : fld('phone', 'Telefono', 'phone', `<input type="tel" id="phone" name="phone" maxlength="30" value="${esc(values.phone)}" autocomplete="tel">`, 'Solo per contattarti via WhatsApp.', true)}
       ${fld('city', 'Città', 'pin', `<input type="text" id="city" name="city" maxlength="80" value="${esc(values.city)}" autocomplete="address-level2">`, 'Se vieni da lontano possiamo consigliarti corsi più vicini.', true)}
-      ${c.ask_company ? fld('company', 'Azienda', 'briefcase', `<input type="text" id="company" name="company" maxlength="80" value="${esc(values.company)}" autocomplete="organization">`, 'Possiamo indicarti opportunità per la tua attività.', true, 'full') : ''}
-    </div>
-    ${slots.length ? `<fieldset class="qs"><legend>Quando potresti esserci? <b class="star">*</b><small>Scegli tutte le fasce che vanno bene.</small></legend>
-      <div class="tiles">${slots.map((s) => `<label class="tile"><input type="checkbox" name="slot" value="${esc(s)}" ${chosen.includes(s) ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}</div></fieldset>` : ''}
-    ${prepayOn(c) && !canWait ? `<fieldset class="qs"><legend>Come preferisci pagare il contributo? <b class="star">*</b></legend>
+      ${c.ask_company ? fld('company', 'Azienda', 'briefcase', `<input type="text" id="company" name="company" maxlength="80" value="${esc(values.company)}" autocomplete="organization">`, 'Possiamo indicarti opportunità per la tua attività.', true) : ''}
+    </div>`],
+    slots.length ? ['Quando puoi venire <b class="star">*</b>', 'Segna tutte le fasce che ti vanno bene: la data la scegliamo in base alle disponibilità.', `<fieldset class="qs"><legend class="vh">Quando potresti esserci?</legend>
+      <div class="tiles">${slots.map((s) => `<label class="tile"><input type="checkbox" name="slot" value="${esc(s)}" ${chosen.includes(s) ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}</div></fieldset>`] : null,
+    prepayOn(c) && !canWait ? ['Come vuoi pagare il contributo <b class="star">*</b>', 'Scegli una delle due.', `<fieldset class="qs"><legend class="vh">Come preferisci pagare il contributo?</legend>
       <div class="tiles pay">
         <label class="tile"><input type="radio" name="payment" value="corso" ${values.payment !== 'anticipo' ? 'checked' : ''}><span><b>Il giorno del corso</b><small>Pago all'accoglienza</small></span></label>
         <label class="tile"><input type="radio" name="payment" id="pay-pre" value="anticipo" ${values.payment === 'anticipo' ? 'checked' : ''}><span><b>In anticipo</b><small>Blocco subito il posto</small></span></label>
       </div>
-      <div class="paywrap">${payBox(c)}</div></fieldset>` : ''}
-    ${c.ask_source ? `<fieldset class="qs"><legend>Come hai conosciuto questo corso? <b class="star">*</b></legend>
+      <div class="paywrap">${payBox(c)}</div></fieldset>`] : null,
+    c.ask_source ? ['Come hai conosciuto questo corso? <b class="star">*</b>', 'Una curiosità che ci aiuta a farci conoscere.', `<fieldset class="qs"><legend class="vh">Come hai conosciuto questo corso?</legend>
       <div class="tiles sm">${SOURCES.map((s) => `<label class="tile"><input type="radio" name="source" value="${esc(s)}" required ${s === 'Altro' ? 'id="src-other"' : ''} ${srcSel === s ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}</div>
-      <div class="srcwrap"><input type="text" name="source_other" maxlength="80" placeholder="Scrivi qui" aria-label="Altro: specifica" value="${esc(srcOther)}"></div></fieldset>` : ''}
-    <label class="consent"><input type="checkbox" name="consent" required><span>Acconsento al trattamento dei miei dati (email, nome, telefono, città${c.ask_company ? ', azienda' : ''}) al solo scopo di organizzare il corso. I dati non vengono ceduti a terzi e vengono cancellati dopo il corso. *</span></label>
+      <div class="srcwrap"><input type="text" name="source_other" maxlength="80" placeholder="Scrivi qui" aria-label="Altro: specifica" value="${esc(srcOther)}"></div></fieldset>`] : null,
+    ['Consenso e invio', '', `<label class="consent"><input type="checkbox" name="consent" required><span>Acconsento al trattamento dei miei dati (email, nome, telefono, città${c.ask_company ? ', azienda' : ''}) al solo scopo di organizzare il corso. I dati non vengono ceduti a terzi e vengono cancellati dopo il corso. *</span></label>
+    <button type="submit" class="btn big">${icon('send')}${canWait ? "Mettimi in lista d'attesa" : 'Invia iscrizione'}</button>`],
+  ].filter(Boolean);
+  const form = `
+  ${h2(canWait ? "Lista d'attesa" : 'Iscriviti', canWait ? 'users' : 'pen')}
+  ${canWait ? msg('warn', "<b>Il corso è al completo.</b> Puoi metterti in lista d'attesa prioritaria: avrai la precedenza se si libera un posto o per il prossimo corso.") : ''}
+  <form method="post" action="/c/${c.slug}#iscrizione" class="card enrollform" autocomplete="on">
+    ${steps.map(([title, hint, body], i) => `<div class="step"><div class="sl"><span class="sn">${i + 1}</span><h3>${title}${hint ? `<small>${hint}</small>` : ''}</h3></div><div class="sb">${body}</div></div>`).join('')}
     <div class="hp" aria-hidden="true"><label>Non compilare<input type="text" name="sito" tabindex="-1" autocomplete="off"></label></div>
     <input type="hidden" name="t" value="${timeToken()}">
-    <button type="submit" class="btn big">${icon('send')}${canWait ? "Mettimi in lista d'attesa" : 'Invia iscrizione'}</button>
   </form>`;
   // ricorda la scelta di pagamento: chi ha cliccato quella sbagliata se ne accorge subito
   const fix = c.contact_email ? ` Hai sbagliato? Scrivici a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.` : '';
   const payChoice = wait || !prepayOn(c) ? '' : paid
     ? `<p>Hai scelto di pagare <b>in anticipo</b>: qui sotto trovi come fare.${fix}</p>`
     : `<p>Hai scelto di pagare <b>il giorno del corso</b>, all'accoglienza.${fix}</p>`;
-  const done = `${wait ? msg('ok', "<b>Sei in lista d'attesa, grazie!</b> Ti scriviamo se si libera un posto o per il prossimo corso.") : `<div class="msg ok done">${icon('checkc')}<div>
+  const finished = `${wait ? msg('ok', "<b>Sei in lista d'attesa, grazie!</b> Ti scriviamo se si libera un posto o per il prossimo corso.") : `<div class="msg ok done">${icon('checkc')}<div>
     <p class="dt">Iscrizione ricevuta, grazie!</p>
     <p>${c.status === 'confirmed'
     ? 'Ti aspettiamo al corso: dai un\'occhiata ai requisiti prima di partire.'
@@ -932,29 +991,34 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
     ${payChoice}</div></div>`}
     ${paid && !wait && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
     <p><a class="btn sec" href="/">${icon('back')}Tutti i corsi</a></p>`;
-  const enroll = ok ? done : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;
+  const enroll = ok ? finished : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;
+  const cta = `<a class="btn big" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${canWait ? "Mettiti in lista d'attesa" : 'Iscriviti ora'}</a>`;
+  // i riquadri in alto: le cose che contano a colpo d'occhio
+  const key = (ic, k, v) => `<div class="key"><span class="ic">${icon(ic)}</span><div><b>${k}</b><span class="v">${esc(v)}</span></div></div>`;
+  const when = c.status === 'confirmed' || done ? c.confirmed_date || 'Già svolto' : slots.length ? 'Da scegliere insieme' : 'Da confermare';
+  const keys = `<div class="keys">${key('pin', 'Dove', c.city)}${key('calendar', 'Quando', when)}${c.price ? key('euro', 'Contributo', c.price) : ''}</div>`;
   return page(courseName(c), `
     <div class="${levelClass(c)}">
     <a class="back" href="/">${icon('back')}Tutti i corsi</a>
     ${mediaBlock(c, n, true)}
     ${pillsRow(c, n)}
     <h1 class="ch">${esc(courseName(c))}</h1>
-    <p class="course-meta row2"><span>${icon('pin')}${esc(c.city)}</span>${c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}</p>
+    ${keys}
     <div class="cwrap">
       <aside class="aside card">
-        <h2>${icon('users')}Iscrizioni</h2>
+        ${done ? `<h2>${icon('checkc')}Corso concluso</h2><p class="sub" style="margin:0">Questo corso si è già svolto.</p><a class="btn big" href="/">${icon('book')}Vedi i prossimi corsi</a>` : `<h2>${icon('users')}Iscrizioni</h2>
         ${counter(c, n)}
         ${c.deadline && !late ? `<p class="dl">${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</p>` : ''}
-        ${ok || stop ? '' : `<a class="btn big" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${canWait ? "Mettiti in lista d'attesa" : 'Iscriviti ora'}</a>`}
+        ${ok || stop ? '' : cta}`}
         ${posterExt(c) ? `<a class="btn sec big" href="/c/${c.slug}/locandina" target="_blank" rel="noopener">${icon('down')}Scarica la locandina</a>` : ''}
         ${shareBox(c)}
       </aside>
       <div class="cmain">
         ${c.description ? `<p class="intro">${esc(c.description)}</p>` : ''}
-        <div class="card">${courseFacts(c)}</div>
-        ${slots.length && c.status !== 'confirmed' ? `${h2('Date indicative', 'calendar')}<p class="sub">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
-        ${reqs.length ? `${h2('Requisiti per partecipare', 'list')}<div class="card"><ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol></div>` : ''}
-        ${c.program ? `${h2('Programma', 'book')}<div class="card">${renderProgram(c.program)}</div>` : ''}
+        ${slots.length && c.status === 'open' ? `${h2('Date possibili', 'calendar')}<p class="sub">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
+        <div class="secs">${sec('info', 'Tutti i dettagli', courseFacts(c))}
+        ${reqs.length ? sec('list', 'Requisiti per partecipare', `<ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol>`, reqs.length) : ''}
+        ${c.program ? sec('book', 'Programma', renderProgram(c.program)) : ''}</div>
         <section id="iscrizione" class="enroll">${enroll}</section>
         ${c.contact_email ? `<p class="contact">${icon('mail')}<span>Per informazioni scrivi a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</span></p>` : ''}
       </div>
@@ -1004,7 +1068,7 @@ async function handlePublic(req, res) {
   // tetto complessivo: limita i danni anche se qualcuno riuscisse a cambiare indirizzo a ogni invio
   if (!rateLimit('reg:*', 200, 3600000)) return fail('Troppe iscrizioni in questo momento, riprova più tardi.');
 
-  if (course.status === 'closed') return fail('Le iscrizioni per questo corso sono chiuse.');
+  if (course.status === 'closed' || course.status === 'done') return fail('Le iscrizioni per questo corso sono chiuse.');
   if (expired(course)) return fail(`Le prenotazioni si sono chiuse il ${fmtDay(course.deadline)}.`);
   if (!EMAIL_RE.test(values.email) || values.email.length > 120) return fail('Inserisci un indirizzo email valido.');
   if (values.name.length < 2 || values.name.length > 80) return fail('Inserisci il tuo nome (o un nickname).');
@@ -1176,8 +1240,12 @@ const csvCell = (v) => {
 const PAY_LABEL = { corso: 'Al corso', anticipo: 'In anticipo' };
 
 function adminDashboard(flash = '') {
-  const courses = db.prepare('SELECT * FROM courses ORDER BY created_at DESC').all();
+  const all = db.prepare('SELECT * FROM courses ORDER BY created_at DESC').all();
+  const courses = all.filter((c) => c.status !== 'done');
+  const past = all.filter((c) => c.status === 'done');
   const base = publicBase();
+  const pastRows = past.map((c) => `<li class="${levelClass(c)}">${levelPill(c)}<a href="/corso/${c.slug}"><b>${esc(courseName(c))} – ${esc(c.city)}</b>
+    <span class="cmeta">${c.confirmed_date ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}<span>${icon('users')}${countRegs(c.id)} iscritti</span></span></a></li>`).join('');
   const rows = courses.map((c) => {
     const n = countRegs(c.id);
     return `<div class="card"><div class="row">${levelPill(c)}${statusBadge(c, n)}
@@ -1190,6 +1258,7 @@ function adminDashboard(flash = '') {
     ${flash ? msg('ok', esc(flash)) : ''}
     ${base ? '' : msg('warn', 'Per avere link e QR code corretti imposta l\'indirizzo pubblico in <a href="/impostazioni">Impostazioni</a>.')}
     ${rows || '<div class="card">Nessun corso. <a href="/corso/nuovo">Creane uno</a>.</div>'}
+    ${past.length ? `<details class="sec past"><summary>${icon('checkc')}Corsi conclusi <small>${past.length}</small><span class="tg"></span></summary><div class="card"><ul class="pl">${pastRows}</ul></div></details>` : ''}
     ${base ? `${h2('Pagina con tutti i corsi', 'qr')}<div class="card ql"><div class="qr">${qrSvg(base + '/')}</div><div><div class="mono">${esc(base)}/</div><p class="sub">Condividi il link o stampa il QR code.</p></div></div>` : ''}`, { admin: true });
 }
 
@@ -1261,7 +1330,10 @@ function adminCourse(c, flash = '') {
       <a class="btn sec" href="/corso/${c.slug}/modifica">${icon('pen')}Modifica corso</a>
       <form method="post" action="/corso/${c.slug}/duplica"><button class="sec" title="Crea un nuovo corso con gli stessi testi, senza iscritti">${icon('copy')}Duplica corso</button></form>
       ${link ? `<a class="btn sec" href="${esc(link)}" target="_blank" rel="noopener">${icon('eye')}Vedi pagina pubblica</a>` : ''}
-      <form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="${c.status === 'closed' ? 'reopen' : 'close'}"><button class="sec">${c.status === 'closed' ? `${icon('unlock')}Riapri iscrizioni` : `${icon('lock')}Chiudi iscrizioni`}</button></form>
+      ${c.status === 'done'
+    ? `<form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="reopen"><button class="sec">${icon('unlock')}Riporta tra i corsi attivi</button></form>`
+    : `<form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="${c.status === 'closed' ? 'reopen' : 'close'}"><button class="sec">${c.status === 'closed' ? `${icon('unlock')}Riapri iscrizioni` : `${icon('lock')}Chiudi iscrizioni`}</button></form>
+      <form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="done"><button class="sec" title="Il corso si è svolto: finisce tra i corsi conclusi e, sul sito, tra i corsi già fatti">${icon('checkc')}Corso fatto</button></form>`}
     </div>
     ${h2('Zona pericolosa', 'alert')}
     <form method="post" action="/corso/${c.slug}/elimina" class="card">
@@ -1280,6 +1352,7 @@ function settingsPage(flash = '', kind = 'ok') {
       <input type="text" name="tg_token" autocomplete="off" placeholder="${getSetting('tg_token') ? '••••••••' : '123456:ABC...'}">
       <label>Telegram – chat ID</label>
       <input type="text" name="tg_chat" autocomplete="off" value="${esc(getSetting('tg_chat'))}">
+      <label class="check" style="margin-top:18px"><input type="checkbox" name="show_past" ${getSetting('show_past', '1') === '1' ? 'checked' : ''}><span>Mostra i corsi già fatti sul sito pubblico <small>(in fondo alla pagina dei corsi, senza modulo d'iscrizione)</small></span></label>
       <p><button>${icon('check')}Salva</button></p></form>
     <form method="post" action="/impostazioni/test-telegram" class="card"><b>Prova Telegram</b>
       <p class="sub">Invia un messaggio di prova ${tg ? '' : '(prima salva token e chat ID)'}.</p><button class="sec">${icon('send')}Invia messaggio di prova</button></form>
@@ -1354,6 +1427,7 @@ async function adminRoutes(req, res, umbrel) {
     const tok = (f.get('tg_token') || '').trim();
     if (tok) setSetting('tg_token', tok);
     setSetting('tg_chat', (f.get('tg_chat') || '').trim());
+    setSetting('show_past', f.get('show_past') === 'on' ? '1' : '0');
     return back('/impostazioni', 'Impostazioni salvate.');
   }
   if (p === '/impostazioni/test-telegram' && req.method === 'POST') {
@@ -1471,8 +1545,9 @@ async function adminRoutes(req, res, umbrel) {
     if (sub === '/stato' && req.method === 'POST') {
       const a = (await readForm(req)).get('action');
       if (a === 'close') db.prepare("UPDATE courses SET status = 'closed' WHERE id = ?").run(c.id);
+      else if (a === 'done') db.prepare("UPDATE courses SET status = 'done' WHERE id = ?").run(c.id);
       else if (a === 'reopen') db.prepare('UPDATE courses SET status = ? WHERE id = ?').run(c.confirmed_date ? 'confirmed' : 'open', c.id);
-      return back(`/corso/${c.slug}`, a === 'close' ? 'Iscrizioni chiuse.' : 'Iscrizioni riaperte.');
+      return back(`/corso/${c.slug}`, a === 'close' ? 'Iscrizioni chiuse.' : a === 'done' ? 'Corso segnato come concluso: sul sito compare tra i corsi già fatti.' : 'Iscrizioni riaperte.');
     }
     if (sub === '/elimina' && req.method === 'POST') {
       if ((await readForm(req)).get('sure') !== 'on') return back(`/corso/${c.slug}`);

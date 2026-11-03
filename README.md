@@ -60,10 +60,10 @@ Quando hai l'indirizzo pubblico (tipo `https://corsi.tuodominio.it`), inseriscil
 2. Condividi il link del corso (o il QR) su Telegram/WhatsApp. Sui social il link mostra nome del corso, città, date e la copertina (o la locandina, se è un'immagine); per questo serve l'indirizzo pubblico in Impostazioni. Chi apre vede città, fasce, contatore e il modulo.
 3. Quando arriva l'avviso Telegram, apri il corso: vedi **quante persone ci sono per ogni fascia** (con la migliore segnalata). Scegli la data e premi **Conferma corso**.
 4. Scrivi agli iscritti con data e luogo. Con **Scarica elenco (Excel/CSV)** hai tutti gli iscritti in un file che si apre direttamente in Excel.
-5. A corso finito, **elimina il corso**: cancella anche tutti gli iscritti (il modulo promette la cancellazione dei dati dopo il corso).
+5. A corso finito premi **Corso fatto**: il corso va tra i conclusi e sul sito compare in fondo, tra i corsi già fatti, senza modulo. Poi **elimina gli iscritti** (o tutto il corso): il modulo promette la cancellazione dei dati dopo il corso.
 
 ## Come funziona, in breve
-- Un corso confermato **continua ad accettare iscrizioni fino al massimo**. Il corso sparisce dall'elenco pubblico solo se lo chiudi tu o se elimini.
+- Un corso confermato **continua ad accettare iscrizioni fino al massimo**. Il corso sparisce dall'elenco pubblico solo se lo chiudi tu, lo segni come fatto o lo elimini. I corsi fatti restano visibili in fondo alla pagina pubblica (si può togliere dalle Impostazioni).
 - Se qualcuno viene eliminato dagli iscritti, il sistema riavvisa quando si ri-raggiunge il minimo.
 - Anti-spam senza servizi esterni: campo trappola nascosto, tempo minimo di compilazione, massimo 20 invii/ora per indirizzo (più un tetto di 200 iscrizioni/ora in totale), un'email per corso.
 - Il luogo preciso e la lista iscritti sono solo nel pannello admin.
