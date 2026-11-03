@@ -7,7 +7,11 @@ App self-hosted per gestire le iscrizioni ai corsi (base, medio, avanzato) in va
 - **Avviso Telegram** quando si raggiunge il minimo (e quando i posti sono esauriti).
 - Dati in un file SQLite sul tuo Umbrel, QR code e caratteri in locale. Unici servizi esterni: Cloudflare Tunnel per raggiungere la pagina e Telegram per gli avvisi.
 
-> Le comunicazioni agli iscritti (data e luogo) le fai tu a mano: nel pannello trovi la lista email da incollare in CCN, un pulsante "Scrivi a tutti" e la lista dei telefoni. Il pagamento non è ancora previsto (BTCPay in un secondo momento).
+- **Pagina del corso completa**, come un modulo Google: immagine di copertina, presentazione, quando, dove (con il pulsante "Apri la mappa"), orari, contributo, partecipanti, scadenza delle prenotazioni, docenti, requisiti con icone, programma.
+- **Pagamento in anticipo** facoltativo: se nel corso metti un indirizzo Bitcoin o Lightning, chi si iscrive può scegliere di pagare subito e vede i QR code.
+- **Pannello**: "Duplica corso" per riusare un corso già fatto, "Segna pagato" per ogni iscritto, "Scarica elenco" per aprire gli iscritti in Excel.
+
+> Le comunicazioni agli iscritti (data e luogo) le fai tu a mano: nel pannello trovi la lista email da incollare in CCN, un pulsante "Scrivi a tutti" e la lista dei telefoni. I pagamenti in anticipo li controlli tu nel wallet e li segni come pagati nel pannello.
 
 ## Cosa NON è stato ancora provato
 
@@ -44,10 +48,13 @@ Le visite passano da Cloudflare, che vede l'indirizzo e il traffico verso la pag
 Quando hai l'indirizzo pubblico (tipo `https://corsi.tuodominio.it`), inseriscilo in **Impostazioni → Indirizzo pubblico**: da quel momento nel pannello compaiono link e QR code corretti.
 
 ### 6. Usare il sistema
-1. **+ Nuovo corso**: livello, città, luogo preciso (privato), descrizione, fasce indicative (una per riga), minimo e massimo.
+1. **+ Nuovo corso** (oppure apri un corso già fatto e premi **Duplica corso**): livello, titolo, città, luogo preciso (privato, a meno che tu non scelga di mostrarlo), presentazione, fasce indicative (una per riga), orari, scadenza delle prenotazioni, minimo e massimo, requisiti, contributo, indirizzi per il pagamento in anticipo, programma, immagine di copertina. Con due caselle scegli se chiedere anche l'azienda e "come hai conosciuto questo corso".
+   - **Programma**: una riga tutta in maiuscolo (es. `MATTINO`) diventa un titoletto, le righe che iniziano con `-` diventano un elenco.
+   - **Requisiti**: uno per riga; l'icona viene scelta dalle parole (penna, smartphone, computer, connessione, corso...).
+   - **Copertina**: JPG, PNG o WebP fino a 4 MB, meglio orizzontale.
 2. Condividi il link del corso (o il QR) su Telegram/WhatsApp. Chi apre vede città, fasce, contatore e il modulo.
 3. Quando arriva l'avviso Telegram, apri il corso: vedi **quante persone ci sono per ogni fascia** (con la migliore segnalata). Scegli la data e premi **Conferma corso**.
-4. Scrivi agli iscritti con data e luogo.
+4. Scrivi agli iscritti con data e luogo. Con **Scarica elenco (Excel/CSV)** hai tutti gli iscritti in un file che si apre direttamente in Excel.
 5. A corso finito, **elimina il corso**: cancella anche tutti gli iscritti (il modulo promette la cancellazione dei dati dopo il corso).
 
 ## Come funziona, in breve
@@ -57,7 +64,7 @@ Quando hai l'indirizzo pubblico (tipo `https://corsi.tuodominio.it`), inseriscil
 - Il luogo preciso e la lista iscritti sono solo nel pannello admin.
 
 ## Backup
-Tutti i dati sono in `~/umbrel/app-data/corsibtc-iscrizioni/data/corsi.db` sul tuo Umbrel. Copia quel file per fare un backup.
+Tutti i dati sono nella cartella `~/umbrel/app-data/corsibtc-iscrizioni/data/` sul tuo Umbrel: `corsi.db` (corsi e iscritti) e la cartella `img/` (immagini di copertina). Copia tutta la cartella per fare un backup.
 
 ## Se qualcosa non funziona
 - **L'icona di Umbrel chiede il login Umbrel** invece di mostrare i corsi: la riga `PROXY_AUTH_ADD: "false"` in `docker-compose.yml` non è stata accettata dalla tua versione di Umbrel. Dimmelo con la versione di umbrelOS e lo sistemo.
