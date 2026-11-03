@@ -9,6 +9,7 @@ App self-hosted per gestire le iscrizioni ai corsi (base, medio, avanzato) in va
 
 - **Pagina del corso completa**, come un modulo Google: immagine di copertina, presentazione, quando, dove (con il pulsante "Apri la mappa"), orari, contributo, partecipanti, scadenza delle prenotazioni, docenti, requisiti con icone, programma.
 - **Pagamento in anticipo** facoltativo: se nel corso metti un indirizzo Bitcoin o Lightning, chi si iscrive può scegliere di pagare subito e vede i QR code.
+- **Lista d'attesa** facoltativa, corso per corso: a posti esauriti ci si iscrive in lista (senza occupare posti, senza pagamento in anticipo); nel pannello la vedi a parte e con "Promuovi" passi una persona tra gli iscritti quando si libera un posto.
 - **Pannello**: "Duplica corso" per riusare un corso già fatto, "Segna pagato" per ogni iscritto, "Scarica elenco" per aprire gli iscritti in Excel.
 
 > Le comunicazioni agli iscritti (data e luogo) le fai tu a mano: nel pannello trovi la lista email da incollare in CCN, un pulsante "Scrivi a tutti" e la lista dei telefoni. I pagamenti in anticipo li controlli tu nel wallet e li segni come pagati nel pannello.

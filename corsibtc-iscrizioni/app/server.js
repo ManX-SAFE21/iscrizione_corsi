@@ -61,11 +61,11 @@ addColumns('courses', {
   teachers: TXT, deadline: TXT, schedule: TXT, price: TXT, requirements: TXT, program: TXT, contact_email: TXT,
   show_location: FLAG, phone_required: FLAG, prepay_text: TXT, btc_address: TXT, ln_address: TXT,
 });
-addColumns('courses', { cover: TXT, ask_company: FLAG, ask_source: FLAG });
-addColumns('registrations', { payment: TXT, paid: FLAG, company: TXT, source: TXT });
+addColumns('courses', { cover: TXT, ask_company: FLAG, ask_source: FLAG, ask_waitlist: FLAG });
+addColumns('registrations', { payment: TXT, paid: FLAG, company: TXT, source: TXT, waitlist: FLAG });
 const COURSE_FIELDS = ['level', 'city', 'location', 'title', 'description', 'slots', 'min_n', 'max_n', 'teachers', 'deadline', 'schedule',
   'price', 'requirements', 'program', 'contact_email', 'show_location', 'phone_required', 'prepay_text', 'btc_address', 'ln_address', 'cover',
-  'ask_company', 'ask_source'];
+  'ask_company', 'ask_source', 'ask_waitlist'];
 // "Come hai conosciuto questo corso?": le scelte del vecchio modulo; "Altro" ha un campo libero
 const SOURCES = ['Amico o invito diretto', 'Telegram', 'Locandina', 'WhatsApp', 'Facebook o Instagram', 'Altro'];
 
@@ -150,8 +150,11 @@ const expired = (c) => !!c.deadline && c.deadline < todayRome();
 const prepayOn = (c) => !!(c.btc_address || c.ln_address);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const courseName = (c) => `Corso ${LEVELS[c.level] || c.level}${c.title ? ' – ' + c.title : ''}`;
-const countRegs = (id) => db.prepare('SELECT COUNT(*) AS n FROM registrations WHERE course_id = ?').get(id).n;
-const regsOf = (id) => db.prepare('SELECT * FROM registrations WHERE course_id = ? ORDER BY created_at').all(id);
+// iscritti = chi ha un posto; la lista d'attesa (waitlist = 1) non occupa posti e non conta per i minimi
+const countRegs = (id) => db.prepare('SELECT COUNT(*) AS n FROM registrations WHERE course_id = ? AND waitlist = 0').get(id).n;
+const regsOf = (id) => db.prepare('SELECT * FROM registrations WHERE course_id = ? AND waitlist = 0 ORDER BY created_at').all(id);
+const waitOf = (id) => db.prepare('SELECT * FROM registrations WHERE course_id = ? AND waitlist = 1 ORDER BY created_at').all(id);
+const allRegsOf = (id) => db.prepare('SELECT * FROM registrations WHERE course_id = ? ORDER BY waitlist, created_at').all(id);
 const publicBase = () => getSetting('public_url').replace(/\/+$/, '');
 
 function readBodyBuf(req, limit) {
@@ -684,7 +687,7 @@ function courseCard(c) {
       <p class="course-meta"><span>${icon('pin')}${esc(c.city)}</span>${c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}${c.deadline && !expired(c) ? `<span>${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</span>` : ''}</p>
       ${slots.length ? `<div class="course-slots">${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
       <div class="course-progress">${counter(c, n)}</div>
-      <a class="btn" href="/c/${c.slug}">${n >= c.max_n ? 'Dettagli' : 'Dettagli e iscrizione'}${icon('arrow')}</a>
+      <a class="btn" href="/c/${c.slug}">${n >= c.max_n ? (c.ask_waitlist && !expired(c) && c.status !== 'closed' ? "Dettagli e lista d'attesa" : 'Dettagli') : 'Dettagli e iscrizione'}${icon('arrow')}</a>
     </div>
   </article>`;
 }
@@ -762,7 +765,7 @@ function renderProgram(text) {
   return `<div class="prog">${out.join('')}</div>`;
 }
 
-function renderCourse(c, { error = '', ok = false, paid = false, values = {} } = {}) {
+function renderCourse(c, { error = '', ok = false, paid = false, wait = false, values = {} } = {}) {
   const n = countRegs(c.id);
   const full = n >= c.max_n;
   const closed = c.status === 'closed';
@@ -770,14 +773,17 @@ function renderCourse(c, { error = '', ok = false, paid = false, values = {} } =
   const slots = slotsOf(c);
   const chosen = values.slots || [];
   const reqs = linesOf(c.requirements);
-  const stop = closed ? 'Le iscrizioni per questo corso sono chiuse.' : full ? 'Il corso è al completo.' : late ? `Le prenotazioni si sono chiuse il ${fmtDay(c.deadline)}.` : '';
+  // a posti esauriti, se il corso lo prevede, ci si può mettere in lista d'attesa
+  const canWait = full && !closed && !late && !!c.ask_waitlist;
+  const stop = closed ? 'Le iscrizioni per questo corso sono chiuse.' : (full && !canWait) ? 'Il corso è al completo.' : late ? `Le prenotazioni si sono chiuse il ${fmtDay(c.deadline)}.` : '';
   const srcSel = String(values.source || '').startsWith('Altro') ? 'Altro' : values.source;
   const srcOther = values.source_other || String(values.source || '').replace(/^Altro:\s*/, '').replace(/^Altro$/, '');
   // campo di testo con icona: etichetta, casella, suggerimento
   const fld = (id, label, ic, input, hint = '', optional = false, cls = '') =>
     `<div class="fld${cls ? ' ' + cls : ''}"><label for="${id}">${label}${optional ? '<span class="opt">facoltativo</span>' : ' <b class="star">*</b>'}</label><div class="inp">${icon(ic)}${input}</div>${hint ? `<p class="hint">${hint}</p>` : ''}</div>`;
   const form = `
-  ${h2('Iscriviti', 'pen')}
+  ${h2(canWait ? "Lista d'attesa" : 'Iscriviti', canWait ? 'users' : 'pen')}
+  ${canWait ? msg('warn', "<b>Il corso è al completo.</b> Puoi metterti in lista d'attesa prioritaria: avrai la precedenza se si libera un posto o per il prossimo corso.") : ''}
   <form method="post" action="/c/${c.slug}#iscrizione" class="card enrollform" autocomplete="on">
     <div class="fgrid">
       ${fld('email', 'Email', 'mail', `<input type="email" id="email" name="email" required maxlength="120" value="${esc(values.email)}" autocomplete="email">`)}
@@ -790,7 +796,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, values = {} } =
     </div>
     ${slots.length ? `<fieldset class="qs"><legend>Quando potresti esserci? <b class="star">*</b><small>Scegli tutte le fasce che vanno bene.</small></legend>
       <div class="tiles">${slots.map((s) => `<label class="tile"><input type="checkbox" name="slot" value="${esc(s)}" ${chosen.includes(s) ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}</div></fieldset>` : ''}
-    ${prepayOn(c) ? `<fieldset class="qs"><legend>Come preferisci pagare il contributo? <b class="star">*</b></legend>
+    ${prepayOn(c) && !canWait ? `<fieldset class="qs"><legend>Come preferisci pagare il contributo? <b class="star">*</b></legend>
       <div class="tiles">
         <label class="tile"><input type="radio" name="payment" value="corso" ${values.payment !== 'anticipo' ? 'checked' : ''}><span><b>Il giorno del corso</b><small>Pago all'accoglienza</small></span></label>
         <label class="tile"><input type="radio" name="payment" id="pay-pre" value="anticipo" ${values.payment === 'anticipo' ? 'checked' : ''}><span><b>In anticipo</b><small>Blocco subito il posto</small></span></label>
@@ -802,12 +808,12 @@ function renderCourse(c, { error = '', ok = false, paid = false, values = {} } =
     <label class="consent"><input type="checkbox" name="consent" required><span>Acconsento al trattamento dei miei dati (email, nome, telefono, città${c.ask_company ? ', azienda' : ''}) al solo scopo di organizzare il corso. I dati non vengono ceduti a terzi e vengono cancellati dopo il corso. *</span></label>
     <div class="hp" aria-hidden="true"><label>Non compilare<input type="text" name="sito" tabindex="-1" autocomplete="off"></label></div>
     <input type="hidden" name="t" value="${timeToken()}">
-    <button type="submit" class="btn big">${icon('send')}Invia iscrizione</button>
+    <button type="submit" class="btn big">${icon('send')}${canWait ? "Mettimi in lista d'attesa" : 'Invia iscrizione'}</button>
   </form>`;
-  const done = `${msg('ok', `<b>Iscrizione ricevuta, grazie!</b> ${c.status === 'confirmed'
+  const done = `${wait ? msg('ok', "<b>Sei in lista d'attesa, grazie!</b> Ti scriviamo se si libera un posto o per il prossimo corso.") : msg('ok', `<b>Iscrizione ricevuta, grazie!</b> ${c.status === 'confirmed'
     ? 'Ti aspettiamo al corso: dai un\'occhiata ai requisiti prima di partire.'
     : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}`)}
-    ${paid && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
+    ${paid && !wait && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
     <p><a class="btn sec" href="/">${icon('back')}Tutti i corsi</a></p>`;
   const enroll = ok ? done : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;
   return page(courseName(c), `
@@ -822,7 +828,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, values = {} } =
         <h2>${icon('users')}Iscrizioni</h2>
         ${counter(c, n)}
         ${c.deadline && !late ? `<p class="dl">${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</p>` : ''}
-        ${ok || stop ? '' : `<a class="btn big" href="#iscrizione">${icon('pen')}Iscriviti ora</a>`}
+        ${ok || stop ? '' : `<a class="btn big" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${canWait ? "Mettiti in lista d'attesa" : 'Iscriviti ora'}</a>`}
       </aside>
       <div class="cmain">
         ${c.description ? `<p class="intro">${esc(c.description)}</p>` : ''}
@@ -849,7 +855,7 @@ async function handlePublic(req, res) {
   const course = db.prepare('SELECT * FROM courses WHERE slug = ?').get(m[1]);
   if (!course) return send(res, 404, page('Non trovato', '<h1>Corso non trovato</h1><p><a href="/">Torna ai corsi</a></p>'));
 
-  if (req.method === 'GET') return send(res, 200, renderCourse(course, { ok: url.searchParams.get('ok') === '1', paid: url.searchParams.get('pay') === '1' }));
+  if (req.method === 'GET') return send(res, 200, renderCourse(course, { ok: url.searchParams.get('ok') === '1', paid: url.searchParams.get('pay') === '1', wait: url.searchParams.get('wl') === '1' }));
   if (req.method !== 'POST') return send(res, 405, 'Metodo non consentito', { 'Content-Type': 'text/plain' });
 
   const f = await readForm(req);
@@ -891,12 +897,16 @@ async function handlePublic(req, res) {
   if (f.get('consent') !== 'on') return fail('Per iscriverti devi acconsentire al trattamento dei dati.');
 
   let error = '';
+  let waiting = 0;
   db.exec('BEGIN IMMEDIATE');
   try {
-    if (countRegs(course.id) >= course.max_n) error = 'Il corso è al completo.';
+    const isFull = countRegs(course.id) >= course.max_n;
+    if (isFull && !course.ask_waitlist) error = 'Il corso è al completo.';
     else {
-      db.prepare('INSERT INTO registrations (course_id, email, name, phone, city, slots, payment, company, source, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)')
-        .run(course.id, values.email, values.name, values.phone, values.city, JSON.stringify(values.slots), values.payment, values.company, values.source, nowIso());
+      waiting = isFull ? 1 : 0; // posti finiti: finisce in lista d'attesa, senza pagamento in anticipo
+      if (waiting) values.payment = '';
+      db.prepare('INSERT INTO registrations (course_id, email, name, phone, city, slots, payment, company, source, waitlist, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
+        .run(course.id, values.email, values.name, values.phone, values.city, JSON.stringify(values.slots), values.payment, values.company, values.source, waiting, nowIso());
     }
     db.exec('COMMIT');
   } catch (e) {
@@ -905,6 +915,10 @@ async function handlePublic(req, res) {
     if (!/UNIQUE/.test(String(e.message))) console.error(e);
   }
   if (error) return fail(error);
+  if (waiting) {
+    telegram(`⏳ ${courseName(course)} (${course.city}): nuova persona in lista d'attesa (${waitOf(course.id).length})`).catch(() => {});
+    return redirect(res, `/c/${course.slug}?ok=1&wl=1`);
+  }
   notifyThresholds(course).catch((e) => console.error('notify', e));
   return redirect(res, `/c/${course.slug}?ok=1${values.payment === 'anticipo' ? '&pay=1' : ''}`);
 }
@@ -947,7 +961,7 @@ function parseCourseForm(f) {
     price: field(f, 'price', 300), requirements: field(f, 'requirements', 2000), program: field(f, 'program', 6000),
     contact_email: field(f, 'contact_email', 120).toLowerCase(),
     show_location: f.get('show_location') === 'on' ? 1 : 0, phone_required: f.get('phone_required') === 'on' ? 1 : 0,
-    ask_company: f.get('ask_company') === 'on' ? 1 : 0, ask_source: f.get('ask_source') === 'on' ? 1 : 0,
+    ask_company: f.get('ask_company') === 'on' ? 1 : 0, ask_source: f.get('ask_source') === 'on' ? 1 : 0, ask_waitlist: f.get('ask_waitlist') === 'on' ? 1 : 0,
     prepay_text: field(f, 'prepay_text', 1000), btc_address: field(f, 'btc_address', 100), ln_address: field(f, 'ln_address', 600),
     cover: '', // decisa dopo, da coverFrom()
   };
@@ -991,6 +1005,7 @@ function courseFormHtml(v, action, button) {
     ${chk('phone_required', 'Telefono obbligatorio nel modulo di iscrizione')}
     ${chk('ask_company', 'Chiedi l\'azienda (facoltativa, per chi vuole opportunità per la propria attività)')}
     ${chk('ask_source', 'Chiedi "Come hai conosciuto questo corso?" (amico, Telegram, locandina, WhatsApp, social, altro)')}
+    ${chk('ask_waitlist', 'A posti esauriti accetta iscrizioni in lista d\'attesa (chi si iscrive ha la precedenza se si libera un posto o per il prossimo corso)')}
     </fieldset>
 
     <fieldset class="fs"><legend>${icon('euro')}Contributo e pagamento</legend>
@@ -1023,7 +1038,7 @@ function adminDashboard(flash = '') {
   const rows = courses.map((c) => {
     const n = countRegs(c.id);
     return `<div class="card"><div class="row">${levelPill(c)}${statusBadge(c, n)}
-      ${n >= c.min_n && c.status === 'open' ? pill('Minimo raggiunto: scegli la data', 'ok', 'bell') : ''}</div>
+      ${n >= c.min_n && c.status === 'open' ? pill('Minimo raggiunto: scegli la data', 'ok', 'bell') : ''}${waitOf(c.id).length ? pill(`${waitOf(c.id).length} in lista d'attesa`, '', 'users') : ''}</div>
       <h2 style="margin:.5em 0 0;display:block">${esc(courseName(c))} – ${esc(c.city)}</h2>
       ${counter(c, n)}
       <p style="margin:12px 0 0"><a class="btn" href="/corso/${c.slug}">Apri${icon('arrow')}</a></p></div>`;
@@ -1037,6 +1052,7 @@ function adminDashboard(flash = '') {
 
 function adminCourse(c, flash = '') {
   const regs = regsOf(c.id);
+  const wait = waitOf(c.id);
   const n = regs.length;
   const base = publicBase();
   const link = base ? `${base}/c/${c.slug}` : '';
@@ -1058,6 +1074,8 @@ function adminCourse(c, flash = '') {
     ${c.location ? `<p class="sub pre">${icon('pin')} ${c.show_location ? 'Luogo' : 'Luogo (privato, non mostrato sulla pagina pubblica)'}: ${esc(c.location)} ${mapLink(mapQuery(c, true))}</p>` : ''}
     ${flash ? msg('ok', esc(flash)) : ''}
     ${counter(c, n)}
+    ${wait.length ? `<p class="sub">In lista d'attesa: <b>${wait.length}</b></p>` : ''}
+    ${wait.length && n < c.max_n ? msg('ok', `C'è un posto libero e ${wait.length} ${wait.length === 1 ? 'persona' : 'persone'} in lista d'attesa: puoi promuovere la prima.`) : ''}
 
     ${h2('Disponibilità per fascia', 'chart')}
     ${stats.length ? `<div class="card"><table>${stats.map((s) => `<tr><td>${esc(s.label)}</td><td style="width:40%"><div class="bar" style="margin:4px 0"><i style="width:${n ? Math.round((s.n / n) * 100) : 0}%"></i></div></td><td><b>${s.n}</b>/${n}${s.n === best && best > 0 ? ' · la migliore' : ''}</td></tr>`).join('')}</table></div>` : '<p class="sub">Nessuna fascia indicata per questo corso.</p>'}
@@ -1083,6 +1101,13 @@ function adminCourse(c, flash = '') {
       <label>Tutte le email <small>da copiare nel campo CCN</small></label><textarea readonly rows="2">${esc(emails)}</textarea>
       ${phones ? `<label>Telefoni</label><textarea readonly rows="${Math.min(8, phones.split('\n').length + 1)}">${esc(phones)}</textarea>` : ''}`
       : '<div class="card">Ancora nessun iscritto.</div>'}
+
+    ${wait.length || c.ask_waitlist ? `${h2(`Lista d'attesa (${wait.length})`, 'hourglass')}
+      ${wait.length ? `<div class="card" style="overflow-x:auto"><table><tr><th>Nome</th><th>Email</th><th>Telefono</th><th>Città</th><th>Fasce</th><th></th></tr>
+      ${wait.map((r) => `<tr><td>${esc(r.name)}<br><small>${fmtDate(r.created_at)}</small></td><td>${esc(r.email)}</td><td>${esc(r.phone)}</td><td>${esc(r.city)}</td>
+        <td>${JSON.parse(r.slots).map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</td>
+        <td><div class="row"><form method="post" action="/iscritto/${r.id}/promuovi"><button class="sec sm" title="Passa tra gli iscritti">${icon('check')}Promuovi</button></form><a class="btn del sm" href="/iscritto/${r.id}/elimina" title="Elimina" aria-label="Elimina">${icon('trash')}</a></div></td></tr>`).join('')}</table></div>
+      <label>Email della lista d'attesa <small>da copiare nel campo CCN</small></label><textarea readonly rows="2">${esc(wait.map((r) => r.email).join(', '))}</textarea>` : '<div class="card">Nessuno in lista d\'attesa.</div>'}` : ''}
 
     ${h2('Link e QR code', 'qr')}
     ${link ? `<div class="card ql"><div class="qr">${qrSvg(link)}</div><div><div class="mono">${esc(link)}</div><p><a href="/corso/${c.slug}/qr.svg" class="btn sec">${icon('down')}Scarica QR (SVG)</a></p></div></div>`
@@ -1193,7 +1218,7 @@ async function handleAdmin(req, res) {
   if (p === '/corso/nuovo') {
     if (req.method === 'GET') {
       const v = {
-        level: 'base', slots: 'Sabato mattina\nSabato pomeriggio\nDomenica',
+        level: 'base', ask_waitlist: 1, slots: 'Sabato mattina\nSabato pomeriggio\nDomenica',
         prepay_text: 'Se vuoi bloccare subito il posto, puoi inviare il contributo in anticipo in Bitcoin o Lightning.\nSe per qualsiasi motivo il corso dovesse saltare, ti rimborsiamo i bitcoin inviati.',
       };
       return send(res, 200, page('Nuovo corso', `<h1>Nuovo corso</h1><p class="sub">Per riusare un corso già fatto, aprilo e usa "Duplica corso".</p>${courseFormHtml(v, '/corso/nuovo', 'Crea corso')}`, { admin: true }));
@@ -1214,6 +1239,17 @@ async function handleAdmin(req, res) {
     if (!r) return send(res, 404, page('Non trovato', '<h1>Iscritto non trovato</h1>', { admin: true }));
     db.prepare('UPDATE registrations SET paid = 1 - paid WHERE id = ?').run(r.id);
     return back(`/corso/${r.slug}`);
+  }
+
+  const promo = p.match(/^\/iscritto\/(\d+)\/promuovi$/);
+  if (promo && req.method === 'POST') {
+    const r = db.prepare('SELECT r.id, r.waitlist, r.course_id, c.slug, c.max_n FROM registrations r JOIN courses c ON c.id = r.course_id WHERE r.id = ?').get(Number(promo[1]));
+    if (!r) return send(res, 404, page('Non trovato', '<h1>Iscritto non trovato</h1>', { admin: true }));
+    if (!r.waitlist) return back(`/corso/${r.slug}`);
+    if (countRegs(r.course_id) >= r.max_n) return back(`/corso/${r.slug}`, 'Non ci sono posti liberi: aumenta il massimo o elimina un iscritto, poi promuovi.');
+    db.prepare('UPDATE registrations SET waitlist = 0 WHERE id = ?').run(r.id);
+    notifyThresholds(db.prepare('SELECT * FROM courses WHERE id = ?').get(r.course_id)).catch((e) => console.error('notify', e));
+    return back(`/corso/${r.slug}`, 'Promosso: ora è tra gli iscritti.');
   }
 
   const iscr = p.match(/^\/iscritto\/(\d+)\/elimina$/);
@@ -1261,9 +1297,9 @@ async function handleAdmin(req, res) {
       return back(`/corso/${slug}/modifica`, 'Copia creata, ancora senza iscritti. Controlla città, fasce e scadenza, poi salva.');
     }
     if (sub === '/iscritti.csv' && req.method === 'GET') {
-      const head = ['Nome', 'Email', 'Telefono', 'Città', 'Azienda', 'Conosciuto da', 'Fasce', 'Contributo', 'Pagato', 'Iscritto il'];
-      const lines = regsOf(c.id).map((r) => [r.name, r.email, r.phone, r.city, r.company, r.source, JSON.parse(r.slots).join(', '), PAY_LABEL[r.payment] || '',
-        r.paid ? 'sì' : 'no', fmtDate(r.created_at)].map(csvCell).join(';'));
+      const head = ['Nome', 'Email', 'Telefono', 'Città', 'Azienda', 'Conosciuto da', 'Fasce', 'Contributo', 'Pagato', 'Iscritto il', 'Stato'];
+      const lines = allRegsOf(c.id).map((r) => [r.name, r.email, r.phone, r.city, r.company, r.source, JSON.parse(r.slots).join(', '), PAY_LABEL[r.payment] || '',
+        r.paid ? 'sì' : 'no', fmtDate(r.created_at), r.waitlist ? "Lista d'attesa" : 'Iscritto'].map(csvCell).join(';'));
       const body = '﻿' + [head.join(';'), ...lines].join('\r\n') + '\r\n';
       res.writeHead(200, { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename="iscritti-${c.slug}.csv"`, 'Cache-Control': 'no-store', ...SEC_HEADERS });
       return res.end(body);
