@@ -562,6 +562,23 @@ tr:last-child td{border-bottom:0}
 .filters a:hover{border-color:var(--lv,var(--teal))}
 .filters a.sel{background:var(--lv,var(--teal));border-color:var(--lv,var(--teal));color:#fff}
 .filters a.sel .i,.filters a.sel small{color:#fff}
+main.wide:has(.adm){max-width:1280px}
+.adm{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:28px;align-items:start}
+.adm-main{min-width:0}
+.adm-side{position:sticky;top:12px;grid-column:2;grid-row:1;display:grid;gap:10px;max-height:calc(100vh - 24px);overflow-y:auto;align-content:start}
+.adm-box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.adm-box .qr{width:100%;max-width:130px;margin:0 auto 8px}
+.adm-box .qr svg{display:block;width:100%;height:auto}
+.adm-box .mono{font-size:.78rem;word-break:break-all;text-align:center;margin:0 0 8px}
+.adm-box p{margin:0}
+.adm-box.danger form{margin:0}.adm-box.danger label.check{margin:0 0 10px;font-size:.9rem}.adm-box.danger .del{display:flex;width:100%;justify-content:center;box-sizing:border-box}
+.adm-box .btn{display:flex;width:100%;justify-content:center;box-sizing:border-box}
+.adm-side h2{display:flex;align-items:center;gap:8px;font-size:1rem;margin:0 0 8px}
+.adm-side h2 .i{color:var(--teal)}
+.adm-btns{display:grid;gap:6px}.adm-box .btn,.adm-box button{padding-top:8px;padding-bottom:8px;font-size:.9rem}
+.adm-btns form{margin:0}
+.adm-btns .btn,.adm-btns button{display:flex;align-items:center;gap:8px;width:100%;justify-content:flex-start;margin:0;box-sizing:border-box}
+@media (max-width:820px){.adm{grid-template-columns:1fr}.adm-side{position:static;grid-column:1;grid-row:auto}}
 .hero .filters{display:inline-flex;flex-wrap:nowrap;gap:2px;margin:14px 0 0;padding:4px;background:rgba(255,255,255,.6);border:1px solid rgba(61,132,119,.16);border-radius:999px}
 .hero .filters a{border:0;background:none;padding:7px 16px;white-space:nowrap}
 .hero .filters a:hover{background:rgba(255,255,255,.7)}
@@ -1023,7 +1040,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
         ${ok || stop ? '' : cta}`}
         ${posterExt(c) ? `<a class="btn sec big" href="/c/${c.slug}/locandina" target="_blank" rel="noopener">${icon('down')}Scarica la locandina</a>` : ''}
         ${shareBox(c)}
-      </aside>
+    </aside>
       <div class="cmain">
         ${c.description ? `<p class="intro">${esc(c.description)}</p>` : ''}
         ${slots.length && c.status === 'open' ? `${h2('Date possibili', 'calendar')}<p class="sub">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
@@ -1291,6 +1308,7 @@ function adminCourse(c, flash = '') {
   const srcSummary = [...srcCount].sort((a, b) => b[1] - a[1]).map(([k, n]) => `${esc(k)} <b>${n}</b>`).join(' · ');
   return page(courseName(c), `
     <a class="back" href="/">${icon('back')}Tutti i corsi</a>
+    <div class="adm"><div class="adm-main">
     ${c.cover ? `<img class="cover" src="/img/${esc(c.cover)}" alt="">` : ''}
     <div class="row">${levelPill(c)}${statusBadge(c, n)}</div>
     <h1>${esc(courseName(c))} – ${esc(c.city)}</h1>
@@ -1332,12 +1350,8 @@ function adminCourse(c, flash = '') {
         <td><div class="row"><form method="post" action="/iscritto/${r.id}/promuovi"><button class="sec sm" title="Passa tra gli iscritti">${icon('check')}Promuovi</button></form><a class="btn del sm" href="/iscritto/${r.id}/elimina" title="Elimina" aria-label="Elimina">${icon('trash')}</a></div></td></tr>`).join('')}</table></div>
       <label>Email della lista d'attesa <small>da copiare nel campo CCN</small></label><textarea readonly rows="2">${esc(wait.map((r) => r.email).join(', '))}</textarea>` : '<div class="card">Nessuno in lista d\'attesa.</div>'}` : ''}
 
-    ${h2('Link e QR code', 'qr')}
-    ${link ? `<div class="card ql"><div class="qr">${qrSvg(link)}</div><div><div class="mono">${esc(link)}</div><p><a href="/corso/${c.slug}/qr.svg" class="btn sec">${icon('down')}Scarica QR (SVG)</a></p></div></div>`
-      : msg('warn', 'Imposta l\'indirizzo pubblico in <a href="/impostazioni">Impostazioni</a> per vedere link e QR.')}
-
-    ${h2('Gestione', 'cog')}
-    <div class="row">
+</div>
+    <aside class="adm-side"><div class="adm-box"><h2>${icon('cog')}Gestione</h2><div class="adm-btns">
       <a class="btn sec" href="/corso/${c.slug}/modifica">${icon('pen')}Modifica corso</a>
       <form method="post" action="/corso/${c.slug}/duplica"><button class="sec" title="Crea un nuovo corso con gli stessi testi, senza iscritti">${icon('copy')}Duplica corso</button></form>
       ${link ? `<a class="btn sec" href="${esc(link)}" target="_blank" rel="noopener">${icon('eye')}Vedi pagina pubblica</a>` : ''}
@@ -1345,11 +1359,15 @@ function adminCourse(c, flash = '') {
     ? `<form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="reopen"><button class="sec">${icon('unlock')}Riporta tra i corsi attivi</button></form>`
     : `<form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="${c.status === 'closed' ? 'reopen' : 'close'}"><button class="sec">${c.status === 'closed' ? `${icon('unlock')}Riapri iscrizioni` : `${icon('lock')}Chiudi iscrizioni`}</button></form>
       <form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="done"><button class="sec" title="Il corso si è svolto: finisce tra i corsi conclusi e, sul sito, tra i corsi già fatti">${icon('checkc')}Corso fatto</button></form>`}
-    </div>
-    ${h2('Zona pericolosa', 'alert')}
-    <form method="post" action="/corso/${c.slug}/elimina" class="card">
+    </div></div>
+    <div class="adm-box"><h2>${icon('qr')}Link e QR code</h2>${link
+      ? `<div class="qr">${qrSvg(link)}</div><div class="mono">${esc(link)}</div><p><a href="/corso/${c.slug}/qr.svg" class="btn sec">${icon('down')}Scarica QR (SVG)</a></p>`
+      : msg('warn', 'Imposta l&rsquo;indirizzo pubblico in <a href="/impostazioni">Impostazioni</a> per vedere link e QR.')}</div>
+      <div class="adm-box danger"><h2>${icon('alert')}Zona pericolosa</h2><form method="post" action="/corso/${c.slug}/elimina" >
       <label class="check"><input type="checkbox" name="sure" required><span>Elimina il corso e tutti i suoi iscritti (non si può annullare)</span></label>
-      <button class="del">${icon('trash')}Elimina corso</button></form>`, { admin: true });
+      <button class="del">${icon('trash')}Elimina corso</button></form></div>
+    </aside>
+  </div>`, { admin: true, wide: true });
 }
 
 function settingsPage(flash = '', kind = 'ok') {
