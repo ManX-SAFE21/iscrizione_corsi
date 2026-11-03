@@ -678,6 +678,8 @@ fieldset.qs{border:0;padding:0;margin:24px 0 0;min-width:0}
 .tile b{display:block;color:var(--title);font-weight:600}
 .tile small{display:block;color:var(--mut);font-weight:400}
 .tile:has(input:checked){border-color:var(--teal);background:var(--tsoft);box-shadow:0 0 0 1px var(--teal) inset}
+.tiles.pay .tile:has(input:checked){box-shadow:0 0 0 2px var(--teal) inset}
+.tiles.pay .tile:has(input:checked) b::after{content:"✓ scelto";margin-left:8px;padding:1px 8px;border-radius:99px;background:var(--teal);color:#fff;font-size:.75em;font-weight:600;vertical-align:2px}
 .consent{display:flex;gap:12px;align-items:flex-start;margin:26px 0 0;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:400;font-size:.9rem;color:var(--mut)}
 .consent input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--teal)}
 .enrollform .btn.big{margin-top:18px}
@@ -902,7 +904,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
     ${slots.length ? `<fieldset class="qs"><legend>Quando potresti esserci? <b class="star">*</b><small>Scegli tutte le fasce che vanno bene.</small></legend>
       <div class="tiles">${slots.map((s) => `<label class="tile"><input type="checkbox" name="slot" value="${esc(s)}" ${chosen.includes(s) ? 'checked' : ''}><span>${esc(s)}</span></label>`).join('')}</div></fieldset>` : ''}
     ${prepayOn(c) && !canWait ? `<fieldset class="qs"><legend>Come preferisci pagare il contributo? <b class="star">*</b></legend>
-      <div class="tiles">
+      <div class="tiles pay">
         <label class="tile"><input type="radio" name="payment" value="corso" ${values.payment !== 'anticipo' ? 'checked' : ''}><span><b>Il giorno del corso</b><small>Pago all'accoglienza</small></span></label>
         <label class="tile"><input type="radio" name="payment" id="pay-pre" value="anticipo" ${values.payment === 'anticipo' ? 'checked' : ''}><span><b>In anticipo</b><small>Blocco subito il posto</small></span></label>
       </div>
@@ -915,9 +917,14 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
     <input type="hidden" name="t" value="${timeToken()}">
     <button type="submit" class="btn big">${icon('send')}${canWait ? "Mettimi in lista d'attesa" : 'Invia iscrizione'}</button>
   </form>`;
+  // ricorda la scelta di pagamento: chi ha cliccato quella sbagliata se ne accorge subito
+  const fix = c.contact_email ? ` Hai sbagliato? Scrivici a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.` : '';
+  const payChoice = wait || !prepayOn(c) ? '' : paid
+    ? `<br>Hai scelto di pagare <b>in anticipo</b>: qui sotto trovi come fare.${fix}`
+    : `<br>Hai scelto di pagare <b>il giorno del corso</b>, all'accoglienza.${fix}`;
   const done = `${wait ? msg('ok', "<b>Sei in lista d'attesa, grazie!</b> Ti scriviamo se si libera un posto o per il prossimo corso.") : msg('ok', `<b>Iscrizione ricevuta, grazie!</b> ${c.status === 'confirmed'
     ? 'Ti aspettiamo al corso: dai un\'occhiata ai requisiti prima di partire.'
-    : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}`)}
+    : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}${payChoice}`)}
     ${paid && !wait && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
     <p><a class="btn sec" href="/">${icon('back')}Tutti i corsi</a></p>`;
   const enroll = ok ? done : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;
