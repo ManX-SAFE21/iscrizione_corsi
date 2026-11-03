@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.7.0"
+version: "1.7.1"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -23,6 +23,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Nuova impaginazione, più facile da leggere. Lista corsi a schede, con in fondo i corsi già fatti. Pagina del corso con Dove, Quando e Contributo subito sotto il titolo; dettagli, requisiti e programma si aprono con un clic. Modulo d'iscrizione diviso in tappe numerate, con gli stessi campi di prima. Colori più tenui: sfondo carta e verde spento. Nella gestione il pulsante Corso fatto sposta un corso tra i conclusi (resta visibile sul sito, senza modulo); nelle impostazioni si può nascondere l'elenco dei corsi fatti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Lista corsi più compatta: titolo, numero di corsi e scelta del livello stanno tutti nel riquadro colorato in alto, così le schede partono più in alto. Il selettore dei livelli è ora una barra unica. Nelle schede dei corsi con immagine, l'immagine in alto sfuma dolcemente nel testo e l'etichetta del livello sta sopra l'immagine. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""

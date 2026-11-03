@@ -478,7 +478,7 @@ a{color:var(--teal)}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .i{width:1.1em;height:1.1em;vertical-align:-.2em;flex:none}
 .sub{color:var(--mut);margin:0 0 1.2em}
-.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;padding:10px 0 14px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;padding:8px 0 10px;margin-bottom:14px;border-bottom:1px solid var(--line)}
 .brand{display:inline-flex;align-items:center;gap:10px;font:600 1.05rem Roboto,sans-serif;color:var(--title);text-decoration:none}
 .brand .mark{width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid var(--line);overflow:hidden;display:inline-flex;flex:none}
 .brand .mark img{width:100%;height:100%;display:block}
@@ -538,14 +538,15 @@ tr:last-child td{border-bottom:0}
 .lv-base{--lv:#3D8477;--lv2:#5FA092}
 .lv-medio{--lv:#4A79A6;--lv2:#6E9BC4}
 .lv-avanzato{--lv:#565E8A;--lv2:#7A82B2}
-.hero{position:relative;overflow:hidden;border-radius:16px;padding:34px 32px;margin:4px 0 22px;background:linear-gradient(120deg,#DDE9E4,#E6EFEA 60%,#EEF3F0);color:var(--body);border:1px solid var(--line)}
+.hero{position:relative;overflow:hidden;border-radius:16px;padding:20px 28px 22px;margin:0 0 14px;background:linear-gradient(120deg,#DDE9E4,#E6EFEA 60%,#EEF3F0);color:var(--body);border:1px solid var(--line)}
 .hero::before,.hero::after{content:'';position:absolute;border-radius:50%;background:rgba(61,132,119,.08)}
 .hero::before{width:280px;height:280px;right:-70px;top:-110px}
 .hero::after{width:180px;height:180px;right:90px;bottom:-110px}
 .hero>*{position:relative}
-.hero h1{color:var(--title);font-size:clamp(2rem,5vw,2.8rem);margin:0 0 .3em}
-.hero p{margin:0;max-width:560px;font-size:1.08rem;color:var(--body)}
-.hero .stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.hero .hrow{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin:0 0 6px}
+.hero h1{color:var(--title);font-size:clamp(1.7rem,4.5vw,2.1rem);margin:0}
+.hero p{margin:0;max-width:560px;font-size:1rem;color:var(--body)}
+.hero .stats{display:flex;gap:8px;flex-wrap:wrap}
 .hero .pill{background:rgba(255,255,255,.7);color:var(--title);font-size:.85rem}
 .hero .pill .i{color:var(--teal)}
 .gh{margin:28px 0 10px;font-size:1.15rem;color:var(--lv,var(--title))}
@@ -561,13 +562,23 @@ tr:last-child td{border-bottom:0}
 .filters a:hover{border-color:var(--lv,var(--teal))}
 .filters a.sel{background:var(--lv,var(--teal));border-color:var(--lv,var(--teal));color:#fff}
 .filters a.sel .i,.filters a.sel small{color:#fff}
+.hero .filters{display:inline-flex;flex-wrap:nowrap;gap:2px;margin:14px 0 0;padding:4px;background:rgba(255,255,255,.6);border:1px solid rgba(61,132,119,.16);border-radius:999px}
+.hero .filters a{border:0;background:none;padding:7px 16px;white-space:nowrap}
+.hero .filters a:hover{background:rgba(255,255,255,.7)}
+.hero .filters a.sel{background:var(--lv,var(--teal));box-shadow:0 1px 3px rgba(10,15,28,.18)}
+@media (max-width:400px){.hero .filters a{padding:7px 11px;font-size:.88rem}}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
 .ccard{display:flex;flex-direction:column;gap:10px;padding:18px 20px 16px;background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--lv);border-radius:12px;color:inherit;text-decoration:none;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
 .ccard:hover{border-color:#C5CFDC}
 .ccard .chead{display:flex;align-items:center;gap:10px}
 .ccard .cic{width:42px;height:42px;border-radius:10px;background:var(--lv);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden}
 .ccard .cic .i{width:22px;height:22px;vertical-align:0}
-.ccard .cic img{width:100%;height:100%;object-fit:cover}
+.ccard .cban{display:block;margin:-18px -20px 0;height:186px;margin-bottom:-66px;overflow:hidden;background:var(--panel);border-radius:7px 7px 0 0}
+.ccard .cban img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%;-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.7) 0%,rgba(0,0,0,.45) 35%,transparent 100%);mask-image:linear-gradient(to bottom,rgba(0,0,0,.7) 0%,rgba(0,0,0,.45) 35%,transparent 100%)}
+.ccard .cban{position:relative}
+.ccard .cban~b,.ccard .cban~.cmeta{position:relative}
+.ccard .cpill{position:absolute;left:12px;top:12px}
+.ccard .cpill .pill{background:rgba(255,255,255,.95);box-shadow:0 1px 3px rgba(10,15,28,.18)}
 .ccard .pill.lvl{border-color:var(--lv);color:var(--lv)}.ccard .pill.lvl .i{color:var(--lv)}
 .ccard b{display:block;color:var(--title);font-weight:600;font-size:1.15rem;line-height:1.3}
 .ccard .cmeta{display:grid;gap:5px;font-size:.95rem;color:var(--body)}
@@ -726,7 +737,7 @@ fieldset.qs{border:0;padding:0;margin:0;min-width:0}
 .tiles.pay .tile:has(input:checked){box-shadow:0 0 0 2px var(--teal) inset}.consent{display:flex;gap:12px;align-items:flex-start;margin:0;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:400;font-size:.9rem;color:var(--mut)}
 .consent input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--teal)}
 .enrollform .btn.big{margin-top:16px;font-size:1.08rem;padding:15px 20px}
-@media (max-width:480px){main{padding-top:4px}.hero{padding:26px 20px}.hero h1{font-size:2rem}.enrollform{padding:18px}}
+@media (max-width:480px){main{padding-top:4px}.hero{padding:16px 18px 18px}.hero h1{font-size:1.6rem}.enrollform{padding:18px}}
 @media print{.top,.nav,button,.btn,.back,.maplink{display:none}body{background:#fff}.card{box-shadow:none}}
 `;
 
@@ -812,7 +823,7 @@ function courseRow(c) {
     : slotsOf(c).length ? `<span>${icon('calendar')}Data da scegliere insieme</span>` : '';
   const dl = c.deadline && !expired(c) ? `<span>${icon('hourglass')}Iscrizioni entro il ${fmtDay(c.deadline)}</span>` : '';
   return `<a class="ccard ${levelClass(c)}" href="/c/${c.slug}">
-    <span class="chead"><span class="cic">${c.cover ? `<img src="/img/${esc(c.cover)}" alt="">` : levelIcon(c.level)}</span>${levelPill(c)}</span>
+    ${c.cover ? `<span class="cban"><img src="/img/${esc(c.cover)}" alt=""><span class="cpill">${levelPill(c)}</span></span>` : `<span class="chead"><span class="cic">${levelIcon(c.level)}</span>${levelPill(c)}</span>`}
     <b>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</b>
     <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${when}${dl}</span>
     <span class="cseat">${seatsShort(c, n)}</span>
@@ -840,11 +851,11 @@ function renderList(only = '') {
     ? `<nav class="filters">${chip('', 'Tutti', all.length)}${levels.map((k) => chip(k, LEVELS[k], byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
   const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}Livello ${LEVELS[k]}</h2>
     <div class="cgrid">${byLevel(k).map(courseRow).join('')}</div></section>`;
-  return page('Corsi Bitcoin', `<header class="hero"><h1>Corsi Bitcoin</h1>
-    <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello giusto per te.</p>
-    ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</header>
+  return page('Corsi Bitcoin', `<header class="hero"><div class="hrow"><h1>Corsi Bitcoin</h1>
+    ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</div>
+    <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello giusto per te.</p>${filters}</header>
     ${all.length
-      ? filters + (only ? [only] : levels).map(group).join('')
+      ? (only ? [only] : levels).map(group).join('')
       : `<div class="card empty">${icon('calendar')}<p>Al momento non ci sono corsi aperti. Torna a trovarci presto.</p></div>`}
     ${past.length ? `<details class="sec past"><summary>${icon('checkc')}Corsi già fatti <small>${past.length}</small><span class="tg"></span></summary><div class="card"><ul class="pl">${past.map(pastRow).join('')}</ul></div></details>` : ''}`, { wide: true });
 }
