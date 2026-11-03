@@ -2,12 +2,12 @@
 
 App self-hosted per gestire le iscrizioni ai corsi (base, medio, avanzato) in varie città.
 
-- **Pagina pubblica**: elenco corsi, date indicative, contatore "5 su 8", modulo di iscrizione. Nessun nome visibile al pubblico.
+- **Pagina pubblica**: elenco corsi in righe compatte diviso per livello (con filtri Base, Medio, Avanzato), date indicative, contatore "5 su 8", modulo di iscrizione. Nessun nome visibile al pubblico.
 - **Pannello admin** (solo rete di casa, porta **9150**): crei i corsi, vedi chi si è iscritto e quante persone sono disponibili per ogni fascia, confermi la data.
 - **Avviso Telegram** quando si raggiunge il minimo (e quando i posti sono esauriti).
 - Dati in un file SQLite sul tuo Umbrel, QR code e caratteri in locale. Unici servizi esterni: Cloudflare Tunnel per raggiungere la pagina e Telegram per gli avvisi.
 
-- **Pagina del corso completa**, come un modulo Google: immagine di copertina, presentazione, quando, dove (con il pulsante "Apri la mappa"), orari, contributo, partecipanti, scadenza delle prenotazioni, docenti, requisiti con icone, programma.
+- **Pagina del corso completa**, come un modulo Google: immagine di copertina, presentazione, quando, dove (con il pulsante "Apri la mappa"), orari, contributo, partecipanti, scadenza delle prenotazioni, docenti, requisiti con icone, programma, locandina da scaricare, pulsanti Condividi (WhatsApp, Telegram, Facebook, X).
 - **Pagamento in anticipo** facoltativo: se nel corso metti un indirizzo Bitcoin o Lightning, chi si iscrive può scegliere di pagare subito e vede i QR code.
 - **Lista d'attesa** facoltativa, corso per corso: a posti esauriti ci si iscrive in lista (senza occupare posti, senza pagamento in anticipo); nel pannello la vedi a parte e con "Promuovi" passi una persona tra gli iscritti quando si libera un posto.
 - **Pannello**: "Duplica corso" per riusare un corso già fatto, "Segna pagato" per ogni iscritto, "Scarica elenco" per aprire gli iscritti in Excel.
@@ -53,7 +53,8 @@ Quando hai l'indirizzo pubblico (tipo `https://corsi.tuodominio.it`), inseriscil
    - **Programma**: una riga tutta in maiuscolo (es. `MATTINO`) diventa un titoletto, le righe che iniziano con `-` diventano un elenco.
    - **Requisiti**: uno per riga; l'icona viene scelta dalle parole (penna, smartphone, computer, connessione, corso...).
    - **Copertina**: JPG, PNG o WebP fino a 4 MB, meglio orizzontale.
-2. Condividi il link del corso (o il QR) su Telegram/WhatsApp. Chi apre vede città, fasce, contatore e il modulo.
+   - **Locandina**: PDF oppure JPG, PNG o WebP fino a 10 MB; nella pagina del corso compare "Scarica la locandina".
+2. Condividi il link del corso (o il QR) su Telegram/WhatsApp. Sui social il link mostra nome del corso, città, date e la copertina (o la locandina, se è un'immagine); per questo serve l'indirizzo pubblico in Impostazioni. Chi apre vede città, fasce, contatore e il modulo.
 3. Quando arriva l'avviso Telegram, apri il corso: vedi **quante persone ci sono per ogni fascia** (con la migliore segnalata). Scegli la data e premi **Conferma corso**.
 4. Scrivi agli iscritti con data e luogo. Con **Scarica elenco (Excel/CSV)** hai tutti gli iscritti in un file che si apre direttamente in Excel.
 5. A corso finito, **elimina il corso**: cancella anche tutti gli iscritti (il modulo promette la cancellazione dei dati dopo il corso).
@@ -65,7 +66,7 @@ Quando hai l'indirizzo pubblico (tipo `https://corsi.tuodominio.it`), inseriscil
 - Il luogo preciso e la lista iscritti sono solo nel pannello admin.
 
 ## Backup
-Tutti i dati sono nella cartella `~/umbrel/app-data/corsibtc-iscrizioni/data/` sul tuo Umbrel: `corsi.db` (corsi e iscritti) e la cartella `img/` (immagini di copertina). Copia tutta la cartella per fare un backup.
+Tutti i dati sono nella cartella `~/umbrel/app-data/corsibtc-iscrizioni/data/` sul tuo Umbrel: `corsi.db` (corsi e iscritti) e la cartella `img/` (copertine e locandine). Copia tutta la cartella per fare un backup.
 
 ## Se qualcosa non funziona
 - **L'icona di Umbrel chiede il login Umbrel** invece di mostrare i corsi: la riga `PROXY_AUTH_ADD: "false"` in `docker-compose.yml` non è stata accettata dalla tua versione di Umbrel. Dimmelo con la versione di umbrelOS e lo sistemo.

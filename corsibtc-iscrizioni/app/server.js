@@ -62,10 +62,11 @@ addColumns('courses', {
   show_location: FLAG, phone_required: FLAG, prepay_text: TXT, btc_address: TXT, ln_address: TXT,
 });
 addColumns('courses', { cover: TXT, ask_company: FLAG, ask_source: FLAG, ask_waitlist: FLAG });
+addColumns('courses', { poster: TXT });
 addColumns('registrations', { payment: TXT, paid: FLAG, company: TXT, source: TXT, waitlist: FLAG });
 const COURSE_FIELDS = ['level', 'city', 'location', 'title', 'description', 'slots', 'min_n', 'max_n', 'teachers', 'deadline', 'schedule',
   'price', 'requirements', 'program', 'contact_email', 'show_location', 'phone_required', 'prepay_text', 'btc_address', 'ln_address', 'cover',
-  'ask_company', 'ask_source', 'ask_waitlist'];
+  'ask_company', 'ask_source', 'ask_waitlist', 'poster'];
 // "Come hai conosciuto questo corso?": le scelte del vecchio modulo; "Altro" ha un campo libero
 const SOURCES = ['Amico o invito diretto', 'Telegram', 'Locandina', 'WhatsApp', 'Facebook o Instagram', 'Altro'];
 
@@ -75,6 +76,9 @@ fs.mkdirSync(IMG_DIR, { recursive: true });
 const MAX_IMG = 4 * 1024 * 1024;
 const IMG_TYPES = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
 const IMG_NAME = /^[0-9a-f]{20}\.(jpg|png|webp)$/;
+const FILE_NAME = /^[0-9a-f]{20}\.(jpg|png|webp|pdf)$/; // copertine e locandine
+const MAX_POSTER = 10 * 1024 * 1024;
+const MAX_UPLOAD = MAX_IMG + MAX_POSTER + 65536;
 // tipo riconosciuto dai primi byte del file, non dal nome
 function imageExt(data) {
   if (data.length < 12) return '';
@@ -83,23 +87,24 @@ function imageExt(data) {
   if (data.toString('latin1', 0, 4) === 'RIFF' && data.toString('latin1', 8, 12) === 'WEBP') return 'webp';
   return '';
 }
+const isPdf = (data) => data.length > 8 && data.toString('latin1', 0, 5) === '%PDF-';
 function removeCover(name) {
-  if (!IMG_NAME.test(name || '')) return;
+  if (!FILE_NAME.test(name || '')) return;
   try { fs.unlinkSync(path.join(IMG_DIR, name)); } catch { /* già assente */ }
 }
 function copyCover(name) {
-  if (!IMG_NAME.test(name || '')) return '';
+  if (!FILE_NAME.test(name || '')) return '';
   const copy = crypto.randomBytes(10).toString('hex') + path.extname(name);
   try { fs.copyFileSync(path.join(IMG_DIR, name), path.join(IMG_DIR, copy)); } catch { return ''; }
   return copy;
 }
 // controllo prima di leggere: così il browser riceve un messaggio chiaro invece di una connessione interrotta
 const tooBig = (req) => {
-  const big = Number(req.headers['content-length'] || 0) > MAX_IMG + 65536;
+  const big = Number(req.headers['content-length'] || 0) > MAX_UPLOAD;
   if (big) req.resume(); // scarta il corpo, così la risposta arriva pulita al browser
   return big;
 };
-const TOO_BIG = 'Immagine troppo grande: massimo 4 MB. Riducila e riprova.';
+const TOO_BIG = 'File troppo grandi: copertina massimo 4 MB, locandina massimo 10 MB. Riducili e riprova.';
 // copertina dopo il salvataggio del modulo: file nuovo, oppure rimozione, oppure quella attuale
 function coverFrom(f, current = '') {
   const up = f.files && f.files.cover;
@@ -114,6 +119,44 @@ function coverFrom(f, current = '') {
   }
   if (f.get('cover_remove') === 'on') { removeCover(current); return { cover: '' }; }
   return { cover: current };
+}
+// locandina dopo il salvataggio del modulo: come la copertina, ma accetta anche un PDF
+function posterFrom(f, current = '') {
+  const up = f.files && f.files.poster;
+  if (up) {
+    const ext = isPdf(up.data) ? 'pdf' : imageExt(up.data);
+    if (!ext) return { err: "La locandina deve essere un PDF oppure un'immagine JPG, PNG o WebP." };
+    if (up.data.length > MAX_POSTER) return { err: 'Locandina troppo grande: massimo 10 MB.' };
+    const name = crypto.randomBytes(10).toString('hex') + '.' + ext;
+    fs.writeFileSync(path.join(IMG_DIR, name), up.data);
+    removeCover(current);
+    return { poster: name };
+  }
+  if (f.get('poster_remove') === 'on') { removeCover(current); return { poster: '' }; }
+  return { poster: current };
+}
+// copertina e locandina insieme, per Nuovo corso e Modifica corso
+function filesFrom(f, out, c = {}) {
+  const cv = coverFrom(f, c.cover || '');
+  if (cv.err) return cv.err;
+  const pv = posterFrom(f, c.poster || '');
+  if (pv.err) return pv.err;
+  out.cover = cv.cover;
+  out.poster = pv.poster;
+  return '';
+}
+const posterExt = (c) => (FILE_NAME.test(c.poster || '') ? path.extname(c.poster).slice(1) : '');
+// la locandina si apre nel browser con il nome del corso, es. "locandina-corso-base-thiene.pdf"
+function servePoster(res, c) {
+  const ext = posterExt(c);
+  let buf = null;
+  try { if (ext) buf = fs.readFileSync(path.join(IMG_DIR, c.poster)); } catch { /* file mancante */ }
+  if (!buf) return false;
+  const nice = `locandina-${courseName(c)}-${c.city}`.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
+  res.writeHead(200, { 'Content-Type': ext === 'pdf' ? 'application/pdf' : IMG_TYPES[ext], 'Content-Disposition': `inline; filename="${nice}.${ext}"`,
+    'Cache-Control': 'public, max-age=3600', 'X-Content-Type-Options': 'nosniff' });
+  res.end(buf);
+  return true;
 }
 function serveImage(res, p) {
   const m = p.match(/^\/img\/([0-9a-f]{20}\.(?:jpg|png|webp))$/);
@@ -201,7 +244,7 @@ async function readMultipart(req, boundary, limit) {
 }
 async function readForm(req) {
   const m = /^multipart\/form-data;.*boundary=(?:"([^"]+)"|([^;\s]+))/i.exec(req.headers['content-type'] || '');
-  if (m) return readMultipart(req, m[1] || m[2], MAX_IMG + 65536);
+  if (m) return readMultipart(req, m[1] || m[2], MAX_UPLOAD);
   const f = new URLSearchParams(await readBody(req));
   f.files = {};
   return f;
@@ -497,18 +540,35 @@ tr:last-child td{border-bottom:0}
 .hero .stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
 .hero .pill{background:rgba(255,255,255,.16);color:#fff;font-size:.85rem}
 .hero .pill .i{color:#fff}
-.steps{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:12px;margin:0 0 8px;padding:0}
-.steps li{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.steps .ic{flex:none;width:38px;height:38px;border-radius:10px;background:var(--tsoft);color:var(--teal);display:flex;align-items:center;justify-content:center}
-.steps .ic .i{width:19px;height:19px;vertical-align:0}
-.steps b{display:block;color:var(--title);font-weight:600;line-height:1.3}
-.steps .t{display:block;font-size:.9rem;color:var(--mut);line-height:1.45;margin-top:2px}
-.gh{margin:32px 0 14px}
+.gh{margin:28px 0 10px;font-size:1.15rem;color:var(--lv,var(--title))}
+.gh .i{color:var(--lv,var(--teal))}
 .gh .pill{margin-left:4px;background:var(--soft);color:var(--mut)}
 .empty{display:flex;gap:14px;align-items:center;color:var(--mut)}
 .empty .i{width:28px;height:28px;color:var(--teal)}
 .empty p{margin:0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:22px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 4px}
+.filters a{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--body);text-decoration:none;font-size:.92rem;font-weight:500}
+.filters a .i{color:var(--lv,var(--teal))}
+.filters a small{color:var(--mut);font-weight:400}
+.filters a:hover{border-color:var(--lv,var(--teal))}
+.filters a.sel{background:var(--lv,var(--teal));border-color:var(--lv,var(--teal));color:#fff}
+.filters a.sel .i,.filters a.sel small{color:#fff}
+.clist{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.crow{display:grid;grid-template-columns:auto minmax(0,1fr) 170px auto;gap:16px;align-items:center;padding:13px 18px 13px 16px;border-left:4px solid var(--lv);color:inherit;text-decoration:none;transition:background .12s}
+.crow+.crow{border-top:1px solid var(--line)}
+.crow:hover{background:#F7F9FB}
+.crow .cic{width:38px;height:38px;border-radius:10px;background:var(--lv);color:#fff;display:flex;align-items:center;justify-content:center}
+.crow .cic .i{width:20px;height:20px;vertical-align:0}
+.crow .cic img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.crow b{display:block;color:var(--title);font-weight:600;font-size:1.02rem;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow .cmeta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:3px;font-size:.88rem;color:var(--mut)}
+.crow .cmeta>span{display:inline-flex;align-items:center;gap:5px}
+.crow .cmeta .i{color:var(--lv)}
+.crow .cmeta .pill{padding:1px 9px;font-size:.78rem}
+.crow .cseat .bar{margin:0 0 4px}
+.crow .cseat .bar>i{background:var(--lv)}
+.crow .cseat small{display:block;font-size:.8rem;color:var(--mut);white-space:nowrap}
+.crow .cgo{color:var(--lv)}
 .media{position:relative;height:168px;overflow:hidden;flex:none;background:linear-gradient(135deg,var(--lv),var(--lv2))}
 .media img.cover{display:block;width:100%;height:100%;object-fit:cover}
 .media .deco{position:absolute;right:-18px;bottom:-34px;width:150px;height:150px;color:rgba(255,255,255,.17)}
@@ -542,6 +602,14 @@ tr:last-child td{border-bottom:0}
 .aside .dl{display:flex;gap:8px;align-items:center;color:var(--mut);font-size:.92rem;margin:10px 0 0}
 .aside .dl .i{color:var(--lv,var(--teal))}
 .btn.big,button.big{width:100%;padding:13px 20px;font-size:1rem}
+.aside .btn.sec.big{margin-top:10px}
+.share{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.share>b{display:flex;align-items:center;gap:6px;font-size:.92rem;color:var(--title);margin:0 0 8px}
+.share>b .i{color:var(--lv,var(--teal))}
+.share div{display:flex;flex-wrap:wrap;gap:6px}
+.share a{padding:5px 12px;border:1px solid var(--line);border-radius:999px;font-size:.86rem;color:var(--body);text-decoration:none;background:var(--panel)}
+.share a:hover{border-color:var(--lv,var(--teal));color:var(--lv,var(--teal))}
+.share .mono{margin:10px 0 0;font-size:.78rem;color:var(--mut);user-select:all}
 .aside .btn.big{margin-top:14px}
 @media (min-width:940px){.cwrap{grid-template-columns:minmax(0,1fr) 320px;gap:36px;align-items:start}.aside{grid-column:2;grid-row:1;position:sticky;top:18px}.cmain{grid-column:1;grid-row:1}}
 .foot{display:flex;gap:8px;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:.85rem;margin-top:44px;padding-top:18px;border-top:1px solid var(--line)}
@@ -608,7 +676,7 @@ fieldset.qs{border:0;padding:0;margin:24px 0 0;min-width:0}
 .consent{display:flex;gap:12px;align-items:flex-start;margin:26px 0 0;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:400;font-size:.9rem;color:var(--mut)}
 .consent input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--teal)}
 .enrollform .btn.big{margin-top:18px}
-@media (max-width:640px){.steps{gap:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}.steps li{border:0;border-radius:0;padding:11px 14px;align-items:center}.steps li+li{border-top:1px solid var(--line)}.steps .ic{width:34px;height:34px}.steps .t{font-size:.85rem}.gh{margin-top:26px}}
+@media (max-width:640px){.crow{grid-template-columns:auto minmax(0,1fr);gap:12px;padding:12px 14px 12px 12px}.crow .cseat{grid-column:2}.crow .cgo{display:none}.crow b{white-space:normal}.crow .cic{width:34px;height:34px}}
 @media (max-width:480px){main{padding-top:4px}.hero{padding:26px 20px}.hero h1{font-size:2rem}.enrollform{padding:18px}}
 @media print{.top,.nav,button,.btn,.back,.maplink{display:none}body{background:#fff}.card{box-shadow:none}}
 `;
@@ -623,14 +691,14 @@ function serveIcon(res, p) {
 
 const FOOT = `<footer class="foot">${icon('shield')}<span>I dati degli iscritti non vengono ceduti a terzi e vengono cancellati dopo il corso.</span></footer>`;
 
-function page(title, body, { admin = false, wide = false } = {}) {
+function page(title, body, { admin = false, wide = false, head = '' } = {}) {
   const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg" alt="" width="34" height="34"></span>Corsi Bitcoin${admin ? '<small>· Admin</small>' : ''}</a>`;
   const nav = admin
     ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo corso</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
        <form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form></nav>`
     : '';
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg">${head}
 <title>${esc(title)}</title><style>${CSS}</style></head><body><main${wide ? ' class="wide"' : ''}><header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main></body></html>`;
 }
 
@@ -676,40 +744,48 @@ function mediaBlock(c, n, big = false) {
 }
 const pillsRow = (c, n) => (c.cover ? `<div class="row pr">${levelPill(c)}${statusBadge(c, n, false)}</div>` : '');
 
-function courseCard(c) {
-  const n = countRegs(c.id);
-  const slots = slotsOf(c);
-  return `<article class="card course ${levelClass(c)}">
-    ${mediaBlock(c, n)}
-    <div class="body">
-      ${pillsRow(c, n)}
-      <h2>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</h2>
-      <p class="course-meta"><span>${icon('pin')}${esc(c.city)}</span>${c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}${c.deadline && !expired(c) ? `<span>${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</span>` : ''}</p>
-      ${slots.length ? `<div class="course-slots">${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
-      <div class="course-progress">${counter(c, n)}</div>
-      <a class="btn" href="/c/${c.slug}">${n >= c.max_n ? (c.ask_waitlist && !expired(c) && c.status !== 'closed' ? "Dettagli e lista d'attesa" : 'Dettagli') : 'Dettagli e iscrizione'}${icon('arrow')}</a>
-    </div>
-  </article>`;
+// posti in breve, per la riga della lista
+function seatsShort(c, n) {
+  const confirmed = c.status === 'confirmed';
+  const pct = Math.min(100, Math.round((n / (confirmed ? c.max_n : c.min_n)) * 100));
+  const txt = n >= c.max_n ? `Completo (${n}/${c.max_n})`
+    : confirmed || n >= c.min_n ? `${c.max_n - n} posti liberi su ${c.max_n}`
+      : `${n} su ${c.min_n} per partire`;
+  return `<div class="bar"><i style="width:${pct}%"></i></div><small>${esc(txt)}</small>`;
 }
 
-function renderList() {
+function courseRow(c) {
+  const n = countRegs(c.id);
+  const wait = n >= c.max_n && c.ask_waitlist && !expired(c) && c.status !== 'closed';
+  const when = c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>`
+    : c.deadline && !expired(c) ? `<span>${icon('hourglass')}Entro il ${fmtDay(c.deadline)}</span>` : '';
+  return `<a class="crow ${levelClass(c)}" href="/c/${c.slug}">
+    <span class="cic">${c.cover ? `<img src="/img/${esc(c.cover)}" alt="">` : levelIcon(c.level)}</span>
+    <span><b>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</b>
+      <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${when}${wait ? pill("Lista d'attesa aperta", 'on', 'users') : statusBadge(c, n, false)}</span></span>
+    <span class="cseat">${seatsShort(c, n)}</span>
+    <span class="cgo">${icon('arrow')}</span>
+  </a>`;
+}
+
+function renderList(only = '') {
   const all = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed') ORDER BY created_at DESC").all();
-  const confirmed = all.filter((c) => c.status === 'confirmed');
-  const open = all.filter((c) => c.status !== 'confirmed');
+  const lv = (c) => (LEVELS[c.level] ? c.level : 'base');
   const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
-  const group = (title, ic, list) => (list.length
-    ? `<h2 class="gh">${icon(ic)}${title}<span class="pill">${list.length}</span></h2><div class="grid">${list.map(courseCard).join('')}</div>` : '');
-  const steps = [
-    ['list', 'Scegli il corso', 'Il livello e la città più comodi per te.'],
-    ['calendar', 'Indica quando puoi', 'Seleziona tutte le fasce che vanno bene.'],
-    ['mail', 'Ti scriviamo noi', 'Raggiunto il minimo, scegliamo la data in base alle disponibilità.'],
-  ];
+  const levels = Object.keys(LEVELS).filter((k) => all.some((c) => lv(c) === k));
+  if (!levels.includes(only)) only = '';
+  // dentro ogni livello: prima i confermati, poi quelli con iscrizioni aperte
+  const byLevel = (k) => all.filter((c) => lv(c) === k).sort((a, b) => (b.status === 'confirmed') - (a.status === 'confirmed'));
+  const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
+  const filters = levels.length > 1
+    ? `<nav class="filters">${chip('', 'Tutti', all.length)}${levels.map((k) => chip(k, LEVELS[k], byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
+  const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}Livello ${LEVELS[k]}</h2>
+    <div class="clist">${byLevel(k).map(courseRow).join('')}</div></section>`;
   return page('Corsi Bitcoin', `<header class="hero"><h1>Corsi Bitcoin</h1>
-    <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello e dicci quando potresti esserci.</p>
-    ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} ${cities === 1 ? 'città' : 'città'}</span></div>` : ''}</header>
-    <ol class="steps">${steps.map(([ic, t, d]) => `<li><span class="ic">${icon(ic)}</span><span><b>${t}</b><span class="t">${d}</span></span></li>`).join('')}</ol>
+    <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello giusto per te.</p>
+    ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</header>
     ${all.length
-      ? group('Corsi confermati', 'checkc', confirmed) + group('Iscrizioni aperte', 'pen', open)
+      ? filters + (only ? [only] : levels).map(group).join('')
       : `<div class="card empty">${icon('calendar')}<p>Al momento non ci sono corsi aperti. Torna a trovarci presto.</p></div>`}`, { wide: true });
 }
 
@@ -763,6 +839,29 @@ function renderProgram(text) {
   }
   flush();
   return `<div class="prog">${out.join('')}</div>`;
+}
+
+// come appare il link sui social (WhatsApp, Telegram, Facebook, X): titolo, descrizione e immagine
+function socialHead(c) {
+  const base = publicBase();
+  if (!base) return '';
+  const when = c.status === 'confirmed' ? c.confirmed_date : slotsOf(c).join(', ');
+  const desc = [`${c.city}${when ? ' · ' + when : ''}`, c.description].filter(Boolean).join(' – ').replace(/\s+/g, ' ');
+  const short = desc.length > 200 ? desc.slice(0, 200).replace(/\s+\S*$/, '') + '…' : desc; // taglio a parola intera
+  const img = c.cover ? `${base}/img/${c.cover}` : ['jpg', 'png', 'webp'].includes(posterExt(c)) ? `${base}/c/${c.slug}/locandina` : '';
+  const m = (k, v) => `<meta property="${k}" content="${esc(v)}">`;
+  return '\n' + [m('og:type', 'website'), m('og:site_name', 'Corsi Bitcoin'), m('og:title', courseName(c)), m('og:description', short),
+    m('og:url', `${base}/c/${c.slug}`), img ? m('og:image', img) : '', `<meta name="twitter:card" content="${img ? 'summary_large_image' : 'summary'}">`].join('');
+}
+// link di condivisione: semplici indirizzi, nessuno script e nessun servizio caricato nella pagina
+function shareBox(c) {
+  const base = publicBase();
+  if (!base) return '';
+  const link = `${base}/c/${c.slug}`;
+  const text = `${courseName(c)} a ${c.city}`;
+  const u = encodeURIComponent(link), t = encodeURIComponent(text);
+  const a = (href, label) => `<a href="${href}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+  return `<div class="share"><b>${icon('send')}Condividi</b><div>${a(`https://wa.me/?text=${encodeURIComponent(text + ' ' + link)}`, 'WhatsApp')}${a(`https://t.me/share/url?url=${u}&amp;text=${t}`, 'Telegram')}${a(`https://www.facebook.com/sharer/sharer.php?u=${u}`, 'Facebook')}${a(`https://x.com/intent/post?url=${u}&amp;text=${t}`, 'X')}</div><p class="mono">${esc(link)}</p></div>`;
 }
 
 function renderCourse(c, { error = '', ok = false, paid = false, wait = false, values = {} } = {}) {
@@ -829,6 +928,8 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
         ${counter(c, n)}
         ${c.deadline && !late ? `<p class="dl">${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</p>` : ''}
         ${ok || stop ? '' : `<a class="btn big" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${canWait ? "Mettiti in lista d'attesa" : 'Iscriviti ora'}</a>`}
+        ${posterExt(c) ? `<a class="btn sec big" href="/c/${c.slug}/locandina" target="_blank" rel="noopener">${icon('down')}Scarica la locandina</a>` : ''}
+        ${shareBox(c)}
       </aside>
       <div class="cmain">
         ${c.description ? `<p class="intro">${esc(c.description)}</p>` : ''}
@@ -840,7 +941,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
         ${c.contact_email ? `<p class="contact">${icon('mail')}<span>Per informazioni scrivi a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</span></p>` : ''}
       </div>
     </div>
-    </div>`, { wide: true });
+    </div>`, { wide: true, head: socialHead(c) });
 }
 
 async function handlePublic(req, res) {
@@ -848,8 +949,14 @@ async function handlePublic(req, res) {
   const p = url.pathname;
   if (p === '/health') return send(res, 200, 'ok', { 'Content-Type': 'text/plain' });
   if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p) || serveIcon(res, p))) return;
-  if (req.method === 'GET' && p === '/') return send(res, 200, renderList());
+  if (req.method === 'GET' && p === '/') return send(res, 200, renderList(url.searchParams.get('livello') || ''));
 
+  const pm = p.match(/^\/c\/([0-9a-f]{10})\/locandina$/);
+  if (pm && req.method === 'GET') {
+    const pc = db.prepare('SELECT * FROM courses WHERE slug = ?').get(pm[1]);
+    if (pc && servePoster(res, pc)) return;
+    return send(res, 404, page('Non trovato', '<h1>Locandina non trovata</h1><p><a href="/">Torna ai corsi</a></p>'));
+  }
   const m = p.match(/^\/c\/([0-9a-f]{10})$/);
   if (!m) return send(res, 404, page('Non trovato', '<h1>Pagina non trovata</h1><p><a href="/">Torna ai corsi</a></p>'));
   const course = db.prepare('SELECT * FROM courses WHERE slug = ?').get(m[1]);
@@ -963,7 +1070,7 @@ function parseCourseForm(f) {
     show_location: f.get('show_location') === 'on' ? 1 : 0, phone_required: f.get('phone_required') === 'on' ? 1 : 0,
     ask_company: f.get('ask_company') === 'on' ? 1 : 0, ask_source: f.get('ask_source') === 'on' ? 1 : 0, ask_waitlist: f.get('ask_waitlist') === 'on' ? 1 : 0,
     prepay_text: field(f, 'prepay_text', 1000), btc_address: field(f, 'btc_address', 100), ln_address: field(f, 'ln_address', 600),
-    cover: '', // decisa dopo, da coverFrom()
+    cover: '', poster: '', // decise dopo, da filesFrom()
   };
   let err = '';
   if (!LEVELS[level]) err = 'Scegli il livello.';
@@ -987,6 +1094,9 @@ function courseFormHtml(v, action, button) {
     <label>Immagine di copertina <small>facoltativa: JPG, PNG o WebP, massimo 4 MB, meglio orizzontale (es. 1200×400)</small></label>
     ${v.cover ? `<div class="cover-now"><img class="cover" src="/img/${esc(v.cover)}" alt="Copertina attuale">${chk('cover_remove', 'Togli questa immagine')}</div>` : ''}
     <input type="file" name="cover" accept="image/jpeg,image/png,image/webp">
+    <label>Locandina <small>facoltativa: PDF oppure immagine JPG, PNG o WebP, massimo 10 MB. Chi visita il corso la può scaricare</small></label>
+    ${v.poster && v.slug ? `<div class="cover-now"><p><a class="btn sec" href="/corso/${v.slug}/locandina" target="_blank" rel="noopener">${icon('down')}Apri la locandina attuale</a></p>${chk('poster_remove', 'Togli la locandina')}</div>` : ''}
+    <input type="file" name="poster" accept="application/pdf,image/jpeg,image/png,image/webp">
     </fieldset>
 
     <fieldset class="fs"><legend>${icon('pin')}Dove e quando</legend>
@@ -1226,7 +1336,7 @@ async function handleAdmin(req, res) {
     if (tooBig(req)) return send(res, 413, page('Nuovo corso', `<h1>Nuovo corso</h1>${msg('err', TOO_BIG)}<p><a href="/corso/nuovo">Torna al modulo</a></p>`, { admin: true }));
     const f = await readForm(req);
     let { out, err } = parseCourseForm(f);
-    if (!err) { const cv = coverFrom(f); if (cv.err) err = cv.err; else out.cover = cv.cover; }
+    if (!err) err = filesFrom(f, out);
     if (err) return send(res, 400, page('Nuovo corso', `<h1>Nuovo corso</h1>${msg('err', esc(err))}${courseFormHtml(out, '/corso/nuovo', 'Crea corso')}`, { admin: true }));
     const slug = newSlug();
     insertCourse(slug, out);
@@ -1279,13 +1389,17 @@ async function handleAdmin(req, res) {
       if (!publicBase()) return back(`/corso/${c.slug}`);
       return send(res, 200, qrSvg(`${publicBase()}/c/${c.slug}`), { 'Content-Type': 'image/svg+xml', 'Content-Disposition': `attachment; filename="corso-${c.slug}.svg"` });
     }
+    if (sub === '/locandina' && req.method === 'GET') {
+      if (servePoster(res, c)) return;
+      return back(`/corso/${c.slug}`, 'Questo corso non ha una locandina.');
+    }
     if (sub === '/modifica') {
       if (req.method === 'GET') return send(res, 200, page('Modifica corso', `<a class="back" href="/corso/${c.slug}">${icon('back')}Torna al corso</a><h1>Modifica corso</h1>${flash ? msg('ok', esc(flash)) : ''}${courseFormHtml(c, `/corso/${c.slug}/modifica`, 'Salva')}`, { admin: true }));
       if (tooBig(req)) return send(res, 413, page('Modifica corso', `<h1>Modifica corso</h1>${msg('err', TOO_BIG)}<p><a href="/corso/${c.slug}/modifica">Torna al modulo</a></p>`, { admin: true }));
       const f = await readForm(req);
       let { out, err } = parseCourseForm(f);
-      if (!err) { const cv = coverFrom(f, c.cover); if (cv.err) err = cv.err; else out.cover = cv.cover; }
-      if (err) return send(res, 400, page('Modifica corso', `<h1>Modifica corso</h1>${msg('err', esc(err))}${courseFormHtml({ ...out, cover: c.cover }, `/corso/${c.slug}/modifica`, 'Salva')}`, { admin: true }));
+      if (!err) err = filesFrom(f, out, c);
+      if (err) return send(res, 400, page('Modifica corso', `<h1>Modifica corso</h1>${msg('err', esc(err))}${courseFormHtml({ ...out, cover: c.cover, poster: c.poster, slug: c.slug }, `/corso/${c.slug}/modifica`, 'Salva')}`, { admin: true }));
       db.prepare(`UPDATE courses SET ${COURSE_FIELDS.map((k) => `${k} = ?`).join(', ')} WHERE id = ?`).run(...COURSE_FIELDS.map((k) => out[k]), c.id);
       resetNotified(c.id);
       return back(`/corso/${c.slug}`, 'Corso aggiornato.');
@@ -1293,7 +1407,7 @@ async function handleAdmin(req, res) {
     if (sub === '/duplica' && req.method === 'POST') {
       // stessi testi, nessun iscritto, iscrizioni aperte; la scadenza va riscritta perché quella vecchia è passata
       const slug = newSlug();
-      insertCourse(slug, { ...c, deadline: '', cover: copyCover(c.cover) });
+      insertCourse(slug, { ...c, deadline: '', cover: copyCover(c.cover), poster: copyCover(c.poster) });
       return back(`/corso/${slug}/modifica`, 'Copia creata, ancora senza iscritti. Controlla città, fasce e scadenza, poi salva.');
     }
     if (sub === '/iscritti.csv' && req.method === 'GET') {
@@ -1320,6 +1434,7 @@ async function handleAdmin(req, res) {
       if ((await readForm(req)).get('sure') !== 'on') return back(`/corso/${c.slug}`);
       db.prepare('DELETE FROM courses WHERE id = ?').run(c.id);
       removeCover(c.cover);
+      removeCover(c.poster);
       return back('/', 'Corso eliminato.');
     }
   }
