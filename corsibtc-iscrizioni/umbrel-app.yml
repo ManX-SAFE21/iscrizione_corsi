@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.5.0"
+version: "1.5.1"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -22,6 +22,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Home più ordinata: corsi in righe compatte divise per livello, con filtri. Locandina del corso (PDF o immagine) da scaricare. Pulsanti Condividi e anteprima del link sui social."
+releaseNotes: "Ora Aggiorna installa anche il programma nuovo. Home più ordinata: corsi in righe compatte divise per livello, con filtri. Locandina del corso (PDF o immagine) da scaricare. Pulsanti Condividi e anteprima del link sui social."
 submitter: Manuxxx
 submission: ""

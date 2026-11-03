@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Umbrel, con "Aggiorna", copia solo docker-compose.yml, umbrel-app.yml e la cartella hooks:
+# il programma (cartella app/) va copiato da qui, prima di ogni avvio.
+# Si copia solo dallo store che ha la STESSA versione installata, così un riavvio
+# non porta dentro una versione nuova prima che si prema "Aggiorna".
+set -euo pipefail
+
+APP_DIR="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")"
+UMBREL_DIR="$(readlink -f "${APP_DIR}/../..")"
+APP_ID="$(basename "${APP_DIR}")"
+version() { grep -m1 '^version:' "$1" 2>/dev/null | sed -E 's/^version:[[:space:]]*"?([^"]*)"?.*/\1/'; }
+
+installed="$(version "${APP_DIR}/umbrel-app.yml")"
+[[ -n "${installed}" ]] || exit 0
+
+for store in "${UMBREL_DIR}"/app-stores/*/"${APP_ID}"; do
+  [[ -f "${store}/app/server.js" ]] || continue
+  [[ "$(version "${store}/umbrel-app.yml")" == "${installed}" ]] || continue
+  if ! diff -rq "${store}/app" "${APP_DIR}/app" >/dev/null 2>&1; then
+    echo "corsibtc-iscrizioni: copio il programma della versione ${installed}"
+    mkdir -p "${APP_DIR}/app"
+    rsync --archive --delete "${store}/app/" "${APP_DIR}/app/"
+    chown -R 1000:1000 "${APP_DIR}/app"
+  fi
+  exit 0
+done
+echo "corsibtc-iscrizioni: nessuno store con la versione ${installed}, programma lasciato com'è"
