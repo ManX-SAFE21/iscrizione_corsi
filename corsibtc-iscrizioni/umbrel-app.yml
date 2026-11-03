@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.6.3"
+version: "1.6.4"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -23,6 +23,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Nel modulo di iscrizione la scelta di pagamento attiva è più evidente, e il messaggio finale ricorda come si è scelto di pagare. Corretto: le email (e gli indirizzi Lightning) nella pagina del corso non vengono più nascoste da Cloudflare. Nel modulo del corso il pulsante Salva resta sempre visibile in fondo allo schermo. L'icona dell'app ora apre il pannello di gestione, con il login di Umbrel e senza altre password. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Nuovo carattere Roboto, più leggibile. Il messaggio di iscrizione ricevuta è più evidente: ricorda come si è scelto di pagare e che il corso viene confermato entro 7 giorni prima della data. Nel modulo la scelta di pagamento attiva è più evidente. Corretto: le email (e gli indirizzi Lightning) nella pagina del corso non vengono più nascoste da Cloudflare. Nel modulo del corso il pulsante Salva resta sempre visibile in fondo allo schermo. L'icona dell'app ora apre il pannello di gestione, con il login di Umbrel e senza altre password. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""

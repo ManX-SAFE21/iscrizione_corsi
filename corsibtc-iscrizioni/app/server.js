@@ -462,15 +462,14 @@ const h2 = (txt, ic) => `<h2>${icon(ic)}${txt}</h2>`;
 const mapLink = (q) => `<a class="maplink" href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(q)}" target="_blank" rel="noopener noreferrer" title="Apri sulla mappa">${icon('map')}Apri la mappa</a>`;
 
 const CSS = `
-@font-face{font-family:Inter;src:url(/fonts/inter-latin-wght-normal.woff2) format('woff2');font-weight:100 900;font-display:swap}
-@font-face{font-family:'Space Grotesk';src:url(/fonts/space-grotesk-latin-wght-normal.woff2) format('woff2');font-weight:300 700;font-display:swap}
+@font-face{font-family:Roboto;src:url(/fonts/roboto-latin-wght-normal.woff2) format('woff2');font-weight:100 900;font-display:swap}
 @font-face{font-family:'Space Mono';src:url(/fonts/space-mono-latin-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
 :root{--bg:#F4F6F9;--panel:#FFFFFF;--line:#D3DBE6;--title:#0A0F1C;--body:#1E2735;--mut:#54637A;--teal:#0A7568;--teald:#085E54;--tsoft:#E1F2EE;--soft:#E8EDF4;--err:#B3261E;--esoft:#FBECEA;--warn:#8A5200;--wsoft:#FBF2E3;--shadow:0 1px 2px rgba(10,15,28,.05),0 6px 18px rgba(10,15,28,.04)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 Inter,'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 Roboto,'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased}
 main{max-width:720px;margin:0 auto;padding:12px 16px 64px}
 main.wide{max-width:1040px}
-h1,h2,h3{font-family:'Space Grotesk',Inter,'Segoe UI',Arial,sans-serif;font-weight:600;color:var(--title);line-height:1.2}
+h1,h2,h3{font-family:Roboto,'Segoe UI',Arial,sans-serif;font-weight:500;color:var(--title);line-height:1.2}
 h1{font-size:1.85rem;margin:.3em 0 .3em}
 h2{font-size:1.2rem;margin:1.8em 0 .6em;display:flex;align-items:center;gap:8px}
 h2 .i{color:var(--teal);width:1.05em;height:1.05em}
@@ -480,12 +479,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .i{width:1.1em;height:1.1em;vertical-align:-.2em;flex:none}
 .sub{color:var(--mut);margin:0 0 1.2em}
 .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;padding:10px 0 14px;margin-bottom:22px;border-bottom:1px solid var(--line)}
-.brand{display:inline-flex;align-items:center;gap:10px;font:600 1.05rem 'Space Grotesk',Inter,sans-serif;color:var(--title);text-decoration:none}
+.brand{display:inline-flex;align-items:center;gap:10px;font:600 1.05rem Roboto,sans-serif;color:var(--title);text-decoration:none}
 .brand .mark{width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid var(--line);overflow:hidden;display:inline-flex;flex:none}
 .brand .mark img{width:100%;height:100%;display:block}
 .brand small{font-weight:500;color:var(--mut);margin-left:2px}
 .nav{display:flex;gap:2px;flex-wrap:wrap;align-items:center}
-.nav a,.nav button{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;color:var(--body);background:none;border:0;font:500 .93rem/1.4 Inter,'Segoe UI',Arial,sans-serif;text-decoration:none;cursor:pointer}
+.nav a,.nav button{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;color:var(--body);background:none;border:0;font:500 .93rem/1.4 Roboto,'Segoe UI',Arial,sans-serif;text-decoration:none;cursor:pointer}
 .nav a:hover,.nav button:hover{background:var(--soft);color:var(--title)}
 .nav .i{color:var(--teal)}
 .back{display:inline-flex;align-items:center;gap:6px;color:var(--mut);text-decoration:none;font-size:.93rem;margin:0 0 12px}
@@ -510,7 +509,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--teal)}
 textarea{min-height:90px}
 .check{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin:8px 0;color:var(--body)}
 .check input{width:20px;height:20px;margin-top:3px;flex:none;accent-color:var(--teal)}
-button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--teal);color:#fff;border:1px solid var(--teal);border-radius:8px;padding:10px 18px;font:500 15px/1.4 Inter,'Segoe UI',Arial,sans-serif;cursor:pointer;text-decoration:none}
+button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--teal);color:#fff;border:1px solid var(--teal);border-radius:8px;padding:10px 18px;font:500 15px/1.4 Roboto,'Segoe UI',Arial,sans-serif;cursor:pointer;text-decoration:none}
 button:hover,.btn:hover{background:var(--teald);border-color:var(--teald)}
 .btn.sec,button.sec{background:#fff;color:var(--title);border-color:var(--line)}
 .btn.sec:hover,button.sec:hover{background:#fff;border-color:var(--teal);color:var(--teal)}
@@ -522,6 +521,10 @@ button.paid{color:var(--teald);border-color:var(--tsoft);background:var(--tsoft)
 .msg{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;margin:12px 0;border:1px solid var(--line);background:var(--panel);color:var(--title)}
 .msg .i{margin-top:.22em}
 .msg.ok{border-color:#BFE3DA;background:var(--tsoft)}.msg.ok .i{color:var(--teald)}
+.msg.done{gap:14px;padding:20px 22px;border:2px solid var(--teal);font-size:1.05rem}
+.msg.done .i{width:30px;height:30px;margin-top:0}
+.msg.done p{margin:0 0 8px}.msg.done p:last-child{margin:0}
+.msg.done .dt{font-size:1.35rem;font-weight:700;color:var(--teald);margin-bottom:10px}
 .msg.err{border-color:#E7C2BE;background:var(--esoft)}.msg.err .i{color:var(--err)}
 .msg.warn{border-color:#EAD3A8;background:var(--wsoft)}.msg.warn .i{color:var(--warn)}
 table{width:100%;border-collapse:collapse;font-size:.92rem}
@@ -648,7 +651,7 @@ form:has(#src-other:checked) .srcwrap{display:block}
 .pay .qr{margin:8px 0}
 fieldset.fs{border:0;border-top:1px solid var(--line);margin:28px 0 0;padding:8px 0 0}
 fieldset.fs:first-child{border-top:0;margin-top:0}
-.fs legend{font:600 1.05rem 'Space Grotesk',Inter,sans-serif;color:var(--title);padding:0 10px 0 0;display:flex;align-items:center;gap:8px}
+.fs legend{font:600 1.05rem Roboto,sans-serif;color:var(--title);padding:0 10px 0 0;display:flex;align-items:center;gap:8px}
 .fs legend .i{color:var(--teal)}
 .contact{display:flex;align-items:center;gap:8px;color:var(--mut);margin-top:28px}
 .ql{display:flex;gap:20px;flex-wrap:wrap;align-items:center}
@@ -678,9 +681,7 @@ fieldset.qs{border:0;padding:0;margin:24px 0 0;min-width:0}
 .tile b{display:block;color:var(--title);font-weight:600}
 .tile small{display:block;color:var(--mut);font-weight:400}
 .tile:has(input:checked){border-color:var(--teal);background:var(--tsoft);box-shadow:0 0 0 1px var(--teal) inset}
-.tiles.pay .tile:has(input:checked){box-shadow:0 0 0 2px var(--teal) inset}
-.tiles.pay .tile:has(input:checked) b::after{content:"✓ scelto";margin-left:8px;padding:1px 8px;border-radius:99px;background:var(--teal);color:#fff;font-size:.75em;font-weight:600;vertical-align:2px}
-.consent{display:flex;gap:12px;align-items:flex-start;margin:26px 0 0;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:400;font-size:.9rem;color:var(--mut)}
+.tiles.pay .tile:has(input:checked){box-shadow:0 0 0 2px var(--teal) inset}.consent{display:flex;gap:12px;align-items:flex-start;margin:26px 0 0;padding:14px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:400;font-size:.9rem;color:var(--mut)}
 .consent input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--teal)}
 .enrollform .btn.big{margin-top:18px}
 @media (max-width:640px){.crow{grid-template-columns:auto minmax(0,1fr);gap:12px;padding:12px 14px 12px 12px}.crow .cseat{grid-column:2}.crow .cgo{display:none}.crow b{white-space:normal}.crow .cic{width:34px;height:34px}}
@@ -805,7 +806,7 @@ function payBox(c) {
       ${c.btc_address ? payItem('Bitcoin', 'btc', c.btc_address, 'bitcoin:' + c.btc_address) : ''}
       ${c.ln_address ? payItem('Lightning', 'zap', c.ln_address, 'lightning:' + c.ln_address) : ''}
     </div>
-    ${c.contact_email ? `<p style="margin:14px 0 0">${icon('mail')} Dopo il pagamento mandaci la prova a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</p>` : ''}
+    ${c.contact_email ? `<p style="margin:14px 0 0">${icon('mail')} Dopo il pagamento, inviaci la transazione effettuata a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</p>` : ''}
   </div>`;
 }
 
@@ -920,11 +921,15 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   // ricorda la scelta di pagamento: chi ha cliccato quella sbagliata se ne accorge subito
   const fix = c.contact_email ? ` Hai sbagliato? Scrivici a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.` : '';
   const payChoice = wait || !prepayOn(c) ? '' : paid
-    ? `<br>Hai scelto di pagare <b>in anticipo</b>: qui sotto trovi come fare.${fix}`
-    : `<br>Hai scelto di pagare <b>il giorno del corso</b>, all'accoglienza.${fix}`;
-  const done = `${wait ? msg('ok', "<b>Sei in lista d'attesa, grazie!</b> Ti scriviamo se si libera un posto o per il prossimo corso.") : msg('ok', `<b>Iscrizione ricevuta, grazie!</b> ${c.status === 'confirmed'
+    ? `<p>Hai scelto di pagare <b>in anticipo</b>: qui sotto trovi come fare.${fix}</p>`
+    : `<p>Hai scelto di pagare <b>il giorno del corso</b>, all'accoglienza.${fix}</p>`;
+  const done = `${wait ? msg('ok', "<b>Sei in lista d'attesa, grazie!</b> Ti scriviamo se si libera un posto o per il prossimo corso.") : `<div class="msg ok done">${icon('checkc')}<div>
+    <p class="dt">Iscrizione ricevuta, grazie!</p>
+    <p>${c.status === 'confirmed'
     ? 'Ti aspettiamo al corso: dai un\'occhiata ai requisiti prima di partire.'
-    : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}${payChoice}`)}
+    : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}</p>
+    <p>Ti confermeremo il corso entro 7 giorni prima della data, via email o telefono.</p>
+    ${payChoice}</div></div>`}
     ${paid && !wait && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
     <p><a class="btn sec" href="/">${icon('back')}Tutti i corsi</a></p>`;
   const enroll = ok ? done : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;

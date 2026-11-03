@@ -86,6 +86,6 @@ corsibtc-iscrizioni/
   docker-compose.yml            ← avvio (immagine node:22-alpine, nessuna build)
   app/server.js                 ← l'app (zero dipendenze da installare)
   app/lib/qrcode.js             ← generatore QR (qrcode-generator, licenza MIT)
-  app/fonts/                    ← caratteri Inter, Space Grotesk, Space Mono (licenza SIL OFL 1.1)
+  app/fonts/                    ← caratteri Roboto, Space Mono (licenza SIL OFL 1.1)
   data/.gitkeep                 ← cartella dei dati
 ```
