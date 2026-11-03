@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.7.3"
+version: "1.7.4"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -23,6 +23,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "La pagina principale della gestione usa le stesse schede della pagina pubblica, affiancate e divise per livello, con il selettore Tutti / Base / Medio / Avanzato accanto al titolo. Ogni scheda mostra gli avvisi per il gestore (minimo raggiunto, lista d'attesa) e il pulsante Gestisci. Accanto al titolo c'è anche il pulsante Nuovo corso. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Email già pronte per gli iscritti, senza password né configurazioni: si aprono nel tuo programma di posta e premi Invia. Dopo la conferma del corso, il riquadro Avvisa gli iscritti prepara l'email con data, orari, luogo e mappa, contributo e cosa portare, con tutti gli iscritti in copia nascosta. Su ogni iscritto c'è anche una busta per scrivere solo a lui: conferma completa se il corso è confermato, altrimenti iscrizione ricevuta. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""

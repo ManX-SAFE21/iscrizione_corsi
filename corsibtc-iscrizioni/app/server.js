@@ -563,6 +563,8 @@ tr:last-child td{border-bottom:0}
 .filters a.sel{background:var(--lv,var(--teal));border-color:var(--lv,var(--teal));color:#fff}
 .filters a.sel .i,.filters a.sel small{color:#fff}
 main.wide:has(.adm){max-width:1280px}
+.rowact{display:flex;gap:6px;justify-content:flex-end}.rowact .btn{margin:0}
+.mailbox h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:1.05rem}.mailbox h3 .i{color:var(--teal)}.mailbox details summary{cursor:pointer;color:var(--teald);font-weight:500;margin:6px 0}
 .adm{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:28px;align-items:start}
 .adm-main{min-width:0}
 .adm-side{position:sticky;top:12px;grid-column:2;grid-row:1;display:grid;gap:10px;max-height:calc(100vh - 24px);overflow-y:auto;align-content:start}
@@ -1300,6 +1302,49 @@ function adminDashboard(flash = '', only = '') {
     ${base ? `${h2('Pagina con tutti i corsi', 'qr')}<div class="card ql"><div class="qr">${qrSvg(base + '/')}</div><div><div class="mono">${esc(base)}/</div><p class="sub">Condividi il link o stampa il QR code.</p></div></div>` : ''}`, { admin: true, wide: true });
 }
 
+// email di conferma per gli iscritti: la apre il programma di posta di chi gestisce, gli iscritti in copia nascosta
+function confirmMailText(c, name = '') {
+  const addr = linesOf(c.location).join(', ');
+  const where = !addr ? c.city : addr.toLowerCase().includes(c.city.toLowerCase()) ? addr : `${addr} – ${c.city}`;
+  const lines = [
+    name ? `Ciao ${name},` : 'Ciao,',
+    '',
+    `il corso "${courseName(c)}" è confermato. Ti aspettiamo!`,
+    '',
+    `Quando: ${c.confirmed_date}`,
+    c.schedule ? `Orari: ${linesOf(c.schedule).join(', ')}` : '',
+    `Dove: ${where}`,
+    `Mappa: https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery(c, true))}`,
+    c.price ? `Contributo: ${linesOf(c.price).join(' oppure ')}` : '',
+    c.teachers ? `Docenti: ${linesOf(c.teachers).join(', ')}` : '',
+  ].filter((l, i) => l !== '' || i === 1 || i === 3);
+  if (c.requirements) lines.push('', 'Requisiti e cosa portare:', ...linesOf(c.requirements).map((l) => `- ${l.replace(/^[-•*]\s*/, '')}`));
+  lines.push('', c.contact_email ? `Per qualsiasi domanda scrivi a ${c.contact_email} o rispondi a questa email.` : 'Per qualsiasi domanda rispondi a questa email.', '', 'A presto!');
+  return lines.join('\n');
+}
+
+function receivedMailText(c, reg) {
+  const slots = JSON.parse(reg.slots || '[]');
+  const lines = [
+    `Ciao ${reg.name},`,
+    '',
+    `abbiamo ricevuto la tua iscrizione al corso "${courseName(c)}" a ${c.city}. Grazie!`,
+    '',
+    'Appena fissiamo la data definitiva ti scriviamo con tutti i dettagli.',
+  ];
+  if (slots.length) lines.push('', 'Le fasce che ci hai indicato:', ...slots.map((x) => `- ${x}`));
+  if (c.price) lines.push('', `Contributo: ${linesOf(c.price).join(' oppure ')}`);
+  if (c.requirements) lines.push('', 'Requisiti e cosa portare:', ...linesOf(c.requirements).map((l) => `- ${l.replace(/^[-•*]\s*/, '')}`));
+  lines.push('', c.contact_email ? `Per qualsiasi domanda scrivi a ${c.contact_email} o rispondi a questa email.` : 'Per qualsiasi domanda rispondi a questa email.', '', 'A presto!');
+  return lines.join('\n');
+}
+const mailTo = (to, subject, body) => `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body.replace(/\n/g, '\r\n'))}`;
+function regMailHref(c, reg) {
+  return c.status === 'confirmed' && c.confirmed_date
+    ? mailTo(reg.email, `Corso confermato: ${courseName(c)} – ${c.confirmed_date}`, confirmMailText(c, reg.name))
+    : mailTo(reg.email, `Iscrizione ricevuta: ${courseName(c)} – ${c.city}`, receivedMailText(c, reg));
+}
+
 function adminCourse(c, flash = '') {
   const regs = regsOf(c.id);
   const wait = waitOf(c.id);
@@ -1337,6 +1382,15 @@ function adminCourse(c, flash = '') {
       <label>Data definitiva <small>testo libero, es. "sabato 21 marzo 2026, 9.30–17.00"</small></label>
       <input type="text" name="date" required maxlength="120" value="${esc(c.confirmed_date)}">
       <p><button>${icon('checkc')}${c.status === 'confirmed' ? 'Aggiorna data' : 'Conferma corso'}</button></p></form>
+    ${c.status === 'confirmed' && c.confirmed_date && regs.length ? (() => {
+    const body = confirmMailText(c);
+    const href = `mailto:?bcc=${encodeURIComponent(regs.map((r) => r.email).join(','))}&subject=${encodeURIComponent(`Corso confermato: ${courseName(c)} – ${c.confirmed_date}`)}&body=${encodeURIComponent(body.replace(/\n/g, '\r\n'))}`;
+    return `<div class="card mailbox"><h3>${icon('mail')}Avvisa gli iscritti</h3>
+      <p class="sub">Si apre il tuo programma di posta con l'email già scritta e i ${regs.length} iscritti in copia nascosta: controlla e premi Invia.</p>
+      <p><a class="btn" href="${esc(href)}">${icon('mail')}Prepara l'email di conferma</a></p>
+      <details><summary>Vedi il testo dell'email</summary><textarea readonly rows="${Math.min(18, body.split('\n').length + 1)}">${esc(body)}</textarea>
+      <p class="sub">Se il programma di posta non si apre, copia questo testo e incollalo in una nuova email.</p></details></div>`;
+  })() : ''}
 
     ${h2(`Iscritti (${n})`, 'users')}
     ${regs.length ? `<p class="sub">Pagati: <b>${regs.filter((r) => r.paid).length}</b> su ${n}${prepayOn(c) ? ` · hanno scelto di pagare in anticipo: ${regs.filter((r) => r.payment === 'anticipo').length}` : ''}</p>
@@ -1346,7 +1400,7 @@ function adminCourse(c, flash = '') {
         ${showCo ? `<td>${esc(r.company)}</td>` : ''}${showSrc ? `<td>${esc(r.source)}</td>` : ''}
         <td>${JSON.parse(r.slots).map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</td>
         <td>${PAY_LABEL[r.payment] ? `<small>${PAY_LABEL[r.payment]}</small><br>` : ''}<form method="post" action="/iscritto/${r.id}/pagato"><button class="sec sm${r.paid ? ' paid' : ''}" title="${r.paid ? 'Segna come non pagato' : 'Segna come pagato'}">${r.paid ? `${icon('checkc')}Pagato` : `${icon('check')}Segna pagato`}</button></form></td>
-        <td><a class="btn del sm" href="/iscritto/${r.id}/elimina" title="Elimina iscritto" aria-label="Elimina iscritto">${icon('trash')}</a></td></tr>`).join('')}</table></div>
+        <td><div class="rowact"><a class="btn sec sm" href="${esc(regMailHref(c, r))}" title="Scrivi a ${esc(r.name)}: email già pronta" aria-label="Scrivi a ${esc(r.name)}">${icon('mail')}</a><a class="btn del sm" href="/iscritto/${r.id}/elimina" title="Elimina iscritto" aria-label="Elimina iscritto">${icon('trash')}</a></div></td></tr>`).join('')}</table></div>
       <div class="row"><a class="btn sec" href="/corso/${c.slug}/iscritti.csv">${icon('down')}Scarica elenco (Excel/CSV)</a>
       <a class="btn sec" href="mailto:?bcc=${encodeURIComponent(regs.map((r) => r.email).join(','))}&subject=${encodeURIComponent(courseName(c))}">${icon('mail')}Scrivi a tutti</a></div>
       <label>Tutte le email <small>da copiare nel campo CCN</small></label><textarea readonly rows="2">${esc(emails)}</textarea>
