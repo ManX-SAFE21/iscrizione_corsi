@@ -702,9 +702,10 @@ function page(title, body, { admin = false, wide = false, head = '' } = {}) {
     ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo corso</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
        ${adminCtx.getStore()?.umbrel ? '' : `<form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form>`}</nav>`
     : '';
+  // <!--email_off-->: Cloudflare non deve nascondere le email (e gli indirizzi Lightning): lo script che le ricompone sarebbe bloccato dalla CSP
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg">${head}
-<title>${esc(title)}</title><style>${CSS}</style></head><body><main${wide ? ' class="wide"' : ''}><header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main></body></html>`;
+<title>${esc(title)}</title><style>${CSS}</style></head><body><!--email_off--><main${wide ? ' class="wide"' : ''}><header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main><!--/email_off--></body></html>`;
 }
 
 function qrSvg(url) {
