@@ -491,6 +491,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .back{display:inline-flex;align-items:center;gap:6px;color:var(--mut);text-decoration:none;font-size:.93rem;margin:0 0 12px}
 .back:hover{color:var(--teal)}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:14px 0;box-shadow:var(--shadow)}
+/* pulsante Salva del modulo corso: resta in fondo allo schermo mentre si scorre */
+.savebar{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:24px -20px -20px;padding:12px 20px;background:var(--panel);border-top:1px solid var(--line);border-radius:0 0 12px 12px;box-shadow:0 -6px 14px rgba(10,15,28,.06)}
+.savebar small{color:var(--mut);font-size:.85rem}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:999px;font-size:.82rem;font-weight:500;background:var(--soft);color:var(--mut);white-space:nowrap}
 .pill .i{width:.95em;height:.95em}
@@ -1146,7 +1149,7 @@ function courseFormHtml(v, action, button) {
     <fieldset class="fs"><legend>${icon('list')}Programma</legend>
     <label>Programma della giornata <small>una riga tutta in MAIUSCOLO diventa un titoletto, le righe che iniziano con "-" un elenco</small></label><textarea name="program" maxlength="6000" style="min-height:220px">${esc(v.program)}</textarea>
     </fieldset>
-    <p style="margin-top:24px"><button>${icon('check')}${button}</button></p></form>`;
+    <p class="savebar"><button>${icon('check')}${button}</button><small>Le modifiche si salvano solo con questo pulsante.</small></p></form>`;
 }
 
 const insertCourse = (slug, v) => db.prepare(`INSERT INTO courses (slug, created_at, ${COURSE_FIELDS.join(', ')}) VALUES (?, ?, ${COURSE_FIELDS.map(() => '?').join(', ')})`)
