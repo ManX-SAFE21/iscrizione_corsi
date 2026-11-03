@@ -579,11 +579,13 @@ main.wide:has(.adm){max-width:1280px}
 .adm-btns form{margin:0}
 .adm-btns .btn,.adm-btns button{display:flex;align-items:center;gap:8px;width:100%;justify-content:flex-start;margin:0;box-sizing:border-box}
 @media (max-width:820px){.adm{grid-template-columns:1fr}.adm-side{position:static;grid-column:1;grid-row:auto}}
-.hero .filters{display:inline-flex;flex-wrap:nowrap;gap:2px;margin:14px 0 0;padding:4px;background:rgba(255,255,255,.6);border:1px solid rgba(61,132,119,.16);border-radius:999px}
-.hero .filters a{border:0;background:none;padding:7px 16px;white-space:nowrap}
-.hero .filters a:hover{background:rgba(255,255,255,.7)}
-.hero .filters a.sel{background:var(--lv,var(--teal));box-shadow:0 1px 3px rgba(10,15,28,.18)}
+.hero .filters,.filters.seg{display:inline-flex;flex-wrap:nowrap;gap:2px;margin:14px 0 0;padding:4px;background:rgba(255,255,255,.6);border:1px solid rgba(61,132,119,.16);border-radius:999px}
+.hero .filters a,.filters.seg a{border:0;background:none;padding:7px 16px;white-space:nowrap}
+.hero .filters a:hover,.filters.seg a:hover{background:rgba(255,255,255,.7)}
+.hero .filters a.sel,.filters.seg a.sel{background:var(--lv,var(--teal));box-shadow:0 1px 3px rgba(10,15,28,.18)}
 @media (max-width:400px){.hero .filters a{padding:7px 11px;font-size:.88rem}}
+.dhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px}.dhead h1{margin:0}.dhead .filters.seg{margin:0 auto 0 8px;background:var(--panel);border-color:var(--line)}.dhead .filters.seg a:hover{background:var(--soft)}
+.ccard .calert{display:flex;flex-wrap:wrap;gap:6px}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
 .ccard{display:flex;flex-direction:column;gap:10px;padding:18px 20px 16px;background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--lv);border-radius:12px;color:inherit;text-decoration:none;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
 .ccard:hover{border-color:#C5CFDC}
@@ -833,18 +835,24 @@ function seatsShort(c, n) {
   return `<div class="bar"><i style="width:${pct}%"></i></div><small>${esc(txt)}</small>`;
 }
 
-function courseRow(c) {
+function courseRow(c, admin = false) {
   const n = countRegs(c.id);
   const wait = n >= c.max_n && c.ask_waitlist && !expired(c) && c.status !== 'closed';
   const when = c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>`
     : slotsOf(c).length ? `<span>${icon('calendar')}Data da scegliere insieme</span>` : '';
   const dl = c.deadline && !expired(c) ? `<span>${icon('hourglass')}Iscrizioni entro il ${fmtDay(c.deadline)}</span>` : '';
-  return `<a class="ccard ${levelClass(c)}" href="/c/${c.slug}">
+  const nw = admin ? waitOf(c.id).length : 0;
+  const alerts = admin ? [
+    n >= c.min_n && c.status === 'open' ? pill('Minimo raggiunto: scegli la data', 'ok', 'bell') : '',
+    nw ? pill(`${nw} in lista d'attesa`, '', 'hourglass') : '',
+  ].join('') : '';
+  return `<a class="ccard ${levelClass(c)}" href="${admin ? '/corso/' : '/c/'}${c.slug}">
     ${c.cover ? `<span class="cban"><img src="/img/${esc(c.cover)}" alt=""><span class="cpill">${levelPill(c)}</span></span>` : `<span class="chead"><span class="cic">${levelIcon(c.level)}</span>${levelPill(c)}</span>`}
     <b>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</b>
     <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${when}${dl}</span>
+    ${alerts ? `<span class="calert">${alerts}</span>` : ''}
     <span class="cseat">${seatsShort(c, n)}</span>
-    <span class="cfoot">${wait ? pill("Lista d'attesa aperta", 'on', 'users') : statusBadge(c, n, false)}<span class="cgo">Vedi il corso${icon('arrow')}</span></span>
+    <span class="cfoot">${wait ? pill("Lista d'attesa aperta", 'on', 'users') : statusBadge(c, n, false)}<span class="cgo">${admin ? 'Gestisci' : 'Vedi il corso'}${icon('arrow')}</span></span>
   </a>`;
 }
 
@@ -1267,27 +1275,29 @@ const csvCell = (v) => {
 };
 const PAY_LABEL = { corso: 'Al corso', anticipo: 'In anticipo' };
 
-function adminDashboard(flash = '') {
+function adminDashboard(flash = '', only = '') {
   const all = db.prepare('SELECT * FROM courses ORDER BY created_at DESC').all();
   const courses = all.filter((c) => c.status !== 'done');
   const past = all.filter((c) => c.status === 'done');
   const base = publicBase();
   const pastRows = past.map((c) => `<li class="${levelClass(c)}">${levelPill(c)}<a href="/corso/${c.slug}"><b>${esc(courseName(c))} – ${esc(c.city)}</b>
     <span class="cmeta">${c.confirmed_date ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}<span>${icon('users')}${countRegs(c.id)} iscritti</span></span></a></li>`).join('');
-  const rows = courses.map((c) => {
-    const n = countRegs(c.id);
-    return `<div class="card"><div class="row">${levelPill(c)}${statusBadge(c, n)}
-      ${n >= c.min_n && c.status === 'open' ? pill('Minimo raggiunto: scegli la data', 'ok', 'bell') : ''}${waitOf(c.id).length ? pill(`${waitOf(c.id).length} in lista d'attesa`, '', 'users') : ''}</div>
-      <h2 style="margin:.5em 0 0;display:block">${esc(courseName(c))} – ${esc(c.city)}</h2>
-      ${counter(c, n)}
-      <p style="margin:12px 0 0"><a class="btn" href="/corso/${c.slug}">Apri${icon('arrow')}</a></p></div>`;
-  }).join('');
-  return page('Admin corsi', `<h1>Corsi</h1>
+  const lv = (c) => (LEVELS[c.level] ? c.level : 'base');
+  const levels = Object.keys(LEVELS).filter((k) => courses.some((c) => lv(c) === k));
+  if (!levels.includes(only)) only = '';
+  const byLevel = (k) => courses.filter((c) => lv(c) === k);
+  const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
+  const filters = levels.length > 1
+    ? `<nav class="filters seg">${chip('', 'Tutti', courses.length)}${levels.map((k) => chip(k, LEVELS[k], byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
+  const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}Livello ${LEVELS[k]}</h2>
+    <div class="cgrid">${byLevel(k).map((c) => courseRow(c, true)).join('')}</div></section>`;
+  const rows = courses.length ? (only ? [only] : levels).map(group).join('') : '';
+  return page('Admin corsi', `<div class="dhead"><h1>Corsi</h1>${filters}<a class="btn" href="/corso/nuovo">${icon('plus')}Nuovo corso</a></div>
     ${flash ? msg('ok', esc(flash)) : ''}
     ${base ? '' : msg('warn', 'Per avere link e QR code corretti imposta l\'indirizzo pubblico in <a href="/impostazioni">Impostazioni</a>.')}
     ${rows || '<div class="card">Nessun corso. <a href="/corso/nuovo">Creane uno</a>.</div>'}
     ${past.length ? `<details class="sec past"><summary>${icon('checkc')}Corsi conclusi <small>${past.length}</small><span class="tg"></span></summary><div class="card"><ul class="pl">${pastRows}</ul></div></details>` : ''}
-    ${base ? `${h2('Pagina con tutti i corsi', 'qr')}<div class="card ql"><div class="qr">${qrSvg(base + '/')}</div><div><div class="mono">${esc(base)}/</div><p class="sub">Condividi il link o stampa il QR code.</p></div></div>` : ''}`, { admin: true });
+    ${base ? `${h2('Pagina con tutti i corsi', 'qr')}<div class="card ql"><div class="qr">${qrSvg(base + '/')}</div><div><div class="mono">${esc(base)}/</div><p class="sub">Condividi il link o stampa il QR code.</p></div></div>` : ''}`, { admin: true, wide: true });
 }
 
 function adminCourse(c, flash = '') {
@@ -1445,7 +1455,7 @@ async function adminRoutes(req, res, umbrel) {
   const flash = url.searchParams.get('m') || '';
   const back = (to, m) => redirect(res, m ? `${to}?m=${encodeURIComponent(m)}` : to);
 
-  if (req.method === 'GET' && p === '/') return send(res, 200, adminDashboard(flash));
+  if (req.method === 'GET' && p === '/') return send(res, 200, adminDashboard(flash, url.searchParams.get('livello') || ''));
   if (p === '/impostazioni' && req.method === 'GET') return send(res, 200, settingsPage(flash));
 
   if (p === '/impostazioni' && req.method === 'POST') {
