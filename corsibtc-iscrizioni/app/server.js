@@ -877,7 +877,7 @@ function renderList(only = '') {
   const filters = levels.length > 1
     ? `<nav class="filters">${chip('', 'Tutti', all.length)}${levels.map((k) => chip(k, LEVELS[k], byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
   const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}Livello ${LEVELS[k]}</h2>
-    <div class="cgrid">${byLevel(k).map(courseRow).join('')}</div></section>`;
+    <div class="cgrid">${byLevel(k).map((c) => courseRow(c)).join('')}</div></section>`;
   return page('Corsi Bitcoin', `<header class="hero"><div class="hrow"><h1>Corsi Bitcoin</h1>
     ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</div>
     <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello giusto per te.</p>${filters}</header>
