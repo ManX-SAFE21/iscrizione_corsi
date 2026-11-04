@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.7.5"
+version: "1.8.0"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -23,6 +23,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Correzione: nella pagina pubblica, dalla seconda scheda di ogni livello in poi, il clic portava a una pagina non trovata. Ora tutte le schede aprono la pagina del corso. Restano le email di conferma già pronte per gli iscritti della 1.7.4. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Arrivano gli eventi. Il pulsante Nuovo corso diventa Nuovo evento e nel modulo si sceglie il tipo: Corso Base, Corso Medio, Corso Avanzato oppure Evento, per esempio una presentazione. Gli eventi hanno etichetta e colore propri, il gruppo Eventi nella pagina pubblica e nel selettore, e nelle loro pagine ed email si parla di evento invece che di corso. I corsi già inseriti non cambiano. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""

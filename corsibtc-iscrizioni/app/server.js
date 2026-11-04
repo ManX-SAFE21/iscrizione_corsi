@@ -182,7 +182,21 @@ let SECRET = getSetting('secret');
 if (!SECRET) { SECRET = crypto.randomBytes(32).toString('hex'); setSetting('secret', SECRET); }
 
 /* ---------- utilità ---------- */
-const LEVELS = { base: 'Base', medio: 'Medio', avanzato: 'Avanzato' };
+const LEVELS = { base: 'Base', medio: 'Medio', avanzato: 'Avanzato', evento: 'Evento' };
+// tipi come si scelgono nel modulo
+const KINDS = { base: 'Corso Base', medio: 'Corso Medio', avanzato: 'Corso Avanzato', evento: 'Evento' };
+const isEvent = (c) => c.level === 'evento';
+const kindName = (c) => (isEvent(c) ? 'Evento' : `Corso ${LEVELS[c.level] || c.level}`);
+// nome del gruppo e del filtro: "Livello Base" / "Eventi"
+const groupName = (k) => (k === 'evento' ? 'Eventi' : `Livello ${LEVELS[k]}`);
+const chipName = (k) => (k === 'evento' ? 'Eventi' : LEVELS[k]);
+// testi pensati per un corso, voltati per un evento (solo frasi fisse, mai i testi scritti dal gestore)
+const EV_WORDS = [
+  [/\bil prossimo corso\b/g, 'il prossimo evento'], [/\bIl corso\b/g, "L'evento"], [/\bil corso\b/g, "l'evento"],
+  [/\bal corso\b/g, "all'evento"], [/\bdel corso\b/g, "dell'evento"], [/\bQuesto corso\b/g, 'Questo evento'],
+  [/\bquesto corso\b/g, 'questo evento'], [/\bCorso concluso\b/g, 'Evento concluso'],
+];
+const evWords = (c, t) => (isEvent(c) ? EV_WORDS.reduce((acc, [re, w]) => acc.replace(re, w), t) : t);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nowIso = () => new Date().toISOString();
 const fmtDate = (iso) => new Date(iso).toLocaleString('it-IT', { timeZone: 'Europe/Rome', dateStyle: 'short', timeStyle: 'short' });
@@ -194,7 +208,7 @@ const fmtDay = (d) => (d ? d.split('-').reverse().join('/') : '');
 const expired = (c) => !!c.deadline && c.deadline < todayRome();
 const prepayOn = (c) => !!(c.btc_address || c.ln_address);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const courseName = (c) => `Corso ${LEVELS[c.level] || c.level}${c.title ? ' – ' + c.title : ''}`;
+const courseName = (c) => `${kindName(c)}${c.title ? ' – ' + c.title : ''}`;
 // iscritti = chi ha un posto; la lista d'attesa (waitlist = 1) non occupa posti e non conta per i minimi
 const countRegs = (id) => db.prepare('SELECT COUNT(*) AS n FROM registrations WHERE course_id = ? AND waitlist = 0').get(id).n;
 const regsOf = (id) => db.prepare('SELECT * FROM registrations WHERE course_id = ? AND waitlist = 0 ORDER BY created_at').all(id);
@@ -404,6 +418,7 @@ const ICONS = {
   book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
   pen: '<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8 21h8"/>',
   cog: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
   out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
   down: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
@@ -435,6 +450,7 @@ const ICONS = {
 const icon = (n, cls = '') => `<svg class="i${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
 // livello: tre barrette, piene in base al livello
 const levelIcon = (lv) => {
+  if (lv === 'evento') return icon('mic');
   const k = { base: 1, medio: 2, avanzato: 3 }[lv] || 1;
   return `<svg class="i" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${[0, 1, 2].map((i) => `<rect x="${3 + i * 7}" y="${15 - i * 5}" width="5" height="${7 + i * 5}" rx="1"${i < k ? '' : ' opacity=".28"'}/>`).join('')}</svg>`;
 };
@@ -455,7 +471,7 @@ const REQ_ICONS = [
 ];
 const reqIcon = (t) => (REQ_ICONS.find(([re]) => re.test(t)) || [null, 'check'])[1];
 const pill = (txt, cls = '', ic = '') => `<span class="pill${cls ? ' ' + cls : ''}">${ic ? icon(ic) : ''}${txt}</span>`;
-const levelPill = (c) => `<span class="pill lvl">${levelIcon(c.level)}Livello ${esc(LEVELS[c.level])}</span>`;
+const levelPill = (c) => `<span class="pill lvl">${levelIcon(c.level)}${isEvent(c) ? 'Evento' : `Livello ${esc(LEVELS[c.level])}`}</span>`;
 const msg = (kind, html) => `<div class="msg ${kind}">${icon({ ok: 'checkc', err: 'alert', warn: 'info' }[kind])}<div>${html}</div></div>`;
 const h2 = (txt, ic) => `<h2>${icon(ic)}${txt}</h2>`;
 // link alla mappa: apre l'indirizzo in Google Maps (funziona anche senza account; su telefono apre l'app mappe)
@@ -538,6 +554,7 @@ tr:last-child td{border-bottom:0}
 .lv-base{--lv:#3D8477;--lv2:#5FA092}
 .lv-medio{--lv:#4A79A6;--lv2:#6E9BC4}
 .lv-avanzato{--lv:#565E8A;--lv2:#7A82B2}
+.lv-evento{--lv:#A87436;--lv2:#C4955C}
 .hero{position:relative;overflow:hidden;border-radius:16px;padding:20px 28px 22px;margin:0 0 14px;background:linear-gradient(120deg,#DDE9E4,#E6EFEA 60%,#EEF3F0);color:var(--body);border:1px solid var(--line)}
 .hero::before,.hero::after{content:'';position:absolute;border-radius:50%;background:rgba(61,132,119,.08)}
 .hero::before{width:280px;height:280px;right:-70px;top:-110px}
@@ -775,7 +792,7 @@ const FOOT = `<footer class="foot">${icon('shield')}<span>I dati degli iscritti 
 function page(title, body, { admin = false, wide = false, head = '' } = {}) {
   const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg" alt="" width="34" height="34"></span>Corsi Bitcoin${admin ? '<small>· Admin</small>' : ''}</a>`;
   const nav = admin
-    ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo corso</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
+    ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo evento</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
        ${adminCtx.getStore()?.umbrel ? '' : `<form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form>`}</nav>`
     : '';
   // <!--email_off-->: Cloudflare non deve nascondere le email (e gli indirizzi Lightning): lo script che le ricompone sarebbe bloccato dalla CSP
@@ -850,17 +867,17 @@ function courseRow(c, admin = false) {
   ].join('') : '';
   return `<a class="ccard ${levelClass(c)}" href="${admin ? '/corso/' : '/c/'}${c.slug}">
     ${c.cover ? `<span class="cban"><img src="/img/${esc(c.cover)}" alt=""><span class="cpill">${levelPill(c)}</span></span>` : `<span class="chead"><span class="cic">${levelIcon(c.level)}</span>${levelPill(c)}</span>`}
-    <b>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</b>
+    <b>${esc(c.title || kindName(c))}</b>
     <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${when}${dl}</span>
     ${alerts ? `<span class="calert">${alerts}</span>` : ''}
     <span class="cseat">${seatsShort(c, n)}</span>
-    <span class="cfoot">${wait ? pill("Lista d'attesa aperta", 'on', 'users') : statusBadge(c, n, false)}<span class="cgo">${admin ? 'Gestisci' : 'Vedi il corso'}${icon('arrow')}</span></span>
+    <span class="cfoot">${wait ? pill("Lista d'attesa aperta", 'on', 'users') : statusBadge(c, n, false)}<span class="cgo">${admin ? 'Gestisci' : isEvent(c) ? "Vedi l'evento" : 'Vedi il corso'}${icon('arrow')}</span></span>
   </a>`;
 }
 
 // corso già fatto: una riga nell'elenco in fondo alla pagina, con il link alla sua pagina (senza modulo)
 function pastRow(c) {
-  return `<li class="${levelClass(c)}">${levelPill(c)}<a href="/c/${c.slug}"><b>${esc(c.title || `Corso ${LEVELS[c.level]}`)}</b>
+  return `<li class="${levelClass(c)}">${levelPill(c)}<a href="/c/${c.slug}"><b>${esc(c.title || kindName(c))}</b>
     <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${c.confirmed_date ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}</span></a></li>`;
 }
 
@@ -875,8 +892,8 @@ function renderList(only = '') {
   const byLevel = (k) => all.filter((c) => lv(c) === k).sort((a, b) => (b.status === 'confirmed') - (a.status === 'confirmed'));
   const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
   const filters = levels.length > 1
-    ? `<nav class="filters">${chip('', 'Tutti', all.length)}${levels.map((k) => chip(k, LEVELS[k], byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
-  const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}Livello ${LEVELS[k]}</h2>
+    ? `<nav class="filters">${chip('', 'Tutti', all.length)}${levels.map((k) => chip(k, chipName(k), byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
+  const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}${groupName(k)}</h2>
     <div class="cgrid">${byLevel(k).map((c) => courseRow(c)).join('')}</div></section>`;
   return page('Corsi Bitcoin', `<header class="hero"><div class="hrow"><h1>Corsi Bitcoin</h1>
     ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</div>
@@ -1035,7 +1052,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   const key = (ic, k, v) => `<div class="key"><span class="ic">${icon(ic)}</span><div><b>${k}</b><span class="v">${esc(v)}</span></div></div>`;
   const when = c.status === 'confirmed' || done ? c.confirmed_date || 'Già svolto' : slots.length ? 'Da scegliere insieme' : 'Da confermare';
   const keys = `<div class="keys">${key('pin', 'Dove', c.city)}${key('calendar', 'Quando', when)}${c.price ? key('euro', 'Contributo', c.price) : ''}</div>`;
-  return page(courseName(c), `
+  return page(courseName(c), evWords(c, `
     <div class="${levelClass(c)}">
     <a class="back" href="/">${icon('back')}Tutti i corsi</a>
     ${mediaBlock(c, n, true)}
@@ -1061,7 +1078,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
         ${c.contact_email ? `<p class="contact">${icon('mail')}<span>Per informazioni scrivi a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</span></p>` : ''}
       </div>
     </div>
-    </div>`, { wide: true, head: socialHead(c) });
+    </div>`), { wide: true, head: socialHead(c) });
 }
 
 async function handlePublic(req, res) {
@@ -1208,7 +1225,7 @@ function parseCourseForm(f) {
     cover: '', poster: '', // decise dopo, da filesFrom()
   };
   let err = '';
-  if (!LEVELS[level]) err = 'Scegli il livello.';
+  if (!LEVELS[level]) err = 'Scegli il tipo: corso base, medio, avanzato o evento.';
   else if (!out.city) err = 'Inserisci la città.';
   else if (!(out.min_n >= 1 && out.max_n >= out.min_n && out.max_n <= 200)) err = 'Minimo e massimo non validi (il massimo deve essere almeno pari al minimo).';
   else if (out.deadline && !/^\d{4}-\d{2}-\d{2}$/.test(out.deadline)) err = 'La data di chiusura delle prenotazioni non è valida.';
@@ -1222,7 +1239,7 @@ function courseFormHtml(v, action, button) {
   const chk = (name, label) => `<label class="check"><input type="checkbox" name="${name}" ${v[name] ? 'checked' : ''}><span>${label}</span></label>`;
   return `<form method="post" action="${action}" class="card" enctype="multipart/form-data">
     <fieldset class="fs"><legend>${icon('book')}Il corso</legend>
-    <label>Livello *</label><select name="level">${Object.entries(LEVELS).map(([k, l]) => `<option value="${k}" ${v.level === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    <label>Tipo *</label><select name="level">${Object.entries(KINDS).map(([k, l]) => `<option value="${k}" ${v.level === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
     <label>Titolo <small>facoltativo, es. "Don't Trust, Verify"</small></label><input type="text" name="title" maxlength="80" value="${esc(v.title)}">
     <label>Presentazione <small>due righe in cima alla pagina, es. "Dall'open source al wallet Electrum: come creare la propria cassaforte Bitcoin."</small></label><textarea name="description" maxlength="4000">${esc(v.description)}</textarea>
     <label>Docenti <small>facoltativo</small></label><input type="text" name="teachers" maxlength="120" value="${esc(v.teachers)}">
@@ -1290,11 +1307,11 @@ function adminDashboard(flash = '', only = '') {
   const byLevel = (k) => courses.filter((c) => lv(c) === k);
   const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
   const filters = levels.length > 1
-    ? `<nav class="filters seg">${chip('', 'Tutti', courses.length)}${levels.map((k) => chip(k, LEVELS[k], byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
-  const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}Livello ${LEVELS[k]}</h2>
+    ? `<nav class="filters seg">${chip('', 'Tutti', courses.length)}${levels.map((k) => chip(k, chipName(k), byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
+  const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}${groupName(k)}</h2>
     <div class="cgrid">${byLevel(k).map((c) => courseRow(c, true)).join('')}</div></section>`;
   const rows = courses.length ? (only ? [only] : levels).map(group).join('') : '';
-  return page('Admin corsi', `<div class="dhead"><h1>Corsi</h1>${filters}<a class="btn" href="/corso/nuovo">${icon('plus')}Nuovo corso</a></div>
+  return page('Admin corsi', `<div class="dhead"><h1>Corsi</h1>${filters}<a class="btn" href="/corso/nuovo">${icon('plus')}Nuovo evento</a></div>
     ${flash ? msg('ok', esc(flash)) : ''}
     ${base ? '' : msg('warn', 'Per avere link e QR code corretti imposta l\'indirizzo pubblico in <a href="/impostazioni">Impostazioni</a>.')}
     ${rows || '<div class="card">Nessun corso. <a href="/corso/nuovo">Creane uno</a>.</div>'}
@@ -1320,7 +1337,7 @@ function confirmMailText(c, name = '') {
   ].filter((l, i) => l !== '' || i === 1 || i === 3);
   if (c.requirements) lines.push('', 'Requisiti e cosa portare:', ...linesOf(c.requirements).map((l) => `- ${l.replace(/^[-•*]\s*/, '')}`));
   lines.push('', c.contact_email ? `Per qualsiasi domanda scrivi a ${c.contact_email} o rispondi a questa email.` : 'Per qualsiasi domanda rispondi a questa email.', '', 'A presto!');
-  return lines.join('\n');
+  return evWords(c, lines.join('\n'));
 }
 
 function receivedMailText(c, reg) {
@@ -1336,7 +1353,7 @@ function receivedMailText(c, reg) {
   if (c.price) lines.push('', `Contributo: ${linesOf(c.price).join(' oppure ')}`);
   if (c.requirements) lines.push('', 'Requisiti e cosa portare:', ...linesOf(c.requirements).map((l) => `- ${l.replace(/^[-•*]\s*/, '')}`));
   lines.push('', c.contact_email ? `Per qualsiasi domanda scrivi a ${c.contact_email} o rispondi a questa email.` : 'Per qualsiasi domanda rispondi a questa email.', '', 'A presto!');
-  return lines.join('\n');
+  return evWords(c, lines.join('\n'));
 }
 const mailTo = (to, subject, body) => `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body.replace(/\n/g, '\r\n'))}`;
 function regMailHref(c, reg) {
@@ -1422,7 +1439,7 @@ function adminCourse(c, flash = '') {
       ${c.status === 'done'
     ? `<form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="reopen"><button class="sec">${icon('unlock')}Riporta tra i corsi attivi</button></form>`
     : `<form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="${c.status === 'closed' ? 'reopen' : 'close'}"><button class="sec">${c.status === 'closed' ? `${icon('unlock')}Riapri iscrizioni` : `${icon('lock')}Chiudi iscrizioni`}</button></form>
-      <form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="done"><button class="sec" title="Il corso si è svolto: finisce tra i corsi conclusi e, sul sito, tra i corsi già fatti">${icon('checkc')}Corso fatto</button></form>`}
+      <form method="post" action="/corso/${c.slug}/stato"><input type="hidden" name="action" value="done"><button class="sec" title="Il corso si è svolto: finisce tra i corsi conclusi e, sul sito, tra i corsi già fatti">${icon('checkc')}${isEvent(c) ? 'Evento fatto' : 'Corso fatto'}</button></form>`}
     </div></div>
     <div class="adm-box"><h2>${icon('qr')}Link e QR code</h2>${link
       ? `<div class="qr">${qrSvg(link)}</div><div class="mono">${esc(link)}</div><p><a href="/corso/${c.slug}/qr.svg" class="btn sec">${icon('down')}Scarica QR (SVG)</a></p>`
@@ -1542,16 +1559,16 @@ async function adminRoutes(req, res, umbrel) {
         level: 'base', ask_waitlist: 1, slots: 'Sabato mattina\nSabato pomeriggio\nDomenica',
         prepay_text: 'Se vuoi bloccare subito il posto, puoi inviare il contributo in anticipo in Bitcoin o Lightning.\nSe per qualsiasi motivo il corso dovesse saltare, ti rimborsiamo i bitcoin inviati.',
       };
-      return send(res, 200, page('Nuovo corso', `<h1>Nuovo corso</h1><p class="sub">Per riusare un corso già fatto, aprilo e usa "Duplica corso".</p>${courseFormHtml(v, '/corso/nuovo', 'Crea corso')}`, { admin: true }));
+      return send(res, 200, page('Nuovo evento', `<h1>Nuovo evento</h1><p class="sub">Scegli se è un corso (base, medio, avanzato) o un evento, come una presentazione. Per riusarne uno già fatto, aprilo e usa "Duplica".</p>${courseFormHtml(v, '/corso/nuovo', 'Crea')}`, { admin: true }));
     }
-    if (tooBig(req)) return send(res, 413, page('Nuovo corso', `<h1>Nuovo corso</h1>${msg('err', TOO_BIG)}<p><a href="/corso/nuovo">Torna al modulo</a></p>`, { admin: true }));
+    if (tooBig(req)) return send(res, 413, page('Nuovo evento', `<h1>Nuovo evento</h1>${msg('err', TOO_BIG)}<p><a href="/corso/nuovo">Torna al modulo</a></p>`, { admin: true }));
     const f = await readForm(req);
     let { out, err } = parseCourseForm(f);
     if (!err) err = filesFrom(f, out);
-    if (err) return send(res, 400, page('Nuovo corso', `<h1>Nuovo corso</h1>${msg('err', esc(err))}${courseFormHtml(out, '/corso/nuovo', 'Crea corso')}`, { admin: true }));
+    if (err) return send(res, 400, page('Nuovo evento', `<h1>Nuovo evento</h1>${msg('err', esc(err))}${courseFormHtml(out, '/corso/nuovo', 'Crea')}`, { admin: true }));
     const slug = newSlug();
     insertCourse(slug, out);
-    return back(`/corso/${slug}`, 'Corso creato.');
+    return back(`/corso/${slug}`, isEvent(out) ? 'Evento creato.' : 'Corso creato.');
   }
 
   const paidm = p.match(/^\/iscritto\/(\d+)\/pagato$/);
@@ -1633,14 +1650,14 @@ async function adminRoutes(req, res, umbrel) {
       const date = ((await readForm(req)).get('date') || '').trim().slice(0, 120);
       if (!date) return back(`/corso/${c.slug}`, 'Inserisci la data.');
       db.prepare("UPDATE courses SET status = 'confirmed', confirmed_date = ? WHERE id = ?").run(date, c.id);
-      return back(`/corso/${c.slug}`, 'Corso confermato. Ora scrivi agli iscritti con data e luogo.');
+      return back(`/corso/${c.slug}`, `${isEvent(c) ? 'Evento confermato' : 'Corso confermato'}. Ora scrivi agli iscritti con data e luogo.`);
     }
     if (sub === '/stato' && req.method === 'POST') {
       const a = (await readForm(req)).get('action');
       if (a === 'close') db.prepare("UPDATE courses SET status = 'closed' WHERE id = ?").run(c.id);
       else if (a === 'done') db.prepare("UPDATE courses SET status = 'done' WHERE id = ?").run(c.id);
       else if (a === 'reopen') db.prepare('UPDATE courses SET status = ? WHERE id = ?').run(c.confirmed_date ? 'confirmed' : 'open', c.id);
-      return back(`/corso/${c.slug}`, a === 'close' ? 'Iscrizioni chiuse.' : a === 'done' ? 'Corso segnato come concluso: sul sito compare tra i corsi già fatti.' : 'Iscrizioni riaperte.');
+      return back(`/corso/${c.slug}`, a === 'close' ? 'Iscrizioni chiuse.' : a === 'done' ? `${isEvent(c) ? 'Evento' : 'Corso'} segnato come concluso: sul sito compare tra quelli già fatti.` : 'Iscrizioni riaperte.');
     }
     if (sub === '/elimina' && req.method === 'POST') {
       if ((await readForm(req)).get('sure') !== 'on') return back(`/corso/${c.slug}`);
