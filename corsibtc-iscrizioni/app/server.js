@@ -903,25 +903,33 @@ function pastRow(c) {
     <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${c.confirmed_date ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}</span></a></li>`;
 }
 
+// REGOLA: gestione e pagina pubblica mostrano i corsi con la stessa grafica e lo stesso ordine.
+// Tutte e due passano da qui: cambiare il disegno o l'ordine solo in questa funzione.
+const GROUP_ORDER = ['evento', 'base', 'medio', 'avanzato'];
+function courseGroups(list, only, admin) {
+  // list arriva già dal più recente al più vecchio (ORDER BY created_at DESC)
+  const lv = (c) => (LEVELS[c.level] ? c.level : 'base');
+  const levels = GROUP_ORDER.filter((k) => list.some((c) => lv(c) === k));
+  if (!levels.includes(only)) only = '';
+  const byLevel = (k) => list.filter((c) => lv(c) === k);
+  const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
+  const filters = levels.length > 1
+    ? `<nav class="filters${admin ? ' seg' : ''}">${chip('', 'Tutti', list.length)}${levels.map((k) => chip(k, chipName(k), byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
+  const html = (only ? [only] : levels).map((k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}${groupName(k)}</h2>
+    <div class="fan" style="--n:${byLevel(k).length}">${byLevel(k).map((c, i) => courseRow(c, admin, i)).join('')}</div></section>`).join('');
+  return { filters, html };
+}
+
 function renderList(only = '') {
   const all = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed') ORDER BY created_at DESC").all();
   const past = getSetting('show_past', '1') === '1' ? db.prepare("SELECT * FROM courses WHERE status = 'done' ORDER BY created_at DESC").all() : [];
-  const lv = (c) => (LEVELS[c.level] ? c.level : 'base');
   const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
-  const levels = ['evento', 'base', 'medio', 'avanzato'].filter((k) => all.some((c) => lv(c) === k));
-  if (!levels.includes(only)) only = '';
-  // dentro ogni gruppo: prima il più recente (la query è già in ordine di creazione, dal più nuovo)
-  const byLevel = (k) => all.filter((c) => lv(c) === k);
-  const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
-  const filters = levels.length > 1
-    ? `<nav class="filters">${chip('', 'Tutti', all.length)}${levels.map((k) => chip(k, chipName(k), byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
-  const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}${groupName(k)}</h2>
-    <div class="fan" style="--n:${byLevel(k).length}">${byLevel(k).map((c, i) => courseRow(c, false, i)).join('')}</div></section>`;
+  const { filters, html: groups } = courseGroups(all, only, false);
   return page('Corsi Bitcoin', `<header class="hero"><div class="hrow"><h1>Corsi Bitcoin</h1>
     ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</div>
     <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello giusto per te.</p>${filters}</header>
     ${all.length
-      ? (only ? [only] : levels).map(group).join('')
+      ? groups
       : `<div class="card empty">${icon('calendar')}<p>Al momento non ci sono corsi aperti. Torna a trovarci presto.</p></div>`}
     ${past.length ? `<details class="sec past"><summary>${icon('checkc')}Corsi già fatti <small>${past.length}</small><span class="tg"></span></summary><div class="card"><ul class="pl">${past.map(pastRow).join('')}</ul></div></details>` : ''}`, { wide: true });
 }
@@ -1325,16 +1333,7 @@ function adminDashboard(flash = '', only = '') {
   const base = publicBase();
   const pastRows = past.map((c) => `<li class="${levelClass(c)}">${levelPill(c)}<a href="/corso/${c.slug}"><b>${esc(courseName(c))} – ${esc(c.city)}</b>
     <span class="cmeta">${c.confirmed_date ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>` : ''}<span>${icon('users')}${countRegs(c.id)} iscritti</span></span></a></li>`).join('');
-  const lv = (c) => (LEVELS[c.level] ? c.level : 'base');
-  const levels = Object.keys(LEVELS).filter((k) => courses.some((c) => lv(c) === k));
-  if (!levels.includes(only)) only = '';
-  const byLevel = (k) => courses.filter((c) => lv(c) === k);
-  const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
-  const filters = levels.length > 1
-    ? `<nav class="filters seg">${chip('', 'Tutti', courses.length)}${levels.map((k) => chip(k, chipName(k), byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
-  const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}${groupName(k)}</h2>
-    <div class="cgrid">${byLevel(k).map((c) => courseRow(c, true)).join('')}</div></section>`;
-  const rows = courses.length ? (only ? [only] : levels).map(group).join('') : '';
+  const { filters, html: rows } = courseGroups(courses, only, true);
   return page('Admin corsi', `<div class="dhead"><h1>Corsi</h1>${filters}<a class="btn" href="/corso/nuovo">${icon('plus')}Nuovo evento</a></div>
     ${flash ? msg('ok', esc(flash)) : ''}
     ${base ? '' : msg('warn', 'Per avere link e QR code corretti imposta l\'indirizzo pubblico in <a href="/impostazioni">Impostazioni</a>.')}
