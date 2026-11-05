@@ -605,6 +605,27 @@ main.wide:has(.adm){max-width:1280px}
 @media (max-width:400px){.hero .filters a{padding:7px 11px;font-size:.88rem}}
 .dhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px}.dhead h1{margin:0}.dhead .filters.seg{margin:0 auto 0 8px;background:var(--panel);border-color:var(--line)}.dhead .filters.seg a:hover{background:var(--soft)}
 .ccard .calert{display:flex;flex-wrap:wrap;gap:6px}
+/* pagina pubblica: schede sovrapposte in 3D. Davanti a sinistra la più recente, le altre dietro verso destra.
+   Tutte nella stessa cella della griglia: il mazzo prende l'altezza della scheda più alta.
+   Passandoci sopra una scheda viene davanti; uscendo torna al suo posto e scende dietro piano piano. Solo CSS. */
+.fan{--w:320px;display:grid;grid-template-columns:var(--w);container-type:inline-size;perspective:1400px;padding:10px 0 22px;margin:0 0 18px}
+.fan>.ccard{grid-area:1/1;--step:min(250px,calc((100cqw - var(--w) - 24px) / max(var(--n) - 1,1)));
+  --rest:translateX(calc(var(--i) * var(--step))) translateZ(calc(var(--i) * -60px)) rotateY(-14deg);
+  --up:translateX(calc(var(--i) * var(--step))) translateY(-8px) translateZ(50px) rotateY(0);
+  transform-origin:0 50%;transform:var(--rest);z-index:calc(10 - var(--i));
+  box-shadow:-10px 12px 26px rgba(30,42,47,.13),-2px 2px 6px rgba(30,42,47,.08);
+  filter:brightness(calc(1 - var(--i) * .035)) saturate(calc(1 - var(--i) * .12));
+  transition:transform .22s cubic-bezier(.2,.8,.3,1),filter .22s,box-shadow .22s,z-index .22s steps(30,end)}
+.fan>.ccard:first-child{--rest:translateZ(0) rotateY(0);box-shadow:0 14px 30px rgba(30,42,47,.14),0 2px 6px rgba(30,42,47,.08)}
+.fan>.ccard:hover,.fan>.ccard:focus-visible{transform:var(--up);z-index:40;filter:none;border-color:var(--line);box-shadow:0 22px 44px rgba(30,42,47,.2);
+  transition:transform .22s cubic-bezier(.2,.8,.3,1),filter .22s,box-shadow .22s,z-index 0s}
+/* telefono: le schede scendono in verticale, la più recente in alto e sopra; ognuna copre solo il bordo della successiva */
+@media (max-width:640px){
+  .fan{display:flex;flex-direction:column;padding:6px 0 10px}
+  .fan>.ccard,.fan>.ccard:first-child{--rest:translateZ(0);--up:translateY(-8px) translateZ(24px)}
+  .fan>.ccard+.ccard{margin-top:-44px}
+}
+@media (prefers-reduced-motion:reduce){.fan>.ccard,.fan>.ccard:hover{transition:none}}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
 .ccard{display:flex;flex-direction:column;gap:10px;padding:18px 20px 16px;background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--lv);border-radius:12px;color:inherit;text-decoration:none;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
 .ccard:hover{border-color:#C5CFDC}
@@ -854,7 +875,7 @@ function seatsShort(c, n) {
   return `<div class="bar"><i style="width:${pct}%"></i></div><small>${esc(txt)}</small>`;
 }
 
-function courseRow(c, admin = false) {
+function courseRow(c, admin = false, pos = null) {
   const n = countRegs(c.id);
   const wait = n >= c.max_n && c.ask_waitlist && !expired(c) && c.status !== 'closed';
   const when = c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>`
@@ -865,7 +886,7 @@ function courseRow(c, admin = false) {
     n >= c.min_n && c.status === 'open' ? pill('Minimo raggiunto: scegli la data', 'ok', 'bell') : '',
     nw ? pill(`${nw} in lista d'attesa`, '', 'hourglass') : '',
   ].join('') : '';
-  return `<a class="ccard ${levelClass(c)}" href="${admin ? '/corso/' : '/c/'}${c.slug}">
+  return `<a class="ccard ${levelClass(c)}" href="${admin ? '/corso/' : '/c/'}${c.slug}"${pos === null ? '' : ` style="--i:${pos}"`}>
     ${c.cover ? `<span class="cban"><img src="/img/${esc(c.cover)}" alt=""><span class="cpill">${levelPill(c)}</span></span>` : `<span class="chead"><span class="cic">${levelIcon(c.level)}</span>${levelPill(c)}</span>`}
     <b>${esc(c.title || kindName(c))}</b>
     <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${when}${dl}</span>
@@ -886,15 +907,15 @@ function renderList(only = '') {
   const past = getSetting('show_past', '1') === '1' ? db.prepare("SELECT * FROM courses WHERE status = 'done' ORDER BY created_at DESC").all() : [];
   const lv = (c) => (LEVELS[c.level] ? c.level : 'base');
   const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
-  const levels = Object.keys(LEVELS).filter((k) => all.some((c) => lv(c) === k));
+  const levels = ['evento', 'base', 'medio', 'avanzato'].filter((k) => all.some((c) => lv(c) === k));
   if (!levels.includes(only)) only = '';
-  // dentro ogni livello: prima i confermati, poi quelli con iscrizioni aperte
-  const byLevel = (k) => all.filter((c) => lv(c) === k).sort((a, b) => (b.status === 'confirmed') - (a.status === 'confirmed'));
+  // dentro ogni gruppo: prima il più recente (la query è già in ordine di creazione, dal più nuovo)
+  const byLevel = (k) => all.filter((c) => lv(c) === k);
   const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
   const filters = levels.length > 1
     ? `<nav class="filters">${chip('', 'Tutti', all.length)}${levels.map((k) => chip(k, chipName(k), byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
   const group = (k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}${groupName(k)}</h2>
-    <div class="cgrid">${byLevel(k).map((c) => courseRow(c)).join('')}</div></section>`;
+    <div class="fan" style="--n:${byLevel(k).length}">${byLevel(k).map((c, i) => courseRow(c, false, i)).join('')}</div></section>`;
   return page('Corsi Bitcoin', `<header class="hero"><div class="hrow"><h1>Corsi Bitcoin</h1>
     ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</div>
     <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello giusto per te.</p>${filters}</header>
