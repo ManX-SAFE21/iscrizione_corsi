@@ -581,6 +581,7 @@ tr:last-child td{border-bottom:0}
 .filters a.sel .i,.filters a.sel small{color:#fff}
 main.wide:has(.adm){max-width:1280px}
 .rowact{display:flex;gap:6px;justify-content:flex-end}.rowact .btn{margin:0}
+.slotsbox{display:none}form:has(input[name=use_slots]:checked) .slotsbox{display:block}
 .mailbox h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:1.05rem}.mailbox h3 .i{color:var(--teal)}.mailbox details summary{cursor:pointer;color:var(--teald);font-weight:500;margin:6px 0}
 .adm{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:28px;align-items:start}
 .adm-main{min-width:0}
@@ -1235,7 +1236,7 @@ function parseCourseForm(f) {
   const out = {
     level, city: field(f, 'city', 80), location: field(f, 'location', 200),
     title: field(f, 'title', 80), description: field(f, 'description', 4000),
-    slots: linesOf(f.get('slots')).slice(0, 12).map((s) => s.slice(0, 60)).join('\n'),
+    slots: f.get('slots_toggle') && f.get('use_slots') !== 'on' ? '' : linesOf(f.get('slots')).slice(0, 12).map((s) => s.slice(0, 60)).join('\n'),
     min_n: parseInt(f.get('min_n'), 10), max_n: parseInt(f.get('max_n'), 10),
     teachers: field(f, 'teachers', 120), deadline: field(f, 'deadline', 10), schedule: field(f, 'schedule', 1000),
     price: field(f, 'price', 300), requirements: field(f, 'requirements', 2000), program: field(f, 'program', 6000),
@@ -1276,7 +1277,9 @@ function courseFormHtml(v, action, button) {
     <label>Città *</label><input type="text" name="city" required maxlength="80" value="${esc(v.city)}">
     <label>Luogo preciso <small>indirizzo, sala, parcheggio...</small></label><textarea name="location" maxlength="200" style="min-height:70px">${esc(v.location)}</textarea>
     ${chk('show_location', 'Mostra il luogo preciso sulla pagina pubblica (altrimenti lo vedi solo tu)')}
-    <label>Fasce indicative <small>una per riga, es. "Sabato pomeriggio" (max 12). Lasciale vuote se la data è già decisa: la scrivi in "Conferma corso".</small></label><textarea name="slots">${esc(v.slots)}</textarea>
+    <input type="hidden" name="slots_toggle" value="1">
+    <label class="check"><input type="checkbox" name="use_slots" ${(v.use_slots ?? !!v.slots) ? 'checked' : ''}><span>Proponi delle fasce orarie da scegliere <small>chi si iscrive segna quelle che gli vanno bene. Se la data è già decisa lascia spento e scrivila in "Conferma corso".</small></span></label>
+    <div class="slotsbox"><label>Fasce indicative <small>una per riga, es. "Sabato pomeriggio" (max 12)</small></label><textarea name="slots">${esc(v.slots)}</textarea></div>
     <label>Orari <small>una riga per voce, es. "Accoglienza 9.15"</small></label><textarea name="schedule" maxlength="1000">${esc(v.schedule)}</textarea>
     <label>Prenotazioni entro <small>facoltativo: dopo questa data il modulo si chiude da solo</small></label><input type="date" name="deadline" value="${esc(v.deadline)}">
     </fieldset>
@@ -1577,7 +1580,7 @@ async function adminRoutes(req, res, umbrel) {
   if (p === '/corso/nuovo') {
     if (req.method === 'GET') {
       const v = {
-        level: 'base', ask_waitlist: 1, slots: 'Sabato mattina\nSabato pomeriggio\nDomenica',
+        level: 'base', ask_waitlist: 1, use_slots: 0, slots: 'Sabato mattina\nSabato pomeriggio\nDomenica',
         prepay_text: 'Se vuoi bloccare subito il posto, puoi inviare il contributo in anticipo in Bitcoin o Lightning.\nSe per qualsiasi motivo il corso dovesse saltare, ti rimborsiamo i bitcoin inviati.',
       };
       return send(res, 200, page('Nuovo evento', `<h1>Nuovo evento</h1><p class="sub">Scegli se è un corso (base, medio, avanzato) o un evento, come una presentazione. Per riusarne uno già fatto, aprilo e usa "Duplica".</p>${courseFormHtml(v, '/corso/nuovo', 'Crea')}`, { admin: true }));
