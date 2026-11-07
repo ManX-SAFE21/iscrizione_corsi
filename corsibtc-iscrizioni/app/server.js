@@ -65,6 +65,7 @@ addColumns('courses', {
 });
 addColumns('courses', { cover: TXT, ask_company: FLAG, ask_source: FLAG, ask_waitlist: FLAG });
 addColumns('courses', { poster: TXT });
+addColumns('courses', { ev_date: TXT, ev_start: TXT, ev_end: TXT });
 addColumns('registrations', { payment: TXT, paid: FLAG, company: TXT, source: TXT, waitlist: FLAG });
 const COURSE_FIELDS = ['level', 'city', 'location', 'title', 'description', 'slots', 'min_n', 'max_n', 'teachers', 'deadline', 'schedule',
   'price', 'requirements', 'program', 'contact_email', 'show_location', 'phone_required', 'prepay_text', 'btc_address', 'ln_address', 'cover',
@@ -753,6 +754,18 @@ details.sec{margin:14px 0}
 .foot{display:flex;gap:8px;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:.85rem;margin-top:44px;padding-top:18px;border-top:1px solid var(--line)}
 .foot .i{color:var(--teal);flex:none}
 .intro{font-size:1.1rem;color:var(--body);margin:4px 0 20px;white-space:pre-wrap}
+.calm{margin-top:12px}
+.calm>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--title);font-weight:500;font-size:.95rem}
+.calm>summary::-webkit-details-marker{display:none}
+.calm>summary .i{color:var(--lv,var(--teal))}
+.calm[open]>summary{border-color:var(--lv,var(--teal))}
+.calm-list{display:grid;gap:2px;margin-top:6px;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.calm-list a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:var(--body);text-decoration:none;font-size:.93rem}
+.calm-list a:hover{background:var(--soft)}
+.calm-list a .i{flex:none;color:var(--lv,var(--teal))}
+.calm-list small{display:block;color:var(--mut);font-size:.78rem}
+.calafter{max-width:340px;margin:0 0 16px}
+.calrow{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:10px}.calrow label{display:grid;gap:4px;margin:0}
 .chead2 .desc{font-size:1.2rem;line-height:1.55;color:var(--body);margin:0 0 14px;max-width:72ch;white-space:pre-wrap}
 .chead2 .intro{font-size:clamp(1.3rem,2.6vw,1.6rem);line-height:1.4;color:var(--title);margin:0 0 14px;max-width:62ch}
 /* due colonne che si riempiono dall'alto (come un giornale): niente buchi sotto le caselle corte */
@@ -1041,6 +1054,75 @@ function shareBox(c) {
 
 // sezione apribile con un clic: icona, titolo, eventuale numero, contenuto dentro una scheda
 // sezione sempre aperta della pagina del corso
+// ---- Aggiungi al calendario ----
+// ora locale italiana (con ora legale) -> istante UTC
+function romeToUtc(date, time) {
+  const [y, mo, d] = date.split('-').map(Number);
+  const [h, mi] = time.split(':').map(Number);
+  const want = Date.UTC(y, mo - 1, d, h, mi);
+  const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+  let t = want;
+  for (let k = 0; k < 2; k++) {
+    const p = Object.fromEntries(fmt.formatToParts(new Date(t)).map((x) => [x.type, x.value]));
+    t += want - Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+  }
+  return new Date(t);
+}
+// dati dell'evento per il calendario: solo se confermato con giorno e ora di inizio
+function calInfo(c) {
+  if (c.status !== 'confirmed' || !/^\d{4}-\d{2}-\d{2}$/.test(c.ev_date || '') || !/^\d{2}:\d{2}$/.test(c.ev_start || '')) return null;
+  const start = romeToUtc(c.ev_date, c.ev_start);
+  let end = /^\d{2}:\d{2}$/.test(c.ev_end || '') ? romeToUtc(c.ev_date, c.ev_end) : null;
+  if (!end || end <= start) end = new Date(start.getTime() + 2 * 3600e3);
+  const base = publicBase();
+  const url = base ? `${base}/c/${c.slug}` : '';
+  const intro = String(c.description || '').trim().split(/\n\s*\n|\n/)[0] || '';
+  return { start, end, title: courseName(c), location: mapQuery(c), details: [intro, url].filter(Boolean).join('\n\n'), url };
+}
+const icsTime = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+const icsText = (t) => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+// righe del file .ics lunghe al massimo 75 byte (regola del formato)
+function icsFold(line) {
+  const out = [];
+  let cur = '';
+  for (const ch of line) {
+    if (Buffer.byteLength(cur + ch) > (out.length ? 74 : 75)) { out.push(cur); cur = ''; }
+    cur += ch;
+  }
+  out.push(cur);
+  return out.join('\r\n ');
+}
+function icsFile(c, ev) {
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Corsi Bitcoin//Iscrizioni//IT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+    `UID:${c.slug}@corsi-bitcoin`, `DTSTAMP:${icsTime(new Date())}`, `DTSTART:${icsTime(ev.start)}`, `DTEND:${icsTime(ev.end)}`,
+    `SUMMARY:${icsText(ev.title)}`, `LOCATION:${icsText(ev.location)}`, `DESCRIPTION:${icsText(ev.details)}`, ...(ev.url ? [`URL:${ev.url}`] : []),
+    'END:VEVENT', 'END:VCALENDAR'];
+  return lines.map(icsFold).join('\r\n') + '\r\n';
+}
+function calLinks(c, ev) {
+  const q = (o) => Object.entries(o).map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+  const ms = { subject: ev.title, startdt: ev.start.toISOString(), enddt: ev.end.toISOString(), body: ev.details, location: ev.location, path: '/calendar/action/compose', rru: 'addevent' };
+  return {
+    ics: `/c/${c.slug}/calendario.ics`,
+    google: `https://calendar.google.com/calendar/render?${q({ action: 'TEMPLATE', text: ev.title, dates: `${icsTime(ev.start)}/${icsTime(ev.end)}`, details: ev.details, location: ev.location })}`,
+    outlook: `https://outlook.live.com/calendar/0/deeplink/compose?${q(ms)}`,
+    office: `https://outlook.office.com/calendar/0/deeplink/compose?${q(ms)}`,
+  };
+}
+// menu "Aggiungi al calendario": si apre con un clic, nessuno script
+function calMenu(c) {
+  const ev = calInfo(c);
+  if (!ev) return '';
+  const l = calLinks(c, ev);
+  const out = 'target="_blank" rel="noopener noreferrer"';
+  return `<details class="calm"><summary>${icon('calendar')}Aggiungi al calendario</summary><div class="calm-list">
+    <a href="${l.ics}" download>${icon('down')}<span>Scarica file .ics<small>iPhone, Mac, Outlook sul computer</small></span></a>
+    <a href="${esc(l.google)}" ${out}>${icon('calendar')}<span>Google Calendar</span></a>
+    <a href="${esc(l.outlook)}" ${out}>${icon('calendar')}<span>Outlook.com</span></a>
+    <a href="${esc(l.office)}" ${out}>${icon('calendar')}<span>Office 365</span></a>
+  </div></details>`;
+}
+
 // descrizione: il primo paragrafo è il sottotitolo (grande), il resto è testo normale.
 // I paragrafi sono separati da una riga vuota; senza righe vuote il sottotitolo è la prima riga.
 function descParts(d) {
@@ -1119,6 +1201,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
     : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}</p>
     <p>Ti confermeremo il corso entro 7 giorni prima della data, via email o telefono.</p>
     ${payChoice}</div></div>`}
+    ${!wait && calInfo(c) ? `<div class="calafter">${calMenu(c)}</div>` : ''}
     ${paid && !wait && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
     <p><a class="btn sec" href="/">${icon('back')}Tutti i corsi</a></p>`;
   const enroll = ok ? finished : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;
@@ -1153,7 +1236,8 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
         ${done ? `<h2>${icon('checkc')}Corso concluso</h2><p class="sub" style="margin:0">Questo corso si è già svolto.</p><a class="btn big" href="/">${icon('book')}Vedi i prossimi corsi</a>` : `<h2>${icon('users')}Iscrizioni</h2>
         ${counter(c, n)}
         ${c.deadline && !late ? `<p class="dl">${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</p>` : ''}
-        ${ok || stop ? '' : cta}`}
+        ${ok || stop ? '' : cta}
+        ${calMenu(c)}`}
         ${posterExt(c) ? `<a class="btn sec big" href="/c/${c.slug}/locandina" target="_blank" rel="noopener">${icon('down')}Scarica la locandina</a>` : ''}
         ${shareBox(c)}
     </div>${tocNav(tocItems)}</aside>
@@ -1176,6 +1260,13 @@ async function handlePublic(req, res) {
   if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p) || serveIcon(res, p))) return;
   if (req.method === 'GET' && p === '/') return send(res, 200, renderList(url.searchParams.get('livello') || ''));
 
+  const cm = p.match(/^\/c\/([0-9a-f]{10})\/calendario\.ics$/);
+  if (cm && req.method === 'GET') {
+    const cc = db.prepare('SELECT * FROM courses WHERE slug = ?').get(cm[1]);
+    const ev = cc && calInfo(cc);
+    if (!ev) return send(res, 404, page('Non trovato', '<h1>Data non ancora fissata</h1><p><a href="/">Torna ai corsi</a></p>'));
+    return send(res, 200, icsFile(cc, ev), { 'Content-Type': 'text/calendar; charset=utf-8', 'Content-Disposition': `attachment; filename="${isEvent(cc) ? 'evento' : 'corso'}-${cc.slug}.ics"` });
+  }
   const pm = p.match(/^\/c\/([0-9a-f]{10})\/locandina$/);
   if (pm && req.method === 'GET') {
     const pc = db.prepare('SELECT * FROM courses WHERE slug = ?').get(pm[1]);
@@ -1413,6 +1504,7 @@ function confirmMailText(c, name = '') {
     c.schedule ? `Orari: ${linesOf(c.schedule).join(', ')}` : '',
     `Dove: ${where}`,
     `Mappa: https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery(c, true))}`,
+    calInfo(c) && publicBase() ? `Aggiungi al calendario: ${publicBase()}/c/${c.slug}/calendario.ics` : '',
     c.price ? `Contributo: ${linesOf(c.price).join(' oppure ')}` : '',
     c.teachers ? `Docenti: ${linesOf(c.teachers).join(', ')}` : '',
   ].filter((l, i) => l !== '' || i === 1 || i === 3);
@@ -1479,6 +1571,12 @@ function adminCourse(c, flash = '') {
       ${n < c.min_n ? msg('warn', `Il minimo (${c.min_n}) non è ancora raggiunto: puoi confermare comunque.`) : ''}
       <label>Data definitiva <small>testo libero, es. "sabato 21 marzo 2026, 9.30–17.00"</small></label>
       <input type="text" name="date" required maxlength="120" value="${esc(c.confirmed_date)}">
+      <div class="calrow">
+        <label>Giorno <small>per "Aggiungi al calendario"</small><input type="date" name="ev_date" value="${esc(c.ev_date)}"></label>
+        <label>Inizio<input type="time" name="ev_start" value="${esc(c.ev_start)}"></label>
+        <label>Fine<input type="time" name="ev_end" value="${esc(c.ev_end)}"></label>
+      </div>
+      <p class="sub" style="margin:4px 0 0">Con giorno e ora di inizio, nella pagina e nell'email compare "Aggiungi al calendario".</p>
       <p><button>${icon('checkc')}${c.status === 'confirmed' ? 'Aggiorna data' : 'Conferma corso'}</button></p></form>
     ${c.status === 'confirmed' && c.confirmed_date && regs.length ? (() => {
     const body = confirmMailText(c);
@@ -1728,9 +1826,14 @@ async function adminRoutes(req, res, umbrel) {
       return res.end(body);
     }
     if (sub === '/conferma' && req.method === 'POST') {
-      const date = ((await readForm(req)).get('date') || '').trim().slice(0, 120);
+      const cf = await readForm(req);
+      const date = (cf.get('date') || '').trim().slice(0, 120);
       if (!date) return back(`/corso/${c.slug}`, 'Inserisci la data.');
-      db.prepare("UPDATE courses SET status = 'confirmed', confirmed_date = ? WHERE id = ?").run(date, c.id);
+      const okv = (v, re) => (re.test(v || '') ? v : '');
+      const evDate = okv(cf.get('ev_date'), /^\d{4}-\d{2}-\d{2}$/);
+      const evStart = okv(cf.get('ev_start'), /^\d{2}:\d{2}$/);
+      const evEnd = okv(cf.get('ev_end'), /^\d{2}:\d{2}$/);
+      db.prepare("UPDATE courses SET status = 'confirmed', confirmed_date = ?, ev_date = ?, ev_start = ?, ev_end = ? WHERE id = ?").run(date, evDate, evStart, evEnd, c.id);
       return back(`/corso/${c.slug}`, `${isEvent(c) ? 'Evento confermato' : 'Corso confermato'}. Ora scrivi agli iscritti con data e luogo.`);
     }
     if (sub === '/stato' && req.method === 'POST') {
