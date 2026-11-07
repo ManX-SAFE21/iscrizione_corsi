@@ -485,7 +485,9 @@ const CSS = `
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--body);font:16px/1.6 Roboto,'Segoe UI',Arial,sans-serif;-webkit-font-smoothing:antialiased}
 main{max-width:720px;margin:0 auto;padding:12px 16px 64px}
-main.wide{max-width:1040px}
+/* pagine larghe: colonna chiara (come un foglio) che contiene tutto, larga 1100 px di contenuto */
+main.wide{max-width:calc(1100px + 72px);padding:20px 36px 64px;background:#F9F8F4;border-left:1px solid var(--line);border-right:1px solid var(--line);box-shadow:0 0 40px rgba(30,42,47,.05);min-height:100vh}
+@media (max-width:640px){main.wide{padding:12px 16px 48px;border:0;box-shadow:none}}
 h1,h2,h3{font-family:Roboto,'Segoe UI',Arial,sans-serif;font-weight:500;color:var(--title);line-height:1.2}
 h1{font-size:1.85rem;margin:.3em 0 .3em}
 h2{font-size:1.2rem;margin:1.8em 0 .6em;display:flex;align-items:center;gap:8px}
@@ -628,6 +630,19 @@ main.wide:has(.adm){max-width:1280px}
   .fan>.ccard+.ccard{margin-top:-44px}
 }
 @media (prefers-reduced-motion:reduce){.fan>.ccard,.fan>.ccard:hover{transition:none}}
+/* bacheca: 4 colonne affiancate, una per tipo; dentro, le schede scendono e si coprono un po' (in alto la più recente) */
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;align-items:start;margin:0 0 18px}
+.board.one{grid-template-columns:minmax(0,360px);justify-content:center}
+.board .gh{margin:0 0 10px;font-size:1.05rem}
+.board .fan{display:flex;flex-direction:column;padding:4px 0 10px;margin:0;container-type:normal}
+.board .fan>.ccard,.board .fan>.ccard:first-child{grid-area:auto;width:auto;transform-origin:50% 0;--rest:translateZ(0);--up:translateY(-8px) translateZ(24px)}
+.board .fan>.ccard+.ccard{margin-top:-44px}
+.board .ccard{padding:16px 16px 14px}
+.board .ccard .cban{margin:-16px -16px -66px}
+.board .ccard b{font-size:1.05rem}
+.bempty{padding:22px 14px;border:1px dashed var(--line);border-radius:12px;color:var(--mut);font-size:.92rem;text-align:center;background:rgba(255,255,255,.4)}
+@media (max-width:1000px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.board{grid-template-columns:1fr}}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
 .ccard{display:flex;flex-direction:column;gap:10px;padding:18px 20px 16px;background:var(--panel);border:1px solid var(--line);border-top:5px solid var(--lv);border-radius:12px;color:inherit;text-decoration:none;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
 .ccard:hover{border-color:#C5CFDC}
@@ -958,8 +973,11 @@ function courseGroups(list, only, admin) {
   const chip = (k, label, n, cls = '') => `<a class="${cls}${only === k ? ' sel' : ''}" href="${k ? `/?livello=${k}` : '/'}">${k ? levelIcon(k) : icon('book')}${label} <small>${n}</small></a>`;
   const filters = levels.length > 1
     ? `<nav class="filters${admin ? ' seg' : ''}">${chip('', 'Tutti', list.length)}${levels.map((k) => chip(k, chipName(k), byLevel(k).length, levelClass({ level: k }))).join('')}</nav>` : '';
-  const html = (only ? [only] : levels).map((k) => `<section class="${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}${groupName(k)}</h2>
-    <div class="fan" style="--n:${byLevel(k).length}">${byLevel(k).map((c, i) => courseRow(c, admin, i)).join('')}</div></section>`).join('');
+  // colonna vuota: si vede lo stesso, così i 4 tipi stanno sempre in fila
+  const empty = (k) => `<div class="bempty">${k === 'evento' ? 'Nessun evento in programma' : 'Nessun corso in programma'}</div>`;
+  const cols = (only ? [only] : GROUP_ORDER).map((k) => `<section class="bcol ${levelClass({ level: k })}"><h2 class="gh">${levelIcon(k)}${groupName(k)}</h2>
+    ${byLevel(k).length ? `<div class="fan" style="--n:${byLevel(k).length}">${byLevel(k).map((c, i) => courseRow(c, admin, i)).join('')}</div>` : empty(k)}</section>`).join('');
+  const html = list.length ? `<div class="board${only ? ' one' : ''}">${cols}</div>` : '';
   return { filters, html };
 }
 
