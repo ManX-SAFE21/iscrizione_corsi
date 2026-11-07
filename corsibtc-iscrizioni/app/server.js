@@ -770,7 +770,13 @@ details.sec{margin:14px 0}
 .share .mono{margin:10px 0 0;font-size:.78rem;color:var(--mut);user-select:all}
 .aside .btn.big{margin-top:14px}
 @media (min-width:940px){.cwrap{grid-template-columns:minmax(0,1fr) 230px;gap:32px;align-items:start}.aside{grid-column:2;grid-row:1}.cmain{grid-column:1;grid-row:1}}
-.foot{display:flex;gap:8px;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:.85rem;margin-top:44px;padding-top:18px;border-top:1px solid var(--line)}
+.foot{display:grid;justify-items:center;gap:10px;text-align:center;color:var(--mut);font-size:.85rem;margin-top:44px;padding-top:20px;border-top:1px solid var(--line)}
+.foot .privacy{display:flex;gap:8px;align-items:center;justify-content:center;margin:0}
+.s21link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:4px 6px;border-radius:8px}
+.s21link .s21{width:28px;height:28px;flex:none}
+.s21link b{font-family:'Space Grotesk','Segoe UI',Arial,sans-serif;font-weight:600;letter-spacing:.14em;color:#0A0F1C;font-size:1.15rem}
+.s21link b em{font-style:normal;color:#0D9488}
+.s21link:hover b{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
 .foot .i{color:var(--teal);flex:none}
 .intro{font-size:1.1rem;color:var(--body);margin:4px 0 20px;white-space:pre-wrap}
 .calm{margin-top:12px}
@@ -871,14 +877,16 @@ function serveIcon(res, p) {
   return true;
 }
 
-const FOOT = `<footer class="foot">${icon('shield')}<span>I dati degli iscritti non vengono ceduti a terzi e vengono cancellati dopo il corso.</span></footer>`;
+// logo SAFE21 (dalla cartella del sito safe21.io): piastrella verde con il buco della serratura
+const SAFE21_TILE = '<svg class="s21" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="#0D9488"/><g fill="#F9F8F4"><circle cx="17" cy="14" r="5"/><path d="M14 17h6l2 10H12z"/></g></svg>';
+const FOOT = `<footer class="foot"><p class="privacy">${icon('shield')}<span>I dati degli iscritti non vengono ceduti a terzi e vengono cancellati dopo il corso.</span></p></footer>`;
 
 function page(title, body, { admin = false, wide = false, head = '' } = {}) {
   const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg?v=2" alt="" width="34" height="34"></span><span class="bname">Eventi e Corsi<small>Bitcoin</small></span>${admin ? '<small>· Admin</small>' : ''}</a>`;
   const nav = admin
     ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo evento</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
        ${adminCtx.getStore()?.umbrel ? '' : `<form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form>`}</nav>`
-    : '';
+    : `<a class="s21link" href="https://safe21.io" title="Vai a safe21.io">${SAFE21_TILE}<b>SAFE<em>21</em></b></a>`;
   // <!--email_off-->: Cloudflare non deve nascondere le email (e gli indirizzi Lightning): lo script che le ricompone sarebbe bloccato dalla CSP
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg?v=2">${head}
@@ -1060,7 +1068,7 @@ function socialHead(c) {
   const short = desc.length > 200 ? desc.slice(0, 200).replace(/\s+\S*$/, '') + '…' : desc; // taglio a parola intera
   const img = c.cover ? `${base}/img/${c.cover}` : ['jpg', 'png', 'webp'].includes(posterExt(c)) ? `${base}/c/${c.slug}/locandina` : '';
   const m = (k, v) => `<meta property="${k}" content="${esc(v)}">`;
-  return '\n' + [m('og:type', 'website'), m('og:site_name', 'Eventi e Corsi Bitcoin'), m('og:title', courseName(c)), m('og:description', short),
+  return '\n' + [m('og:type', 'website'), m('og:site_name', 'Eventi e Corsi Bitcoin · SAFE21'), m('og:title', courseName(c)), m('og:description', short),
     m('og:url', `${base}/c/${c.slug}`), img ? m('og:image', img) : '', `<meta name="twitter:card" content="${img ? 'summary_large_image' : 'summary'}">`].join('');
 }
 // link di condivisione: semplici indirizzi, nessuno script e nessun servizio caricato nella pagina

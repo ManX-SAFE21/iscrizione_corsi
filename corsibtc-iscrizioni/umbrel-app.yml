@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.14.0"
+version: "1.14.1"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -23,6 +23,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Nuovo nome e nuovo logo: Eventi e Corsi (Bitcoin), con un calendario e la B di Bitcoin. Nel modulo la domanda Quando si fa?: data già decisa (giorno, inizio e fine con i selettori), da scegliere con gli iscritti (fasce orarie) oppure da decidere più avanti. Con la data già decisa la pagina mostra subito la data per esteso e Aggiungi al calendario. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Logo SAFE21 in alto a destra, sulla riga del logo Eventi e Corsi, con il link a safe21.io; anche le anteprime dei link dicono Eventi e Corsi Bitcoin · SAFE21. Comprende la 1.14.0: nuovo nome e logo, e nel modulo la domanda Quando si fa? con giorno e ore. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""
