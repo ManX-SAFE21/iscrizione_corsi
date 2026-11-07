@@ -503,6 +503,15 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .brand .mark img{width:100%;height:100%;display:block}
 .brand small{font-weight:500;color:var(--mut);margin-left:2px}
 .brand .bname{display:flex;flex-direction:column;line-height:1.15}
+/* gestione: si riconosce subito (sfondo grigio-azzurro e fascia scura in alto) */
+body.admin{background:#D9E0E8}
+body.admin main{background:#F2F5F8;border-left:1px solid #C3CDD8;border-right:1px solid #C3CDD8;min-height:100vh}
+.adminbar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin:-12px -16px 14px;padding:9px 16px;background:#2F3B4A;color:#E8EDF3;font-size:.88rem}
+body.admin main.wide .adminbar{margin:-20px -36px 16px;padding:10px 36px}
+.adminbar .i{color:#8FD3C2}
+.adminbar b{text-transform:uppercase;letter-spacing:.14em;font-size:.8rem;color:#fff}
+.adminbar span{color:#B9C4D0}
+@media (max-width:640px){body.admin main.wide .adminbar{margin:-12px -16px 14px;padding:9px 16px}}
 .brand .bname small{margin:0;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}
 .nav{display:flex;gap:2px;flex-wrap:wrap;align-items:center}
 .nav a,.nav button{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;color:var(--body);background:none;border:0;font:500 .93rem/1.4 Roboto,'Segoe UI',Arial,sans-serif;text-decoration:none;cursor:pointer}
@@ -890,7 +899,7 @@ function page(title, body, { admin = false, wide = false, head = '' } = {}) {
   // <!--email_off-->: Cloudflare non deve nascondere le email (e gli indirizzi Lightning): lo script che le ricompone sarebbe bloccato dalla CSP
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg?v=2">${head}
-<title>${esc(title)}</title><style>${CSS}</style></head><body><!--email_off--><main${wide ? ' class="wide"' : ''}><header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main><!--/email_off--></body></html>`;
+<title>${admin ? 'Gestione · ' : ''}${esc(title)}</title><style>${CSS}</style></head><body${admin ? ' class="admin"' : ''}><!--email_off--><main${wide ? ' class="wide"' : ''}>${admin ? `<div class="adminbar">${icon('cog')}<b>Gestione</b><span>Questa pagina la vedi solo tu. I visitatori vedono il sito pubblico.</span></div>` : ''}<header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main><!--/email_off--></body></html>`;
 }
 
 function qrSvg(url) {
@@ -915,7 +924,7 @@ function counter(c, n) {
 // withDate=false sulle pagine pubbliche, dove la data confermata è già scritta accanto alla città
 function statusBadge(c, n, withDate = true) {
   if (c.status === 'done') return pill('Concluso', 'off', 'checkc');
-  if (c.status === 'closed') return pill('Chiuso', 'off', 'lock');
+  if (c.status === 'closed') return pill('Iscrizioni chiuse', 'off', 'lock');
   if (n >= c.max_n) return pill('Completo', 'off', 'users');
   if (expired(c)) return pill('Prenotazioni chiuse', 'off', 'hourglass');
   if (c.status === 'confirmed') return pill(withDate ? `Confermato: ${esc(c.confirmed_date)}` : 'Confermato', 'ok', 'checkc');
@@ -994,7 +1003,7 @@ function courseGroups(list, only, admin) {
 }
 
 function renderList(only = '') {
-  const all = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed') ORDER BY created_at DESC").all();
+  const all = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed','closed') ORDER BY created_at DESC").all();
   const past = getSetting('show_past', '1') === '1' ? db.prepare("SELECT * FROM courses WHERE status = 'done' ORDER BY created_at DESC").all() : [];
   const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
   const { filters, html: groups } = courseGroups(all, only, false);
