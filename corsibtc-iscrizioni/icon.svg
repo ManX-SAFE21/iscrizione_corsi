@@ -1,16 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
-  <rect width="256" height="256" fill="#FFFFFF"/>
-  <g transform="translate(128 128) scale(.96) translate(-128 -131)" fill="none" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
-    <g stroke="#0D9488">
-      <rect x="58" y="62" width="140" height="168" rx="12"/>
-      <rect x="91" y="32" width="74" height="52" rx="14" fill="#FFFFFF"/>
-      <rect x="108" y="50" width="40" height="20" rx="9"/>
-    </g>
-    <g stroke="#FF6F1F" transform="translate(122.5 162)">
-      <path d="M-20 -36V36"/>
-      <path d="M-20 -36H8a17 17 0 0 1 0 34H-20"/>
-      <path d="M-20 -2H12a19 19 0 0 1 0 38H-20"/>
-      <path d="M-8 -36V-48M8 -36V-48M-8 36V48M8 36V48"/>
-    </g>
+  <rect width="256" height="256" fill="#3D8477"/>
+  <rect x="50" y="64" width="156" height="146" rx="22" fill="#FCFBF8"/>
+  <path d="M50 86a22 22 0 0 1 22-22h112a22 22 0 0 1 22 22v18H50z" fill="#2B5F55"/>
+  <rect x="86" y="44" width="16" height="38" rx="8" fill="#FCFBF8" stroke="#2B5F55" stroke-width="6"/>
+  <rect x="154" y="44" width="16" height="38" rx="8" fill="#FCFBF8" stroke="#2B5F55" stroke-width="6"/>
+  <g transform="translate(124 158) scale(.66)" fill="none" stroke="#E8892B" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-20 -36V36"/>
+    <path d="M-20 -36H8a17 17 0 0 1 0 34H-20"/>
+    <path d="M-20 -2H12a19 19 0 0 1 0 38H-20"/>
+    <path d="M-8 -36V-48M8 -36V-48M-8 36V48M8 36V48"/>
   </g>
 </svg>

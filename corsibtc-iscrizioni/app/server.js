@@ -65,9 +65,9 @@ addColumns('courses', {
 });
 addColumns('courses', { cover: TXT, ask_company: FLAG, ask_source: FLAG, ask_waitlist: FLAG });
 addColumns('courses', { poster: TXT });
-addColumns('courses', { ev_date: TXT, ev_start: TXT, ev_end: TXT });
+addColumns('courses', { ev_date: TXT, ev_start: TXT, ev_end: TXT, when_mode: TXT });
 addColumns('registrations', { payment: TXT, paid: FLAG, company: TXT, source: TXT, waitlist: FLAG });
-const COURSE_FIELDS = ['level', 'city', 'location', 'title', 'description', 'slots', 'min_n', 'max_n', 'teachers', 'deadline', 'schedule',
+const COURSE_FIELDS = ['when_mode', 'ev_date', 'ev_start', 'ev_end', 'level', 'city', 'location', 'title', 'description', 'slots', 'min_n', 'max_n', 'teachers', 'deadline', 'schedule',
   'price', 'requirements', 'program', 'contact_email', 'show_location', 'phone_required', 'prepay_text', 'btc_address', 'ln_address', 'cover',
   'ask_company', 'ask_source', 'ask_waitlist', 'poster'];
 // "Come hai conosciuto questo corso?": le scelte del vecchio modulo; "Altro" ha un campo libero
@@ -499,9 +499,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .sub{color:var(--mut);margin:0 0 1.2em}
 .top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;padding:8px 0 10px;margin-bottom:14px;border-bottom:1px solid var(--line)}
 .brand{display:inline-flex;align-items:center;gap:10px;font:600 1.05rem Roboto,sans-serif;color:var(--title);text-decoration:none}
-.brand .mark{width:34px;height:34px;border-radius:9px;background:#fff;border:1px solid var(--line);overflow:hidden;display:inline-flex;flex:none}
+.brand .mark{width:36px;height:36px;border-radius:10px;overflow:hidden;display:inline-flex;flex:none}
 .brand .mark img{width:100%;height:100%;display:block}
 .brand small{font-weight:500;color:var(--mut);margin-left:2px}
+.brand .bname{display:flex;flex-direction:column;line-height:1.15}
+.brand .bname small{margin:0;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}
 .nav{display:flex;gap:2px;flex-wrap:wrap;align-items:center}
 .nav a,.nav button{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;color:var(--body);background:none;border:0;font:500 .93rem/1.4 Roboto,'Segoe UI',Arial,sans-serif;text-decoration:none;cursor:pointer}
 .nav a:hover,.nav button:hover{background:var(--soft);color:var(--title)}
@@ -584,7 +586,9 @@ tr:last-child td{border-bottom:0}
 .filters a.sel .i,.filters a.sel small{color:#fff}
 main.wide:has(.adm){max-width:1280px}
 .rowact{display:flex;gap:6px;justify-content:flex-end}.rowact .btn{margin:0}
-.slotsbox{display:none}form:has(input[name=use_slots]:checked) .slotsbox{display:block}
+.whenq{grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));margin:4px 0 8px}
+.whenbox{display:none;margin:4px 0 6px}
+form:has(input[name=when_mode][value=date]:checked) .wb-date,form:has(input[name=when_mode][value=slots]:checked) .wb-slots{display:block}
 .mailbox h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:1.05rem}.mailbox h3 .i{color:var(--teal)}.mailbox details summary{cursor:pointer;color:var(--teald);font-weight:500;margin:6px 0}
 .adm{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:28px;align-items:start}
 .adm-main{min-width:0}
@@ -859,7 +863,7 @@ fieldset.qs{border:0;padding:0;margin:0;min-width:0}
 @media print{.top,.nav,button,.btn,.back,.maplink{display:none}body{background:#fff}.card{box-shadow:none}}
 `;
 
-const ICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 256\" width=\"256\" height=\"256\">\n  <rect width=\"256\" height=\"256\" fill=\"#FFFFFF\"/>\n  <g transform=\"translate(128 128) scale(.96) translate(-128 -131)\" fill=\"none\" stroke-width=\"9\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n    <g stroke=\"#0D9488\">\n      <rect x=\"58\" y=\"62\" width=\"140\" height=\"168\" rx=\"12\"/>\n      <rect x=\"91\" y=\"32\" width=\"74\" height=\"52\" rx=\"14\" fill=\"#FFFFFF\"/>\n      <rect x=\"108\" y=\"50\" width=\"40\" height=\"20\" rx=\"9\"/>\n    </g>\n    <g stroke=\"#FF6F1F\" transform=\"translate(122.5 162)\">\n      <path d=\"M-20 -36V36\"/>\n      <path d=\"M-20 -36H8a17 17 0 0 1 0 34H-20\"/>\n      <path d=\"M-20 -2H12a19 19 0 0 1 0 38H-20\"/>\n      <path d=\"M-8 -36V-48M8 -36V-48M-8 36V48M8 36V48\"/>\n    </g>\n  </g>\n</svg>\n";
+const ICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 256\" width=\"256\" height=\"256\">\n  <rect width=\"256\" height=\"256\" fill=\"#3D8477\"/>\n  <rect x=\"50\" y=\"64\" width=\"156\" height=\"146\" rx=\"22\" fill=\"#FCFBF8\"/>\n  <path d=\"M50 86a22 22 0 0 1 22-22h112a22 22 0 0 1 22 22v18H50z\" fill=\"#2B5F55\"/>\n  <rect x=\"86\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#FCFBF8\" stroke=\"#2B5F55\" stroke-width=\"6\"/>\n  <rect x=\"154\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#FCFBF8\" stroke=\"#2B5F55\" stroke-width=\"6\"/>\n  <g transform=\"translate(124 158) scale(.66)\" fill=\"none\" stroke=\"#E8892B\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n    <path d=\"M-20 -36V36\"/>\n    <path d=\"M-20 -36H8a17 17 0 0 1 0 34H-20\"/>\n    <path d=\"M-20 -2H12a19 19 0 0 1 0 38H-20\"/>\n    <path d=\"M-8 -36V-48M8 -36V-48M-8 36V48M8 36V48\"/>\n  </g>\n</svg>\n";
 function serveIcon(res, p) {
   if (p !== '/icon.svg') return false;
   res.writeHead(200, { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=86400', 'X-Content-Type-Options': 'nosniff' });
@@ -870,14 +874,14 @@ function serveIcon(res, p) {
 const FOOT = `<footer class="foot">${icon('shield')}<span>I dati degli iscritti non vengono ceduti a terzi e vengono cancellati dopo il corso.</span></footer>`;
 
 function page(title, body, { admin = false, wide = false, head = '' } = {}) {
-  const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg" alt="" width="34" height="34"></span>Corsi Bitcoin${admin ? '<small>· Admin</small>' : ''}</a>`;
+  const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg?v=2" alt="" width="34" height="34"></span><span class="bname">Eventi e Corsi<small>Bitcoin</small></span>${admin ? '<small>· Admin</small>' : ''}</a>`;
   const nav = admin
     ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo evento</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
        ${adminCtx.getStore()?.umbrel ? '' : `<form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form>`}</nav>`
     : '';
   // <!--email_off-->: Cloudflare non deve nascondere le email (e gli indirizzi Lightning): lo script che le ricompone sarebbe bloccato dalla CSP
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg">${head}
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg?v=2">${head}
 <title>${esc(title)}</title><style>${CSS}</style></head><body><!--email_off--><main${wide ? ' class="wide"' : ''}><header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main><!--/email_off--></body></html>`;
 }
 
@@ -937,7 +941,7 @@ function seatsShort(c, n) {
 function courseRow(c, admin = false, pos = null) {
   const n = countRegs(c.id);
   const wait = n >= c.max_n && c.ask_waitlist && !expired(c) && c.status !== 'closed';
-  const when = c.status === 'confirmed' ? `<span>${icon('calendar')}${esc(c.confirmed_date)}</span>`
+  const when = whenText(c) ? `<span>${icon('calendar')}${esc(whenText(c))}</span>`
     : slotsOf(c).length ? `<span>${icon('calendar')}Data da scegliere insieme</span>` : '';
   const dl = c.deadline && !expired(c) ? `<span>${icon('hourglass')}Iscrizioni entro il ${fmtDay(c.deadline)}</span>` : '';
   const nw = admin ? waitOf(c.id).length : 0;
@@ -986,9 +990,9 @@ function renderList(only = '') {
   const past = getSetting('show_past', '1') === '1' ? db.prepare("SELECT * FROM courses WHERE status = 'done' ORDER BY created_at DESC").all() : [];
   const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
   const { filters, html: groups } = courseGroups(all, only, false);
-  return page('Corsi Bitcoin', `<header class="hero"><div class="hrow"><h1>Corsi Bitcoin</h1>
-    ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} ${all.length === 1 ? 'corso' : 'corsi'}</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</div>
-    <p>Corsi in piccoli gruppi, nella tua città. Scegli il livello giusto per te.</p>${filters}</header>
+  return page('Eventi e Corsi Bitcoin', `<header class="hero"><div class="hrow"><h1>Eventi e Corsi</h1>
+    ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} in programma</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</div>
+    <p>Eventi e corsi su Bitcoin, in piccoli gruppi, nella tua città. Scegli quello giusto per te.</p>${filters}</header>
     ${all.length
       ? groups
       : `<div class="card empty">${icon('calendar')}<p>Al momento non ci sono corsi aperti. Torna a trovarci presto.</p></div>`}
@@ -1017,7 +1021,7 @@ function mapQuery(c, showLocation = c.show_location) {
 function courseFacts(c) {
   const where = [c.city, c.show_location ? c.location : ''].filter(Boolean).join('\n');
   const rows = [
-    ['calendar', 'Quando', c.status === 'confirmed' ? c.confirmed_date : (slotsOf(c).length ? 'Data da scegliere in base alle disponibilità' : '')],
+    ['calendar', 'Quando', whenText(c) || (slotsOf(c).length ? 'Data da scegliere in base alle disponibilità' : '')],
     ['pin', 'Dove', where, mapLink(mapQuery(c))],
     ['clock', 'Orari', c.schedule],
     ['euro', 'Contributo', c.price],
@@ -1056,7 +1060,7 @@ function socialHead(c) {
   const short = desc.length > 200 ? desc.slice(0, 200).replace(/\s+\S*$/, '') + '…' : desc; // taglio a parola intera
   const img = c.cover ? `${base}/img/${c.cover}` : ['jpg', 'png', 'webp'].includes(posterExt(c)) ? `${base}/c/${c.slug}/locandina` : '';
   const m = (k, v) => `<meta property="${k}" content="${esc(v)}">`;
-  return '\n' + [m('og:type', 'website'), m('og:site_name', 'Corsi Bitcoin'), m('og:title', courseName(c)), m('og:description', short),
+  return '\n' + [m('og:type', 'website'), m('og:site_name', 'Eventi e Corsi Bitcoin'), m('og:title', courseName(c)), m('og:description', short),
     m('og:url', `${base}/c/${c.slug}`), img ? m('og:image', img) : '', `<meta name="twitter:card" content="${img ? 'summary_large_image' : 'summary'}">`].join('');
 }
 // link di condivisione: semplici indirizzi, nessuno script e nessun servizio caricato nella pagina
@@ -1072,6 +1076,17 @@ function shareBox(c) {
 
 // sezione apribile con un clic: icona, titolo, eventuale numero, contenuto dentro una scheda
 // sezione sempre aperta della pagina del corso
+// data fissata, scritta per esteso in italiano (solo se c'è giorno e ora di inizio)
+function fixedWhen(c) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(c.ev_date || '') || !/^\d{2}:\d{2}$/.test(c.ev_start || '')) return '';
+  const [y, m, d] = c.ev_date.split('-').map(Number);
+  const day = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(Date.UTC(y, m - 1, d)));
+  const t = (x) => x.replace(/^0/, '').replace(':', '.');
+  return `${day}, ${t(c.ev_start)}${/^\d{2}:\d{2}$/.test(c.ev_end || '') ? '–' + t(c.ev_end) : ''}`;
+}
+// data da mostrare: quella confermata, altrimenti quella fissata nel modulo
+const whenText = (c) => (c.status === 'confirmed' && c.confirmed_date) || (c.when_mode === 'date' ? fixedWhen(c) : '');
+
 // ---- Aggiungi al calendario ----
 // ora locale italiana (con ora legale) -> istante UTC
 function romeToUtc(date, time) {
@@ -1088,7 +1103,7 @@ function romeToUtc(date, time) {
 }
 // dati dell'evento per il calendario: solo se confermato con giorno e ora di inizio
 function calInfo(c) {
-  if (c.status !== 'confirmed' || !/^\d{4}-\d{2}-\d{2}$/.test(c.ev_date || '') || !/^\d{2}:\d{2}$/.test(c.ev_start || '')) return null;
+  if (!(c.status === 'confirmed' || (c.when_mode === 'date' && ['open', 'closed'].includes(c.status))) || !/^\d{4}-\d{2}-\d{2}$/.test(c.ev_date || '') || !/^\d{2}:\d{2}$/.test(c.ev_start || '')) return null;
   const start = romeToUtc(c.ev_date, c.ev_start);
   let end = /^\d{2}:\d{2}$/.test(c.ev_end || '') ? romeToUtc(c.ev_date, c.ev_end) : null;
   if (!end || end <= start) end = new Date(start.getTime() + 2 * 3600e3);
@@ -1111,7 +1126,7 @@ function icsFold(line) {
   return out.join('\r\n ');
 }
 function icsFile(c, ev) {
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Corsi Bitcoin//Iscrizioni//IT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Eventi e Corsi Bitcoin//Iscrizioni//IT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
     `UID:${c.slug}@corsi-bitcoin`, `DTSTAMP:${icsTime(new Date())}`, `DTSTART:${icsTime(ev.start)}`, `DTEND:${icsTime(ev.end)}`,
     `SUMMARY:${icsText(ev.title)}`, `LOCATION:${icsText(ev.location)}`, `DESCRIPTION:${icsText(ev.details)}`, ...(ev.url ? [`URL:${ev.url}`] : []),
     'END:VEVENT', 'END:VCALENDAR'];
@@ -1220,12 +1235,12 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
     ${payChoice}</div></div>`}
     ${!wait && calInfo(c) ? `<div class="calafter">${calMenu(c)}</div>` : ''}
     ${paid && !wait && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
-    <p><a class="btn sec" href="/">${icon('back')}Tutti i corsi</a></p>`;
+    <p><a class="btn sec" href="/">${icon('back')}Tutti gli eventi e i corsi</a></p>`;
   const enroll = ok ? finished : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;
   const cta = `<a class="btn big" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${canWait ? "Mettiti in lista d'attesa" : 'Iscriviti ora'}</a>`;
   // i riquadri in alto: le cose che contano a colpo d'occhio
   const key = (ic, k, v) => `<div class="key"><span class="ic">${icon(ic)}</span><div><b>${k}</b><span class="v">${esc(v)}</span></div></div>`;
-  const when = c.status === 'confirmed' || done ? c.confirmed_date || 'Già svolto' : slots.length ? 'Da scegliere insieme' : 'Da confermare';
+  const when = done ? c.confirmed_date || fixedWhen(c) || 'Già svolto' : whenText(c) || (slots.length ? 'Da scegliere insieme' : 'Da confermare');
   const keys = `<div class="keys">${key('pin', 'Dove', c.city)}${key('calendar', 'Quando', when)}${c.price ? key('euro', 'Contributo', c.price) : ''}</div>`;
   // testata: sopra "EVENTO · THIENE" (o "CORSO BASE · THIENE") e lo stato, poi il titolo da solo, poi quando e contributo
   const kindUp = isEvent(c) ? 'Evento' : `Corso ${LEVELS[c.level] || ''}`;
@@ -1245,7 +1260,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   const tk = (id) => tocItems.findIndex(([x]) => x === id) + 1;
   return page(courseName(c), evWords(c, `
     <div class="${levelClass(c)}">
-    <a class="back" href="/">${icon('back')}Tutti i corsi</a>
+    <a class="back" href="/">${icon('back')}Tutti gli eventi e i corsi</a>
     ${c.cover ? `<div class="media big has-cover"><img class="cover" src="/img/${esc(c.cover)}" alt=""></div>` : '<div class="cstrip"></div>'}
     ${head}
     <div class="cwrap" style="timeline-scope:${tocItems.map((_, i) => `--v${i + 1}`).join(',')}">
@@ -1410,7 +1425,7 @@ function parseCourseForm(f) {
   const out = {
     level, city: field(f, 'city', 80), location: field(f, 'location', 200),
     title: field(f, 'title', 80), description: field(f, 'description', 4000),
-    slots: f.get('slots_toggle') && f.get('use_slots') !== 'on' ? '' : linesOf(f.get('slots')).slice(0, 12).map((s) => s.slice(0, 60)).join('\n'),
+    slots: linesOf(f.get('slots')).slice(0, 12).map((s) => s.slice(0, 60)).join('\n'),
     min_n: parseInt(f.get('min_n'), 10), max_n: parseInt(f.get('max_n'), 10),
     teachers: field(f, 'teachers', 120), deadline: field(f, 'deadline', 10), schedule: field(f, 'schedule', 1000),
     price: field(f, 'price', 300), requirements: field(f, 'requirements', 2000), program: field(f, 'program', 6000),
@@ -1420,8 +1435,22 @@ function parseCourseForm(f) {
     prepay_text: field(f, 'prepay_text', 1000), btc_address: field(f, 'btc_address', 100), ln_address: field(f, 'ln_address', 600),
     cover: '', poster: '', // decise dopo, da filesFrom()
   };
+  // "Quando si fa?": data già decisa (giorno e ore), fasce da scegliere con gli iscritti, oppure più avanti.
+  // Moduli vecchi senza la domanda: casella use_slots (slots_toggle) o solo le fasce.
+  let mode = f.get('when_mode');
+  if (!['date', 'slots', 'later'].includes(mode)) mode = f.get('slots_toggle') ? (f.get('use_slots') === 'on' ? 'slots' : 'later') : (out.slots ? 'slots' : 'later');
+  out.when_mode = mode;
+  if (mode !== 'slots') out.slots = '';
+  const okv = (v, re) => (re.test(v || '') ? v : '');
+  if (mode === 'date') {
+    out.ev_date = okv(f.get('ev_date'), /^\d{4}-\d{2}-\d{2}$/);
+    out.ev_start = okv(f.get('ev_start'), /^\d{2}:\d{2}$/);
+    out.ev_end = okv(f.get('ev_end'), /^\d{2}:\d{2}$/);
+  }
+  // con gli altri modi giorno e ore restano quelli già salvati (per esempio da "Conferma corso")
   let err = '';
   if (!LEVELS[level]) err = 'Scegli il tipo: corso base, medio, avanzato o evento.';
+  else if (out.when_mode === 'date' && !(out.ev_date && out.ev_start)) err = 'Data già decisa: scegli il giorno e l\'ora di inizio.';
   else if (!out.city) err = 'Inserisci la città.';
   else if (!(out.min_n >= 1 && out.max_n >= out.min_n && out.max_n <= 200)) err = 'Minimo e massimo non validi (il massimo deve essere almeno pari al minimo).';
   else if (out.deadline && !/^\d{4}-\d{2}-\d{2}$/.test(out.deadline)) err = 'La data di chiusura delle prenotazioni non è valida.';
@@ -1432,6 +1461,8 @@ function parseCourseForm(f) {
 }
 
 function courseFormHtml(v, action, button) {
+  // modo di "Quando si fa?": quello salvato, altrimenti dedotto (giorno fissato, fasce, oppure più avanti)
+  const wm = ['date', 'slots', 'later'].includes(v.when_mode) ? v.when_mode : v.ev_date && v.status !== 'confirmed' ? 'date' : v.slots ? 'slots' : 'later';
   const chk = (name, label) => `<label class="check"><input type="checkbox" name="${name}" ${v[name] ? 'checked' : ''}><span>${label}</span></label>`;
   return `<form method="post" action="${action}" class="card" enctype="multipart/form-data">
     <fieldset class="fs"><legend>${icon('book')}Il corso</legend>
@@ -1451,9 +1482,18 @@ function courseFormHtml(v, action, button) {
     <label>Città *</label><input type="text" name="city" required maxlength="80" value="${esc(v.city)}">
     <label>Luogo preciso <small>indirizzo, sala, parcheggio...</small></label><textarea name="location" maxlength="200" style="min-height:70px">${esc(v.location)}</textarea>
     ${chk('show_location', 'Mostra il luogo preciso sulla pagina pubblica (altrimenti lo vedi solo tu)')}
-    <input type="hidden" name="slots_toggle" value="1">
-    <label class="check"><input type="checkbox" name="use_slots" ${(v.use_slots ?? !!v.slots) ? 'checked' : ''}><span>Proponi delle fasce orarie da scegliere <small>chi si iscrive segna quelle che gli vanno bene. Se la data è già decisa lascia spento e scrivila in "Conferma corso".</small></span></label>
-    <div class="slotsbox"><label>Fasce indicative <small>una per riga, es. "Sabato pomeriggio" (max 12)</small></label><textarea name="slots">${esc(v.slots)}</textarea></div>
+    <label>Quando si fa? *</label>
+    <div class="tiles whenq">
+      <label class="tile"><input type="radio" name="when_mode" value="date" ${wm === 'date' ? 'checked' : ''}><span><b>Data già decisa</b><small>Scegli giorno e ora</small></span></label>
+      <label class="tile"><input type="radio" name="when_mode" value="slots" ${wm === 'slots' ? 'checked' : ''}><span><b>Da scegliere con gli iscritti</b><small>Proponi delle fasce orarie</small></span></label>
+      <label class="tile"><input type="radio" name="when_mode" value="later" ${wm === 'later' ? 'checked' : ''}><span><b>Da decidere più avanti</b><small>La metti poi in "Conferma corso"</small></span></label>
+    </div>
+    <div class="whenbox wb-date"><div class="calrow">
+      <label>Giorno<input type="date" name="ev_date" value="${esc(v.ev_date)}"></label>
+      <label>Inizio<input type="time" name="ev_start" value="${esc(v.ev_start)}"></label>
+      <label>Fine <small>facoltativa</small><input type="time" name="ev_end" value="${esc(v.ev_end)}"></label>
+    </div><p class="sub" style="margin:6px 0 0">Nella pagina compare subito la data, con "Aggiungi al calendario".</p></div>
+    <div class="whenbox wb-slots"><label>Fasce indicative <small>una per riga, es. "Sabato pomeriggio" (max 12): chi si iscrive segna quelle che gli vanno bene</small></label><textarea name="slots">${esc(v.slots)}</textarea></div>
     <label>Orari <small>una riga per voce, es. "Accoglienza 9.15"</small></label><textarea name="schedule" maxlength="1000">${esc(v.schedule)}</textarea>
     <label>Prenotazioni entro <small>facoltativo: dopo questa data il modulo si chiude da solo</small></label><input type="date" name="deadline" value="${esc(v.deadline)}">
     </fieldset>
@@ -1569,7 +1609,7 @@ function adminCourse(c, flash = '') {
   for (const r of regs) if (r.source) { const k = r.source.startsWith('Altro') ? 'Altro' : r.source; srcCount.set(k, (srcCount.get(k) || 0) + 1); }
   const srcSummary = [...srcCount].sort((a, b) => b[1] - a[1]).map(([k, n]) => `${esc(k)} <b>${n}</b>`).join(' · ');
   return page(courseName(c), `
-    <a class="back" href="/">${icon('back')}Tutti i corsi</a>
+    <a class="back" href="/">${icon('back')}Tutti gli eventi e i corsi</a>
     <div class="adm"><div class="adm-main">
     ${c.cover ? `<img class="cover" src="/img/${esc(c.cover)}" alt="">` : ''}
     <div class="row">${levelPill(c)}${statusBadge(c, n)}</div>
@@ -1587,7 +1627,7 @@ function adminCourse(c, flash = '') {
     <form method="post" action="/corso/${c.slug}/conferma" class="card">
       ${n < c.min_n ? msg('warn', `Il minimo (${c.min_n}) non è ancora raggiunto: puoi confermare comunque.`) : ''}
       <label>Data definitiva <small>testo libero, es. "sabato 21 marzo 2026, 9.30–17.00"</small></label>
-      <input type="text" name="date" required maxlength="120" value="${esc(c.confirmed_date)}">
+      <input type="text" name="date" required maxlength="120" value="${esc(c.confirmed_date || fixedWhen(c))}">
       <div class="calrow">
         <label>Giorno <small>per "Aggiungi al calendario"</small><input type="date" name="ev_date" value="${esc(c.ev_date)}"></label>
         <label>Inizio<input type="time" name="ev_start" value="${esc(c.ev_start)}"></label>
@@ -1752,7 +1792,7 @@ async function adminRoutes(req, res, umbrel) {
   if (p === '/corso/nuovo') {
     if (req.method === 'GET') {
       const v = {
-        level: 'base', ask_waitlist: 1, use_slots: 0, slots: 'Sabato mattina\nSabato pomeriggio\nDomenica',
+        level: 'base', ask_waitlist: 1, when_mode: 'date', slots: 'Sabato mattina\nSabato pomeriggio\nDomenica',
         prepay_text: 'Se vuoi bloccare subito il posto, puoi inviare il contributo in anticipo in Bitcoin o Lightning.\nSe per qualsiasi motivo il corso dovesse saltare, ti rimborsiamo i bitcoin inviati.',
       };
       return send(res, 200, page('Nuovo evento', `<h1>Nuovo evento</h1><p class="sub">Scegli se è un corso (base, medio, avanzato) o un evento, come una presentazione. Per riusarne uno già fatto, aprilo e usa "Duplica".</p>${courseFormHtml(v, '/corso/nuovo', 'Crea')}`, { admin: true }));
@@ -1824,6 +1864,7 @@ async function adminRoutes(req, res, umbrel) {
       let { out, err } = parseCourseForm(f);
       if (!err) err = filesFrom(f, out, c);
       if (err) return send(res, 400, page('Modifica corso', `<h1>Modifica corso</h1>${msg('err', esc(err))}${courseFormHtml({ ...out, cover: c.cover, poster: c.poster, slug: c.slug }, `/corso/${c.slug}/modifica`, 'Salva')}`, { admin: true }));
+      for (const k of COURSE_FIELDS) if (out[k] === undefined) out[k] = c[k] ?? '';
       db.prepare(`UPDATE courses SET ${COURSE_FIELDS.map((k) => `${k} = ?`).join(', ')} WHERE id = ?`).run(...COURSE_FIELDS.map((k) => out[k]), c.id);
       resetNotified(c.id);
       return back(`/corso/${c.slug}`, 'Corso aggiornato.');
@@ -1831,7 +1872,7 @@ async function adminRoutes(req, res, umbrel) {
     if (sub === '/duplica' && req.method === 'POST') {
       // stessi testi, nessun iscritto, iscrizioni aperte; la scadenza va riscritta perché quella vecchia è passata
       const slug = newSlug();
-      insertCourse(slug, { ...c, deadline: '', cover: copyCover(c.cover), poster: copyCover(c.poster) });
+      insertCourse(slug, { ...c, deadline: '', ev_date: '', ev_start: '', ev_end: '', when_mode: c.when_mode === 'date' ? 'later' : c.when_mode, cover: copyCover(c.cover), poster: copyCover(c.poster) });
       return back(`/corso/${slug}/modifica`, 'Copia creata, ancora senza iscritti. Controlla città, fasce e scadenza, poi salva.');
     }
     if (sub === '/iscritti.csv' && req.method === 'GET') {
