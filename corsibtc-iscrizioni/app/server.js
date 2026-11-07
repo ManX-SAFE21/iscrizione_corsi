@@ -702,9 +702,19 @@ details.sec{margin:14px 0}
 .course .btn::after{content:'';position:absolute;inset:0}
 .media.big{height:150px;border-radius:16px;margin:0 0 18px}
 .media.big.has-cover{height:auto;background:var(--soft)}
-.media.big img.cover{height:auto;max-height:380px}
+.media.big img.cover{height:auto;max-height:300px}
 .media.big .deco{width:200px;height:200px;right:-20px;bottom:-56px}
 .ch{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.15rem)}
+.cstrip{height:8px;border-radius:8px;background:linear-gradient(90deg,var(--lv),var(--lv2));margin:0 0 20px}
+.chead2{margin:0 0 26px;padding:0 0 20px;border-bottom:1px solid var(--line)}
+.chead2 .eyebrow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 10px;color:var(--lv);font-weight:600;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
+.chead2 .eyebrow>.i{width:18px;height:18px}
+.chead2 .eyebrow .pill{text-transform:none;letter-spacing:0;font-weight:500;margin-left:4px}
+.chead2 .ch{font-size:clamp(1.5rem,3.4vw,2rem);line-height:1.2;margin:0 0 12px;max-width:34ch}
+.chead2 .subline{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0;color:var(--body);font-size:1.02rem}
+.chead2 .subline span{display:inline-flex;align-items:center;gap:8px}
+.chead2 .subline .i{color:var(--lv)}
+.psec{margin:0 0 22px}.psec>h2{margin:0 0 10px}.psec>.card{margin:0}
 .pr{margin:0 0 12px}
 .course-meta.row2{display:flex;flex-wrap:wrap;gap:6px 20px;margin:0 0 22px;font-size:1rem}
 .cwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
@@ -723,7 +733,7 @@ details.sec{margin:14px 0}
 .share a:hover{border-color:var(--lv,var(--teal));color:var(--lv,var(--teal))}
 .share .mono{margin:10px 0 0;font-size:.78rem;color:var(--mut);user-select:all}
 .aside .btn.big{margin-top:14px}
-@media (min-width:940px){.cwrap{grid-template-columns:minmax(0,1fr) 320px;gap:36px;align-items:start}.aside{grid-column:2;grid-row:1}.cmain{grid-column:1;grid-row:1}}
+@media (min-width:940px){.cwrap{grid-template-columns:minmax(0,1fr) 230px;gap:32px;align-items:start}.aside{grid-column:2;grid-row:1}.cmain{grid-column:1;grid-row:1}}
 .foot{display:flex;gap:8px;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:.85rem;margin-top:44px;padding-top:18px;border-top:1px solid var(--line)}
 .foot .i{color:var(--teal);flex:none}
 .intro{font-size:1.1rem;color:var(--body);margin:4px 0 20px;white-space:pre-wrap}
@@ -1010,6 +1020,8 @@ function shareBox(c) {
 }
 
 // sezione apribile con un clic: icona, titolo, eventuale numero, contenuto dentro una scheda
+// sezione sempre aperta della pagina del corso
+const psec = (ic, title, html) => `<section class="psec">${h2(title, ic)}<div class="card">${html}</div></section>`;
 const sec = (ic, title, html, count = 0) => `<details class="sec"><summary>${icon(ic)}${title}${count ? `<small>${count}</small>` : ''}<span class="tg"></span></summary><div class="card">${html}</div></details>`;
 
 function renderCourse(c, { error = '', ok = false, paid = false, wait = false, values = {} } = {}) {
@@ -1082,13 +1094,18 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   const key = (ic, k, v) => `<div class="key"><span class="ic">${icon(ic)}</span><div><b>${k}</b><span class="v">${esc(v)}</span></div></div>`;
   const when = c.status === 'confirmed' || done ? c.confirmed_date || 'Già svolto' : slots.length ? 'Da scegliere insieme' : 'Da confermare';
   const keys = `<div class="keys">${key('pin', 'Dove', c.city)}${key('calendar', 'Quando', when)}${c.price ? key('euro', 'Contributo', c.price) : ''}</div>`;
+  // testata: sopra "EVENTO · THIENE" (o "CORSO BASE · THIENE") e lo stato, poi il titolo da solo, poi quando e contributo
+  const kindUp = isEvent(c) ? 'Evento' : `Corso ${LEVELS[c.level] || ''}`;
+  const head = `<header class="chead2">
+      <p class="eyebrow">${levelIcon(c.level)}<span>${esc(kindUp)} · ${esc(c.city)}</span>${statusBadge(c, n, false)}</p>
+      <h1 class="ch">${esc(c.title || kindName(c))}</h1>
+      <p class="subline"><span>${icon('calendar')}${esc(when)}</span>${c.price ? `<span>${icon('euro')}${esc(linesOf(c.price)[0])}</span>` : ''}</p>
+    </header>`;
   return page(courseName(c), evWords(c, `
     <div class="${levelClass(c)}">
     <a class="back" href="/">${icon('back')}Tutti i corsi</a>
-    ${mediaBlock(c, n, true)}
-    ${pillsRow(c, n)}
-    <h1 class="ch">${esc(courseName(c))}</h1>
-    ${keys}
+    ${c.cover ? `<div class="media big has-cover"><img class="cover" src="/img/${esc(c.cover)}" alt=""></div>` : '<div class="cstrip"></div>'}
+    ${head}
     <div class="cwrap">
       <aside class="aside card">
         ${done ? `<h2>${icon('checkc')}Corso concluso</h2><p class="sub" style="margin:0">Questo corso si è già svolto.</p><a class="btn big" href="/">${icon('book')}Vedi i prossimi corsi</a>` : `<h2>${icon('users')}Iscrizioni</h2>
@@ -1100,10 +1117,10 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
     </aside>
       <div class="cmain">
         ${c.description ? `<p class="intro">${esc(c.description)}</p>` : ''}
-        ${slots.length && c.status === 'open' ? `${h2('Date possibili', 'calendar')}<p class="sub">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
-        <div class="secs">${sec('info', 'Tutti i dettagli', courseFacts(c))}
-        ${reqs.length ? sec('list', 'Requisiti per partecipare', `<ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol>`, reqs.length) : ''}
-        ${c.program ? sec('book', 'Programma', renderProgram(c.program)) : ''}</div>
+        ${slots.length && c.status === 'open' ? psec('calendar', 'Date possibili', `<p class="sub" style="margin-top:0">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>`) : ''}
+        ${psec('info', 'Tutti i dettagli', courseFacts(c))}
+        ${reqs.length ? psec('list', 'Requisiti per partecipare', `<ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol>`) : ''}
+        ${c.program ? psec('book', 'Programma', renderProgram(c.program)) : ''}
         <section id="iscrizione" class="enroll">${enroll}</section>
         ${c.contact_email ? `<p class="contact">${icon('mail')}<span>Per informazioni scrivi a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</span></p>` : ''}
       </div>
