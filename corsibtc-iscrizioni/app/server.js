@@ -719,7 +719,23 @@ details.sec{margin:14px 0}
 .course-meta.row2{display:flex;flex-wrap:wrap;gap:6px 20px;margin:0 0 22px;font-size:1rem}
 .cwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
 .cmain>:first-child{margin-top:0}
-.aside{margin:0;padding:18px 20px}
+.aside{margin:0}
+.abox{margin:0;padding:18px 20px}
+.toc{display:none}
+@media (min-width:940px){
+  .aside{margin-top:calc(1.2rem * 1.3 + 8px);position:sticky;top:14px;max-height:calc(100vh - 28px);overflow-y:auto}
+  .toc{display:grid;gap:2px;margin:14px 0 0;padding:12px 8px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+  .toc>b{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:600;padding:0 10px 6px}
+  .toc a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;border-left:3px solid transparent;color:var(--body);text-decoration:none;font-size:.93rem}
+  .toc a .i{color:var(--mut)}
+  .toc a:hover{background:var(--soft)}
+  /* la voce si colora mentre la sua sezione passa sulla linea a 15% dall alto dello schermo */
+  @supports (animation-timeline:view()){
+    .toc a{animation:tocOn linear both;animation-fill-mode:none;animation-range:cover 85vh cover calc(100% - 15vh)}
+  }
+}
+@keyframes tocOn{from,to{background:var(--tsoft);border-left-color:var(--lv,var(--teal));color:var(--title);font-weight:600}}
+.psec,.enroll{scroll-margin-top:16px}
 .aside h2{margin:0 0 6px;font-size:1.05rem}
 .aside .dl{display:flex;gap:8px;align-items:center;color:var(--mut);font-size:.92rem;margin:10px 0 0}
 .aside .dl .i{color:var(--lv,var(--teal))}
@@ -737,7 +753,11 @@ details.sec{margin:14px 0}
 .foot{display:flex;gap:8px;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:.85rem;margin-top:44px;padding-top:18px;border-top:1px solid var(--line)}
 .foot .i{color:var(--teal);flex:none}
 .intro{font-size:1.1rem;color:var(--body);margin:4px 0 20px;white-space:pre-wrap}
-.facts{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr));gap:18px 24px}
+.chead2 .desc{font-size:1.2rem;line-height:1.55;color:var(--body);margin:0 0 14px;max-width:72ch;white-space:pre-wrap}
+.chead2 .intro{font-size:clamp(1.3rem,2.6vw,1.6rem);line-height:1.4;color:var(--title);margin:0 0 14px;max-width:62ch}
+/* due colonne che si riempiono dall'alto (come un giornale): niente buchi sotto le caselle corte */
+.facts{list-style:none;margin:0;padding:0;columns:2 260px;column-gap:36px}
+.facts>li{break-inside:avoid;margin:0 0 28px}.facts>li:last-child{margin-bottom:0}
 .fact{display:flex;gap:12px;align-items:flex-start}
 .fact .ic{flex:none;width:38px;height:38px;border-radius:10px;background:var(--tsoft);color:var(--teal);display:flex;align-items:center;justify-content:center}
 .fact .ic .i{width:19px;height:19px;vertical-align:0}
@@ -1021,7 +1041,20 @@ function shareBox(c) {
 
 // sezione apribile con un clic: icona, titolo, eventuale numero, contenuto dentro una scheda
 // sezione sempre aperta della pagina del corso
-const psec = (ic, title, html) => `<section class="psec">${h2(title, ic)}<div class="card">${html}</div></section>`;
+// descrizione: il primo paragrafo è il sottotitolo (grande), il resto è testo normale.
+// I paragrafi sono separati da una riga vuota; senza righe vuote il sottotitolo è la prima riga.
+function descParts(d) {
+  const t = String(d || '').trim();
+  if (!t) return '';
+  const m = t.match(/^([\s\S]*?)\n\s*\n([\s\S]*)$/) || t.match(/^([^\n]*)\n([\s\S]*)$/);
+  const first = m ? m[1].trim() : t;
+  const rest = m ? m[2].trim() : '';
+  return `<p class="intro">${esc(first)}</p>${rest ? `<p class="desc">${esc(rest)}</p>` : ''}`;
+}
+// sezione sempre aperta della pagina del corso; id e numero servono all'indice a destra
+const psec = (ic, title, html, id = '', k = 0) => `<section class="psec"${id ? ` id="${id}" style="view-timeline-name:--v${k}"` : ''}>${h2(title, ic)}<div class="card">${html}</div></section>`;
+// indice delle sezioni (come Google Moduli): la voce della parte che stai leggendo si colora, solo CSS
+const tocNav = (items) => `<nav class="toc" aria-label="In questa pagina"><b>In questa pagina</b>${items.map(([id, label, ic], i) => `<a href="#${id}" style="animation-timeline:--v${i + 1}">${icon(ic)}${label}</a>`).join('')}</nav>`;
 const sec = (ic, title, html, count = 0) => `<details class="sec"><summary>${icon(ic)}${title}${count ? `<small>${count}</small>` : ''}<span class="tg"></span></summary><div class="card">${html}</div></details>`;
 
 function renderCourse(c, { error = '', ok = false, paid = false, wait = false, values = {} } = {}) {
@@ -1099,29 +1132,37 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   const head = `<header class="chead2">
       <p class="eyebrow">${levelIcon(c.level)}<span>${esc(kindUp)} · ${esc(c.city)}</span>${statusBadge(c, n, false)}</p>
       <h1 class="ch">${esc(c.title || kindName(c))}</h1>
+      ${descParts(c.description)}
       <p class="subline"><span>${icon('calendar')}${esc(when)}</span>${c.price ? `<span>${icon('euro')}${esc(linesOf(c.price)[0])}</span>` : ''}</p>
     </header>`;
+  const tocItems = [
+    slots.length && c.status === 'open' ? ['sez-date', 'Date possibili', 'calendar'] : null,
+    ['sez-dettagli', 'Dettagli', 'info'],
+    reqs.length ? ['sez-requisiti', 'Requisiti', 'list'] : null,
+    c.program ? ['sez-programma', 'Programma', 'book'] : null,
+    ['iscrizione', ok ? 'Iscrizione' : canWait ? "Lista d'attesa" : 'Iscriviti', 'pen'],
+  ].filter(Boolean);
+  const tk = (id) => tocItems.findIndex(([x]) => x === id) + 1;
   return page(courseName(c), evWords(c, `
     <div class="${levelClass(c)}">
     <a class="back" href="/">${icon('back')}Tutti i corsi</a>
     ${c.cover ? `<div class="media big has-cover"><img class="cover" src="/img/${esc(c.cover)}" alt=""></div>` : '<div class="cstrip"></div>'}
     ${head}
-    <div class="cwrap">
-      <aside class="aside card">
+    <div class="cwrap" style="timeline-scope:${tocItems.map((_, i) => `--v${i + 1}`).join(',')}">
+      <aside class="aside"><div class="card abox">
         ${done ? `<h2>${icon('checkc')}Corso concluso</h2><p class="sub" style="margin:0">Questo corso si è già svolto.</p><a class="btn big" href="/">${icon('book')}Vedi i prossimi corsi</a>` : `<h2>${icon('users')}Iscrizioni</h2>
         ${counter(c, n)}
         ${c.deadline && !late ? `<p class="dl">${icon('hourglass')}Prenotazioni entro il ${fmtDay(c.deadline)}</p>` : ''}
         ${ok || stop ? '' : cta}`}
         ${posterExt(c) ? `<a class="btn sec big" href="/c/${c.slug}/locandina" target="_blank" rel="noopener">${icon('down')}Scarica la locandina</a>` : ''}
         ${shareBox(c)}
-    </aside>
+    </div>${tocNav(tocItems)}</aside>
       <div class="cmain">
-        ${c.description ? `<p class="intro">${esc(c.description)}</p>` : ''}
-        ${slots.length && c.status === 'open' ? psec('calendar', 'Date possibili', `<p class="sub" style="margin-top:0">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>`) : ''}
-        ${psec('info', 'Tutti i dettagli', courseFacts(c))}
-        ${reqs.length ? psec('list', 'Requisiti per partecipare', `<ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol>`) : ''}
-        ${c.program ? psec('book', 'Programma', renderProgram(c.program)) : ''}
-        <section id="iscrizione" class="enroll">${enroll}</section>
+        ${slots.length && c.status === 'open' ? psec('calendar', 'Date possibili', `<p class="sub" style="margin-top:0">La data definitiva sarà scelta in base alle disponibilità di chi si iscrive.</p><div>${slots.map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>`, 'sez-date', tk('sez-date')) : ''}
+        ${psec('info', 'Tutti i dettagli', courseFacts(c), 'sez-dettagli', tk('sez-dettagli'))}
+        ${reqs.length ? psec('list', 'Requisiti per partecipare', `<ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol>`, 'sez-requisiti', tk('sez-requisiti')) : ''}
+        ${c.program ? psec('book', 'Programma', renderProgram(c.program), 'sez-programma', tk('sez-programma')) : ''}
+        <section id="iscrizione" class="enroll" style="view-timeline-name:--v${tk('iscrizione')}">${enroll}</section>
         ${c.contact_email ? `<p class="contact">${icon('mail')}<span>Per informazioni scrivi a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</span></p>` : ''}
       </div>
     </div>

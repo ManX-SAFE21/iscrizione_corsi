@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.10.0"
+version: "1.11.0"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -23,6 +23,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Pagina del corso più chiara: in alto una riga colorata con tipo e città (per esempio EVENTO · THIENE), poi il titolo da solo e una riga con data e contributo. Date possibili, dettagli, requisiti e programma sono sempre aperti. Il modulo d'iscrizione sta in fondo e il tasto Iscriviti ora porta lì. La colonna a destra è più stretta e lascia più spazio al testo. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Pagina del corso: la colonna a destra resta visibile mentre scorri e sotto il riquadro iscrizioni c'è l'indice della pagina (Date possibili, Dettagli, Requisiti, Programma, Iscriviti); la voce della parte che stai leggendo si colora. Il primo paragrafo della descrizione è il sottotitolo grande, il resto è testo normale. I dettagli stanno in due colonne senza spazi vuoti. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""
