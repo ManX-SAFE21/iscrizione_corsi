@@ -1197,9 +1197,8 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   const finished = `${wait ? msg('ok', "<b>Sei in lista d'attesa, grazie!</b> Ti scriviamo se si libera un posto o per il prossimo corso.") : `<div class="msg ok done">${icon('checkc')}<div>
     <p class="dt">Iscrizione ricevuta, grazie!</p>
     <p>${c.status === 'confirmed'
-    ? 'Ti aspettiamo al corso: dai un\'occhiata ai requisiti prima di partire.'
-    : 'Ti scriveremo non appena il corso sarà confermato, con data e luogo definitivi.'}</p>
-    <p>Ti confermeremo il corso entro 7 giorni prima della data, via email o telefono.</p>
+    ? `Ci vediamo ${esc(c.confirmed_date)}.${reqs.length ? ' Prima di venire dai un\'occhiata ai requisiti qui sopra.' : ''}`
+    : 'Appena fissiamo la data ti scriviamo con giorno, orario e luogo, al più tardi 7 giorni prima del corso.'}</p>
     ${payChoice}</div></div>`}
     ${!wait && calInfo(c) ? `<div class="calafter">${calMenu(c)}</div>` : ''}
     ${paid && !wait && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}

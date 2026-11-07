@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Iscrizioni Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.12.0"
+version: "1.12.1"
 tagline: Iscrizioni ai corsi con soglia minima e date indicative
 description: >-
   Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
@@ -23,6 +23,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Aggiungi al calendario: in Conferma corso si possono indicare giorno, ora di inizio e ora di fine. Così nella pagina del corso, dopo l'iscrizione e nell'email di conferma compare Aggiungi al calendario, con file .ics (iPhone, Mac, Outlook), Google Calendar, Outlook.com e Office 365. Comprende anche la 1.11.0 (indice a destra, sottotitolo, dettagli senza spazi vuoti). Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Messaggio dopo l'iscrizione più chiaro: se la data non è ancora fissata dice che scriverete con giorno, orario e luogo al più tardi 7 giorni prima; se è confermata dice la data e invita a guardare i requisiti. Comprende Aggiungi al calendario della 1.12.0. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""
