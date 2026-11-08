@@ -1,15 +1,16 @@
 manifestVersion: 1
 id: corsibtc-iscrizioni
 category: automation
-name: Iscrizioni Corsi
+name: Eventi e Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.15.0"
-tagline: Iscrizioni ai corsi con soglia minima e date indicative
+version: "1.15.1"
+tagline: Iscrizioni a eventi e corsi Bitcoin, con soglia minima
 description: >-
-  Gestisci le iscrizioni ai tuoi corsi (base, medio, avanzato) in più città.
-  Ogni corso ha un numero minimo e massimo di iscritti e delle fasce orarie
-  indicative. Quando si raggiunge il minimo ricevi un avviso su Telegram e
-  scegli la data in base alle disponibilità. La pagina pubblica mostra solo
+  Gestisci le iscrizioni ai tuoi eventi e corsi Bitcoin (corsi base, medio,
+  avanzato ed eventi come le presentazioni) in più città. Ognuno ha un numero
+  minimo e massimo di iscritti e una data già decisa oppure delle fasce orarie
+  da scegliere con gli iscritti. Quando si raggiunge il minimo ricevi un avviso
+  su Telegram. La pagina pubblica mostra solo
   l'elenco dei corsi e il modulo di iscrizione (raggiungibile con un tunnel
   Cloudflare); l'icona dell'app apre il pannello di gestione, protetto dal
   login di Umbrel.
@@ -23,6 +24,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Gli eventi con le iscrizioni chiuse si vedono anche sul sito, con l'etichetta Iscrizioni chiuse: sito e gestione mostrano gli stessi eventi. La gestione si riconosce subito: fascia scura GESTIONE in alto, sfondo grigio-azzurro e titolo della scheda del browser che inizia con Gestione. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Nel pannello di Umbrel l'app ora si chiama Eventi e Corsi, come il sito. Comprende la 1.15.0: eventi chiusi visibili sul sito e gestione riconoscibile. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""
