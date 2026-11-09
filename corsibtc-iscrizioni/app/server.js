@@ -877,66 +877,126 @@ fieldset.qs{border:0;padding:0;margin:0;min-width:0}
 @media (max-width:480px){main{padding-top:4px}.hero{padding:16px 18px 18px}.hero h1{font-size:1.6rem}.enrollform{padding:18px}}
 @media print{.top,.nav,button,.btn,.back,.maplink{display:none}body{background:#fff}.card{box-shadow:none}}
 
-/* ===== stile VETRATE: fondo profondo color gemma con pozze di luce, vetro, colonne come vetrate colorate ===== */
-body{background:linear-gradient(160deg,#0F5E66 0%,#1B4C7E 48%,#3C3E8C 100%) fixed;min-height:100vh}
-body::before{content:'';position:fixed;inset:-20vmax;z-index:-1;pointer-events:none;
-  background:radial-gradient(closest-side at 18% 10%,rgba(255,255,255,.18),transparent),radial-gradient(closest-side at 88% 92%,rgba(255,170,120,.22),transparent);
-  animation:vbreathe 24s ease-in-out infinite alternate}
-@keyframes vbreathe{to{transform:scale(1.08) translate(2vmax,1.5vmax)}}
-body.admin{background:linear-gradient(160deg,#25303D 0%,#34405A 50%,#4A3B63 100%) fixed}
-body.admin::before{background:radial-gradient(closest-side at 18% 10%,rgba(255,255,255,.12),transparent),radial-gradient(closest-side at 88% 92%,rgba(160,130,220,.22),transparent)}
+/* ===== stile BENTO: chiaro e ordinato. Riquadri bianchi su fondo a puntini, colonne come vassoi del loro colore,
+   schede "schedario" con la testata colorata (così le schede sovrapposte si distinguono) ===== */
+:root{--ink:#12161F;--ink2:#566072;--tsh:0 1px 2px rgba(18,22,31,.06),0 16px 30px -22px rgba(18,22,31,.3)}
+.lv-evento{--lv:#C27A2C;--lv2:#E6A65C;--lvt:#8A5516}.lv-base{--lv:#3D8477;--lv2:#5FB09F;--lvt:#2A6257}.lv-medio{--lv:#4A79A6;--lv2:#79A8D4;--lvt:#2F567C}.lv-avanzato{--lv:#6A5FA8;--lv2:#9A8FD6;--lvt:#4B4280}
+body{background:radial-gradient(#C9CED8 1px,transparent 1.5px) 0 0/22px 22px,#EEF0F3;color:var(--ink);min-height:100vh}
 main,main.wide,body.admin main{background:none;border:0;box-shadow:none;min-height:0}
-/* intestazione: barra di vetro scuro */
-.top{margin:6px 0 18px;padding:9px 14px;border:1px solid rgba(255,255,255,.24);border-radius:20px;background:linear-gradient(145deg,rgba(14,40,66,.62),rgba(14,40,66,.48));-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 14px 30px -20px rgba(0,0,0,.5)}
-.brand,.brand small{color:#fff}
-.brand .bname small{color:#B9E6E0}
-.nav a,.nav button{color:#E6EFF4}
-.nav .i{color:#7DEBDC}
-.nav a:hover,.nav button:hover{background:rgba(255,255,255,.12);color:#fff}
-.s21link b{color:#fff}.s21link b em{color:#7DEBDC}
-.adminbar{background:rgba(0,0,0,.32);border-radius:14px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);margin:0 0 10px!important;padding:8px 14px!important}
-/* foglio chiaro per pagina corso, moduli, accesso */
-.sheet{background:rgba(250,250,247,.96);border:1px solid rgba(255,255,255,.5);border-radius:28px;padding:26px 30px 30px;box-shadow:inset 0 1px 0 #fff,0 30px 60px -30px rgba(0,0,0,.55)}
-@media (max-width:640px){.sheet{border-radius:20px;padding:16px 14px 20px}}
-/* hero di vetro con titolo bianco */
-main.vetro .hero{padding:30px 34px;border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.3);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 30px 60px -30px rgba(0,0,0,.55);margin:0 0 26px}
-main.vetro .hero::before{width:auto;height:auto;inset:0;right:0;top:0;border-radius:0;background:radial-gradient(ellipse at 12% -10%,rgba(255,255,255,.35),transparent 55%)}
-main.vetro .hero::after{display:none}
-main.vetro .hero h1{color:#fff;font-weight:800;font-size:clamp(2rem,5vw,2.9rem);letter-spacing:-.02em}
-main.vetro .hero p{color:#DCE8EE;font-size:1.05rem}
-main.vetro .hero .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);color:#fff}
-main.vetro .hero .pill .i{color:#7DEBDC}
-main.vetro .dhead h1,main.vetro>h2{color:#fff}
-main.vetro>h2 .i{color:#7DEBDC}
-/* filtro a pillola di vetro */
-main.vetro .hero .filters,main.vetro .filters.seg,main.vetro .dhead .filters.seg{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.24)}
-main.vetro .filters a{color:#E2EEF3}
-main.vetro .filters a .i{color:currentColor}
-main.vetro .filters a small{color:rgba(255,255,255,.7)}
-main.vetro .filters a:hover,main.vetro .dhead .filters.seg a:hover{background:rgba(255,255,255,.12)}
-main.vetro .filters a.sel{background:#fff;color:#163F62;box-shadow:0 8px 20px -10px rgba(0,0,0,.5)}
-main.vetro .filters a.sel .i{color:var(--lv,var(--teal))}
-main.vetro .filters a.sel small{color:#54637A}
-/* ogni colonna è una vetrata del suo colore, le schede bianche stanno dentro */
-main.vetro .board{gap:20px}
-main.vetro .bcol{position:relative;padding:14px 14px 4px;border-radius:28px;background:linear-gradient(180deg,color-mix(in srgb,var(--lv) 86%,rgba(255,255,255,.75)),color-mix(in srgb,var(--lv) 60%,transparent));border:1px solid rgba(255,255,255,.38);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 30px 50px -30px rgba(0,0,0,.5);transition:border-color .3s}
-main.vetro .bcol::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,rgba(255,255,255,.3),transparent 42%);pointer-events:none}
-main.vetro .bcol:hover{border-color:rgba(255,255,255,.6)}
-main.vetro .bcol>*{position:relative}
-main.vetro .board .gh{color:#fff;margin:2px 4px 14px;font-size:1.05rem}
-main.vetro .board .gh .i{color:#fff;width:30px;height:30px;padding:6px;border-radius:10px;background:rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
-main.vetro .bempty{margin:0 0 10px;border:1.5px dashed rgba(255,255,255,.55);border-radius:20px;color:#fff;background:rgba(255,255,255,.1)}
-main.vetro .ccard{border:1px solid rgba(255,255,255,.9);border-radius:20px;background:rgba(255,255,255,.97)}
-main.vetro .ccard .cban{border-radius:19px 19px 0 0}
-main.vetro .fan>.ccard,main.vetro .fan>.ccard:first-child{box-shadow:inset 0 1px 0 #fff,0 18px 36px -22px rgba(0,0,0,.55)}
-main.vetro .fan>.ccard:hover,main.vetro .fan>.ccard:focus-visible{border-color:#fff;box-shadow:inset 0 1px 0 #fff,0 0 0 3px rgba(255,255,255,.55),0 30px 46px -20px rgba(0,0,0,.6)}
-main.vetro .board .fan{padding-bottom:6px}
-/* piede sul fondo scuro */
-main.vetro .foot{color:#C9DAE3;border-top-color:rgba(255,255,255,.18)}
-main.vetro .foot .i{color:#7DEBDC}
-@media (max-width:640px){main.vetro .hero{padding:20px 18px;border-radius:22px}.top{border-radius:16px}main.vetro .hero .filters,main.vetro .filters.seg{flex-wrap:wrap;border-radius:22px}}
-@media (prefers-reduced-motion:reduce){body::before{animation:none}}
-@media print{body{background:#fff}body::before{display:none}.sheet{box-shadow:none;border:0;padding:0}}
+.top{margin:6px 0 16px;padding:9px 14px;border:0;border-radius:20px;background:#fff;box-shadow:var(--tsh)}
+/* gestione: barra in alto scura e fondo più grigio, così non si confonde col sito pubblico */
+body.admin{background:radial-gradient(#B4BCCB 1px,transparent 1.5px) 0 0/22px 22px,#E2E6EE}
+body.admin .top{background:#12161F}
+body.admin .brand,body.admin .brand small{color:#fff}
+body.admin .brand .bname small{color:#B9C4D0}
+body.admin .nav a,body.admin .nav button{color:#E6EBF2}
+body.admin .nav .i{color:#7DEBDC}
+body.admin .nav a:hover,body.admin .nav button:hover{background:rgba(255,255,255,.12);color:#fff}
+.adminbar{background:#33415A;border-radius:14px;margin:0 0 10px!important;padding:8px 14px!important}
+/* home: riquadri di misure diverse */
+.hero.bento{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-areas:'t s1 s2' 't nx nx' 'f f f';gap:14px;margin:0 0 24px;padding:0;background:none;border:0;border-radius:0;overflow:visible}
+.hero.bento.nonext{grid-template-areas:'t s1 s2' 'f f f'}
+.hero.bento.solo{grid-template-columns:1fr;grid-template-areas:'t' 'f'}
+.hero.bento::before,.hero.bento::after{display:none}
+.hero.bento .htitle{grid-area:t;position:relative;overflow:hidden;padding:30px;border-radius:26px;background:#12161F;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;min-height:220px}
+.hero.bento .htitle::before{content:'';position:absolute;width:340px;height:340px;right:-90px;top:-130px;border-radius:50%;background:conic-gradient(from 200deg,#C27A2C,#3D8477,#4A79A6,#6A5FA8,#C27A2C);filter:blur(46px);opacity:.75;animation:bspin 30s linear infinite}
+@keyframes bspin{to{transform:rotate(360deg)}}
+.hero.bento .htitle>*{position:relative}
+.hero.bento h1{color:#fff;font-weight:800;font-size:clamp(2.1rem,4.6vw,3.3rem);letter-spacing:-.03em;line-height:1.03;margin:0 0 8px}
+.hero.bento .htitle p{color:#C9D0DC;margin:0;max-width:none;font-size:1.02rem}
+.hero.bento .stat{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:2px;padding:18px 20px;border-radius:26px;background:#fff;color:var(--ink2);box-shadow:var(--tsh)}
+.hero.bento .stat.s1{grid-area:s1}.hero.bento .stat.s2{grid-area:s2;background:#E4F1EE}
+.hero.bento .stat .i{width:22px;height:22px;color:#0D9488;margin-bottom:auto}
+.hero.bento .stat b{font-size:2.5rem;line-height:1;font-weight:800;color:var(--ink)}
+.hero.bento .next{grid-area:nx;display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:26px;background:linear-gradient(120deg,color-mix(in srgb,var(--lv) 16%,#fff),color-mix(in srgb,var(--lv) 7%,#fff));box-shadow:var(--tsh);color:var(--ink);text-decoration:none;transition:transform .2s,box-shadow .2s}
+.hero.bento .next:hover{transform:translateY(-2px);box-shadow:0 0 0 2px var(--lv),var(--tsh)}
+.next .nx{min-width:0}
+.next small{display:block;font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--lvt)}
+.next strong{display:block;font-size:1.1rem;line-height:1.25}
+.next .nx>span{color:var(--ink2);font-size:.92rem}
+.next .cgo{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-weight:700;color:var(--lvt);white-space:nowrap}
+/* filtri: pillola bianca, scelta scura */
+.hero.bento .filters,.filters.seg,.dhead .filters.seg{background:#fff;border:0;box-shadow:var(--tsh);padding:5px}
+.hero.bento .filters{grid-area:f;justify-self:start;margin:0;max-width:100%}
+.hero.bento .filters a,.filters.seg a{color:var(--ink2);font-weight:600}
+.hero.bento .filters a small,.filters.seg a small{font-weight:700;color:var(--ink2)}
+.hero.bento .filters a:hover,.filters.seg a:hover,.dhead .filters.seg a:hover{background:#F1F3F6}
+.hero.bento .filters a.sel,.filters.seg a.sel{background:#12161F;color:#fff;box-shadow:none}
+.hero.bento .filters a.sel .i,.hero.bento .filters a.sel small,.filters.seg a.sel .i,.filters.seg a.sel small{color:#fff}
+/* colonne: vassoi tinti del loro colore */
+.board{gap:16px}
+.bcol{padding:14px 12px 12px;border-radius:26px;background:color-mix(in srgb,var(--lv) 13%,#fff);border:1px solid color-mix(in srgb,var(--lv) 22%,#fff)}
+.board .gh{color:var(--lvt);margin:2px 4px 14px;font-size:1rem;font-weight:700}
+.board .gh .i{width:32px;height:32px;padding:7px;border-radius:11px;background:var(--lv);color:#fff;box-shadow:0 8px 14px -8px var(--lv)}
+.bempty{margin:0;border:1.5px dashed color-mix(in srgb,var(--lv) 45%,#fff);border-radius:20px;color:var(--lvt);background:rgba(255,255,255,.5)}
+.board .fan{padding:0;margin:0}
+/* schede schedario: la scheda dopo copre il fondo (senza testo) di quella prima */
+.ccard,.board .ccard{gap:9px;padding:0 16px 16px;border:1.5px solid color-mix(in srgb,var(--lv) 60%,#fff);border-radius:20px;background:#fff}
+.board .fan>.ccard:not(:last-child){padding-bottom:62px}
+.board .fan>.ccard+.ccard{margin-top:-45px}
+.board .fan>.ccard,.board .fan>.ccard:first-child{z-index:calc(1 + var(--i));filter:none;box-shadow:0 -14px 18px -12px rgba(18,22,31,.45),0 14px 26px -18px rgba(18,22,31,.4)}
+.board .fan>.ccard:hover,.board .fan>.ccard:focus-visible{z-index:40;border-color:var(--lv);box-shadow:0 0 0 2px var(--lv),0 -14px 18px -12px rgba(18,22,31,.45),0 24px 36px -18px rgba(18,22,31,.5)}
+.ccard .chd{position:relative;display:flex;align-items:center;gap:10px;margin:0 -16px 4px;padding:11px 14px;border-radius:18px 18px 0 0;overflow:hidden;background:linear-gradient(120deg,var(--lv),color-mix(in srgb,var(--lv) 70%,#12161F));color:#fff}
+.ccard .chd.img{align-items:flex-end;padding-top:96px}
+.ccard .chd img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+.ccard .chd.img::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,color-mix(in srgb,var(--lv) 12%,transparent) 0%,color-mix(in srgb,var(--lv) 45%,transparent) 42%,var(--lv) 80%)}
+.ccard .chd>.cdate,.ccard .chd>.cht{position:relative;z-index:2}
+.cdate{flex:none;width:52px;border-radius:13px;text-align:center;overflow:hidden;line-height:1;background:#fff;box-shadow:0 6px 12px -6px rgba(0,0,0,.5)}
+.cdate u{display:block;text-decoration:none;font-size:.62rem;font-weight:800;letter-spacing:.12em;padding:4px 0 3px;color:#fff;background:#12161F}
+.cdate b,.ccard .cdate b{display:block;font-size:1.4rem;font-weight:800;line-height:1;padding:5px 0 6px;color:var(--lvt)}
+.cdate.q b,.ccard .cdate.q b{font-size:1.15rem}
+.cdate b .i{width:20px;height:20px;vertical-align:-3px}
+.ccard .cht{display:block;min-width:0}
+.ccard .ctag{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.88)}
+.ccard .ctag .i{width:14px;height:14px}
+.ccard .cht b,.board .ccard .cht b{color:#fff;font-size:1.06rem;line-height:1.28;margin-top:2px}
+.ccard .chd.img .cht{text-shadow:0 1px 8px rgba(0,0,0,.45)}
+.ccard .cfoot{border-top:0;padding-top:4px;margin-top:0}
+.ccard .cmeta .i{color:var(--lvt)}.ccard .cgo{color:var(--lvt)}
+/* riquadri bianchi con gli angoli tondi, ovunque */
+.card,.secs,.adm-box,.toc{background:#fff;border:0;border-radius:26px;box-shadow:var(--tsh)}
+.adm-box,.toc{border-radius:22px}
+.toc{padding:14px 16px}
+.sec summary{background:#fff;border:0;border-radius:20px;box-shadow:var(--tsh)}
+.secs .sec summary{box-shadow:none}
+.secs .sec .card{background:#F6F7F9;box-shadow:none;border-radius:0}
+.savebar{background:#fff;border-radius:0 0 26px 26px}
+.msg{border-radius:16px}
+button,.btn{border-radius:14px}
+input[type=text],input[type=email],input[type=tel],input[type=number],input[type=password],input[type=url],input[type=date],select,textarea{border-radius:14px;background:#F6F7F9;border-color:#E3E6EB}
+.tile{border-radius:16px;background:#F6F7F9;border-color:#E3E6EB}
+.tile:has(input:checked){border-color:var(--lv,var(--teal));background:color-mix(in srgb,var(--lv,var(--teal)) 10%,#fff);box-shadow:0 0 0 1px var(--lv,var(--teal)) inset}
+.consent{border-radius:16px;background:#F6F7F9;border:0}
+.bar{background:#EEF0F3;height:7px;border-radius:7px}.bar>i{border-radius:7px}
+/* pagina del corso */
+.back{display:inline-flex;padding:7px 14px;border-radius:999px;background:#fff;box-shadow:var(--tsh);color:var(--ink2);margin:0 0 14px}
+.cstrip{display:none}
+.media.big{border-radius:26px;overflow:hidden;box-shadow:var(--tsh);margin:0 0 14px}
+.media.big .cover{display:block;max-height:300px}
+.chead2{position:relative;overflow:hidden;margin:0 0 14px;padding:30px 32px;border:0;border-radius:26px;background:#12161F;color:#fff}
+.chead2::before{content:'';position:absolute;width:360px;height:360px;right:-100px;top:-150px;border-radius:50%;background:radial-gradient(closest-side,var(--lv2),var(--lv) 55%,transparent);filter:blur(40px);opacity:.8}
+.chead2>*{position:relative}
+.chead2 .eyebrow{color:var(--lv2)}
+.chead2 .ch{color:#fff;font-weight:800;font-size:clamp(1.9rem,4.2vw,2.9rem);letter-spacing:-.02em;max-width:22ch}
+.chead2 .intro{color:#EEF1F6}
+.chead2 .desc{color:#C9D0DC;font-size:1.05rem}
+.chead2 .subline{color:#fff;gap:8px}
+.chead2 .subline span{padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}
+.chead2 .subline .i{color:var(--lv2)}
+.psec>h2 .i,.enroll>h2 .i{width:32px;height:32px;padding:7px;border-radius:11px;background:var(--lv);color:#fff;box-shadow:0 8px 14px -8px var(--lv)}
+.abox{padding:20px}
+.btn.big,button.big{background:#12161F;border-color:#12161F;color:#fff}
+.btn.big:hover,button.big:hover{background:var(--lv,var(--teal));border-color:var(--lv,var(--teal))}
+.btn.sec.big{background:#fff;color:var(--ink);border-color:#DDE1E7}
+.chip{border-radius:999px;background:color-mix(in srgb,var(--lv,var(--teal)) 13%,#fff)}
+.fact .ic{border-radius:12px;background:color-mix(in srgb,var(--lv) 13%,#fff);color:var(--lv)}
+.maplink{background:#F3F4F7;border:0}
+.sn{background:#12161F}
+.foot{color:var(--ink2);border-top-color:#DDE1E7}
+@media (max-width:860px){.hero.bento{grid-template-columns:1fr 1fr;grid-template-areas:'t t' 's1 s2' 'nx nx' 'f f'}.hero.bento.nonext{grid-template-areas:'t t' 's1 s2' 'f f'}.hero.bento .htitle{min-height:170px;padding:24px}}
+@media (max-width:640px){.hero.bento .filters,.filters.seg{flex-wrap:wrap;border-radius:22px}.chead2{padding:22px 20px;border-radius:22px}.card,.secs{border-radius:20px}.top{border-radius:16px}.hero.bento .next{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){.hero.bento .htitle::before{animation:none}}
+@media print{body{background:#fff}}
 `;
 
 const ICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 256\" width=\"256\" height=\"256\">\n  <rect width=\"256\" height=\"256\" fill=\"#3D8477\"/>\n  <rect x=\"50\" y=\"64\" width=\"156\" height=\"146\" rx=\"22\" fill=\"#FCFBF8\"/>\n  <path d=\"M50 86a22 22 0 0 1 22-22h112a22 22 0 0 1 22 22v18H50z\" fill=\"#2B5F55\"/>\n  <rect x=\"86\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#FCFBF8\" stroke=\"#2B5F55\" stroke-width=\"6\"/>\n  <rect x=\"154\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#FCFBF8\" stroke=\"#2B5F55\" stroke-width=\"6\"/>\n  <g transform=\"translate(124 158) scale(.66)\" fill=\"none\" stroke=\"#E8892B\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n    <path d=\"M-20 -36V36\"/>\n    <path d=\"M-20 -36H8a17 17 0 0 1 0 34H-20\"/>\n    <path d=\"M-20 -2H12a19 19 0 0 1 0 38H-20\"/>\n    <path d=\"M-8 -36V-48M8 -36V-48M-8 36V48M8 36V48\"/>\n  </g>\n</svg>\n";
@@ -1018,6 +1078,14 @@ function seatsShort(c, n) {
   return `<div class="bar"><i style="width:${pct}%"></i></div><small>${esc(txt)}</small>`;
 }
 
+const MESI = ['GEN', 'FEB', 'MAR', 'APR', 'MAG', 'GIU', 'LUG', 'AGO', 'SET', 'OTT', 'NOV', 'DIC'];
+// giorno dell'evento (AAAA-MM-GG) se è già deciso, altrimenti ''
+const dayOf = (c) => ((c.status === 'confirmed' || c.when_mode === 'date') && /^\d{4}-\d{2}-\d{2}$/.test(c.ev_date || '') ? c.ev_date : '');
+function dateLeaf(c) {
+  const d = dayOf(c);
+  if (d) return `<span class="cdate"><u>${MESI[+d.slice(5, 7) - 1]}</u><b>${+d.slice(8)}</b></span>`;
+  return `<span class="cdate q"><u>DATA</u><b>${whenText(c) ? icon('calendar') : '?'}</b></span>`;
+}
 function courseRow(c, admin = false, pos = null) {
   const n = countRegs(c.id);
   const wait = n >= c.max_n && c.ask_waitlist && !expired(c) && c.status !== 'closed';
@@ -1030,8 +1098,7 @@ function courseRow(c, admin = false, pos = null) {
     nw ? pill(`${nw} in lista d'attesa`, '', 'hourglass') : '',
   ].join('') : '';
   return `<a class="ccard ${levelClass(c)}" href="${admin ? '/corso/' : '/c/'}${c.slug}"${pos === null ? '' : ` style="--i:${pos}"`}>
-    ${c.cover ? `<span class="cban"><img src="/img/${esc(c.cover)}" alt=""><span class="cpill">${levelPill(c)}</span></span>` : `<span class="chead"><span class="cic">${levelIcon(c.level)}</span>${levelPill(c)}</span>`}
-    <b>${esc(c.title || kindName(c))}</b>
+    <span class="chd${c.cover ? ' img' : ''}">${c.cover ? `<img src="/img/${esc(c.cover)}" alt="">` : ''}${dateLeaf(c)}<span class="cht"><span class="ctag">${levelIcon(c.level)}${esc(kindName(c))}</span><b>${esc(c.title || kindName(c))}</b></span></span>
     <span class="cmeta"><span>${icon('pin')}${esc(c.city)}</span>${when}${dl}</span>
     ${alerts ? `<span class="calert">${alerts}</span>` : ''}
     <span class="cseat">${seatsShort(c, n)}</span>
@@ -1070,9 +1137,13 @@ function renderList(only = '') {
   const past = getSetting('show_past', '1') === '1' ? db.prepare("SELECT * FROM courses WHERE status = 'done' ORDER BY created_at DESC").all() : [];
   const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
   const { filters, html: groups } = courseGroups(all, only, false);
-  return page('Eventi e Corsi Bitcoin', `<header class="hero"><div class="hrow"><h1>Eventi e Corsi</h1>
-    ${all.length ? `<div class="stats"><span class="pill">${icon('book')}${all.length} in programma</span><span class="pill">${icon('pin')}${cities} città</span></div>` : ''}</div>
-    <p>Eventi e corsi su Bitcoin, in piccoli gruppi, nella tua città. Scegli quello giusto per te.</p>${filters}</header>
+  const today = todayRome();
+  const next = all.filter((c) => dayOf(c) >= today && dayOf(c)).sort((a, b) => dayOf(a).localeCompare(dayOf(b)))[0];
+  return page('Eventi e Corsi Bitcoin', `<header class="hero bento${all.length ? (next ? '' : ' nonext') : ' solo'}"><div class="htitle"><h1>Eventi e Corsi</h1>
+    <p>Eventi e corsi su Bitcoin, in piccoli gruppi, nella tua città. Scegli quello giusto per te.</p></div>
+    ${all.length ? `<span class="stat s1">${icon('book')}<span><b>${all.length}</b> in programma</span></span><span class="stat s2">${icon('pin')}<span><b>${cities}</b> città</span></span>` : ''}
+    ${next ? `<a class="next ${levelClass(next)}" href="/c/${next.slug}">${dateLeaf(next)}<span class="nx"><small>Prossimo appuntamento</small><strong>${esc(next.title || kindName(next))}</strong><span>${esc(next.city)}${whenText(next) ? ' · ' + esc(whenText(next)) : ''}</span></span><span class="cgo">Vedi${icon('arrow')}</span></a>` : ''}
+    ${filters}</header>
     ${all.length
       ? groups
       : `<div class="card empty">${icon('calendar')}<p>Al momento non ci sono corsi aperti. Torna a trovarci presto.</p></div>`}
