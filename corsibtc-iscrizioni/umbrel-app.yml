@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Eventi e Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.17.0"
+version: "1.17.1"
 tagline: Iscrizioni a eventi e corsi Bitcoin, con soglia minima
 description: >-
   Gestisci le iscrizioni ai tuoi eventi e corsi Bitcoin (corsi base, medio,
@@ -24,6 +24,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Nuova grafica Bento: riquadri chiari con titolo, numeri e prossimo appuntamento in alto; colonne tinte del colore del tipo; schede con la testata colorata e la data in grande, con immagine se c'è. Pagina del corso e gestione nello stesso stile (la gestione ha la barra scura e il pulsante Sito pubblico). Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Pagina del corso migliorata: il pulsante Iscriviti ora è subito in alto, l'immagine sta dentro la testata e si vede intera, il modulo è più corto (campi affiancati) e sul telefono c'è un pulsante Iscriviti fisso in basso. Comprende la 1.17.0 (grafica Bento). Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""

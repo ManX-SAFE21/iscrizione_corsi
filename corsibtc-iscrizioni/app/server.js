@@ -996,7 +996,31 @@ input[type=text],input[type=email],input[type=tel],input[type=number],input[type
 @media (max-width:860px){.hero.bento{grid-template-columns:1fr 1fr;grid-template-areas:'t t' 's1 s2' 'nx nx' 'f f'}.hero.bento.nonext{grid-template-areas:'t t' 's1 s2' 'f f'}.hero.bento .htitle{min-height:170px;padding:24px}}
 @media (max-width:640px){.hero.bento .filters,.filters.seg{flex-wrap:wrap;border-radius:22px}.chead2{padding:22px 20px;border-radius:22px}.card,.secs{border-radius:20px}.top{border-radius:16px}.hero.bento .next{flex-wrap:wrap}}
 @media (prefers-reduced-motion:reduce){.hero.bento .htitle::before{animation:none}}
-@media print{body{background:#fff}}
+/* pagina corso: immagine dentro la testata, Iscriviti subito in alto, modulo su due colonne */
+.chead2.h2{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:center;padding:28px 30px}
+.chead2.h2.withimg{grid-template-columns:minmax(0,1fr) 300px}
+.chead2.h2 .himg{border-radius:20px;overflow:hidden;aspect-ratio:1;box-shadow:0 20px 40px -20px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.14)}
+.chead2.h2 .himg img{display:block;width:100%;height:100%;object-fit:cover}
+.chead2.h2 .intro{font-size:clamp(1.1rem,2vw,1.3rem);margin:0 0 16px}
+.chead2.h2 .hact{display:flex;align-items:center;flex-wrap:wrap;gap:12px 18px;margin:18px 0 0}
+.chead2.h2 .hcta{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:14px;background:#fff;color:#12161F;font-weight:700;font-size:1.05rem;text-decoration:none;box-shadow:0 10px 24px -10px var(--lv2);transition:transform .2s,background .2s}
+.chead2.h2 .hcta:hover{transform:translateY(-2px);background:var(--lv2)}
+.chead2.h2 .hseat{color:#C9D0DC;font-size:.95rem}
+.hnote{margin:0 0 14px;padding:16px 20px;display:flex;gap:12px;align-items:flex-start}
+.hnote>.i{color:var(--lv);margin-top:.3em}
+.hnote .desc{margin:0;color:var(--ink2);font-size:1.02rem;line-height:1.55;white-space:pre-wrap}
+@media (min-width:940px){.cwrap{grid-template-columns:minmax(0,1fr) 280px}}
+@media (min-width:700px){.fgrid{grid-template-columns:1fr 1fr;gap:0 18px}.fgrid .fld:nth-child(2) label{margin-top:0}}
+.mcta{display:none}
+@media (max-width:760px){
+  .chead2.h2.withimg{grid-template-columns:1fr}
+  .chead2.h2 .himg{aspect-ratio:16/9;order:-1}
+  .chead2.h2 .hcta{display:none}
+  .mcta{position:fixed;left:12px;right:12px;bottom:12px;z-index:30;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:16px;background:#12161F;color:#fff;font-weight:700;text-decoration:none;box-shadow:0 14px 30px -10px rgba(18,22,31,.6)}
+  main:has(#iscrizione:target) .mcta{display:none}
+  body:has(.mcta){padding-bottom:76px}
+}
+@media print{body{background:#fff}.mcta,.hact{display:none}}
 `;
 
 const ICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 256\" width=\"256\" height=\"256\">\n  <rect width=\"256\" height=\"256\" fill=\"#3D8477\"/>\n  <rect x=\"50\" y=\"64\" width=\"156\" height=\"146\" rx=\"22\" fill=\"#FCFBF8\"/>\n  <path d=\"M50 86a22 22 0 0 1 22-22h112a22 22 0 0 1 22 22v18H50z\" fill=\"#2B5F55\"/>\n  <rect x=\"86\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#FCFBF8\" stroke=\"#2B5F55\" stroke-width=\"6\"/>\n  <rect x=\"154\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#FCFBF8\" stroke=\"#2B5F55\" stroke-width=\"6\"/>\n  <g transform=\"translate(124 158) scale(.66)\" fill=\"none\" stroke=\"#E8892B\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n    <path d=\"M-20 -36V36\"/>\n    <path d=\"M-20 -36H8a17 17 0 0 1 0 34H-20\"/>\n    <path d=\"M-20 -2H12a19 19 0 0 1 0 38H-20\"/>\n    <path d=\"M-8 -36V-48M8 -36V-48M-8 36V48M8 36V48\"/>\n  </g>\n</svg>\n";
@@ -1395,12 +1419,20 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   const keys = `<div class="keys">${key('pin', 'Dove', c.city)}${key('calendar', 'Quando', when)}${c.price ? key('euro', 'Contributo', c.price) : ''}</div>`;
   // testata: sopra "EVENTO · THIENE" (o "CORSO BASE · THIENE") e lo stato, poi il titolo da solo, poi quando e contributo
   const kindUp = isEvent(c) ? 'Evento' : `Corso ${LEVELS[c.level] || ''}`;
-  const head = `<header class="chead2">
+  const dp = descParts(c.description);
+  const dCut = dp.indexOf('<p class="desc">');
+  const introHtml = dCut < 0 ? dp : dp.slice(0, dCut);
+  const noteHtml = dCut < 0 ? '' : `<div class="card hnote">${icon('info')}${dp.slice(dCut)}</div>`;
+  const canCta = !done && !ok && !stop;
+  const ctaTxt = canWait ? "Mettiti in lista d'attesa" : 'Iscriviti ora';
+  const seatTxt = (counter(c, n).match(/margin:0">([^<]*)</) || [])[1] || '';
+  const head = `<header class="chead2 h2${c.cover ? ' withimg' : ''}"><div class="htxt">
       <p class="eyebrow">${levelIcon(c.level)}<span>${esc(kindUp)} · ${esc(c.city)}</span>${statusBadge(c, n, false)}</p>
       <h1 class="ch">${esc(c.title || kindName(c))}</h1>
-      ${descParts(c.description)}
+      ${introHtml}
       <p class="subline"><span>${icon('calendar')}${esc(when)}</span>${c.price ? `<span>${icon('euro')}${esc(linesOf(c.price)[0])}</span>` : ''}</p>
-    </header>`;
+      ${canCta ? `<div class="hact"><a class="hcta" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${ctaTxt}</a><span class="hseat">${seatTxt}</span></div>` : ''}
+    </div>${c.cover ? `<div class="himg"><img class="cover" src="/img/${esc(c.cover)}" alt=""></div>` : ''}</header>${noteHtml}`;
   const tocItems = [
     slots.length && c.status === 'open' ? ['sez-date', 'Date possibili', 'calendar'] : null,
     ['sez-dettagli', 'Dettagli', 'info'],
@@ -1412,7 +1444,6 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   return page(courseName(c), evWords(c, `
     <div class="${levelClass(c)}">
     <a class="back" href="/">${icon('back')}Tutti gli eventi e i corsi</a>
-    ${c.cover ? `<div class="media big has-cover"><img class="cover" src="/img/${esc(c.cover)}" alt=""></div>` : '<div class="cstrip"></div>'}
     ${head}
     <div class="cwrap" style="timeline-scope:${tocItems.map((_, i) => `--v${i + 1}`).join(',')}">
       <aside class="aside"><div class="card abox">
@@ -1429,7 +1460,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
         ${psec('info', 'Tutti i dettagli', courseFacts(c), 'sez-dettagli', tk('sez-dettagli'))}
         ${reqs.length ? psec('list', 'Requisiti per partecipare', `<ol class="req">${reqs.map((r) => `<li><span class="ic">${icon(reqIcon(r))}</span><span>${esc(r)}</span></li>`).join('')}</ol>`, 'sez-requisiti', tk('sez-requisiti')) : ''}
         ${c.program ? psec('book', 'Programma', renderProgram(c.program), 'sez-programma', tk('sez-programma')) : ''}
-        <section id="iscrizione" class="enroll" style="view-timeline-name:--v${tk('iscrizione')}">${enroll}</section>
+        <section id="iscrizione" class="enroll" style="view-timeline-name:--v${tk('iscrizione')}">${enroll}</section>${canCta ? `<a class="mcta" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${ctaTxt}</a>` : ''}
         ${c.contact_email ? `<p class="contact">${icon('mail')}<span>Per informazioni scrivi a <a href="mailto:${esc(c.contact_email)}">${esc(c.contact_email)}</a>.</span></p>` : ''}
       </div>
     </div>
