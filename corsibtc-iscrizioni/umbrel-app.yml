@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Eventi e Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.15.1"
+version: "1.16.0"
 tagline: Iscrizioni a eventi e corsi Bitcoin, con soglia minima
 description: >-
   Gestisci le iscrizioni ai tuoi eventi e corsi Bitcoin (corsi base, medio,
@@ -24,6 +24,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Nel pannello di Umbrel l'app ora si chiama Eventi e Corsi, come il sito. Comprende la 1.15.0: eventi chiusi visibili sul sito e gestione riconoscibile. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Nuova grafica Vetrate: fondo color gemma con luci sfumate, ogni colonna è una vetrata colorata con le schede bianche dentro; pagina del corso e moduli su un foglio chiaro. La gestione ha lo stesso stile con un fondo grigio-viola e un nuovo pulsante Sito pubblico per vedere il sito come i visitatori. Comprende la 1.15.1 (nome Eventi e Corsi su Umbrel). Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""

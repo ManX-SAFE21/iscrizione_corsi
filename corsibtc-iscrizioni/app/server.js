@@ -876,6 +876,67 @@ fieldset.qs{border:0;padding:0;margin:0;min-width:0}
 .enrollform .btn.big{margin-top:16px;font-size:1.08rem;padding:15px 20px}
 @media (max-width:480px){main{padding-top:4px}.hero{padding:16px 18px 18px}.hero h1{font-size:1.6rem}.enrollform{padding:18px}}
 @media print{.top,.nav,button,.btn,.back,.maplink{display:none}body{background:#fff}.card{box-shadow:none}}
+
+/* ===== stile VETRATE: fondo profondo color gemma con pozze di luce, vetro, colonne come vetrate colorate ===== */
+body{background:linear-gradient(160deg,#0F5E66 0%,#1B4C7E 48%,#3C3E8C 100%) fixed;min-height:100vh}
+body::before{content:'';position:fixed;inset:-20vmax;z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side at 18% 10%,rgba(255,255,255,.18),transparent),radial-gradient(closest-side at 88% 92%,rgba(255,170,120,.22),transparent);
+  animation:vbreathe 24s ease-in-out infinite alternate}
+@keyframes vbreathe{to{transform:scale(1.08) translate(2vmax,1.5vmax)}}
+body.admin{background:linear-gradient(160deg,#25303D 0%,#34405A 50%,#4A3B63 100%) fixed}
+body.admin::before{background:radial-gradient(closest-side at 18% 10%,rgba(255,255,255,.12),transparent),radial-gradient(closest-side at 88% 92%,rgba(160,130,220,.22),transparent)}
+main,main.wide,body.admin main{background:none;border:0;box-shadow:none;min-height:0}
+/* intestazione: barra di vetro scuro */
+.top{margin:6px 0 18px;padding:9px 14px;border:1px solid rgba(255,255,255,.24);border-radius:20px;background:linear-gradient(145deg,rgba(14,40,66,.62),rgba(14,40,66,.48));-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 14px 30px -20px rgba(0,0,0,.5)}
+.brand,.brand small{color:#fff}
+.brand .bname small{color:#B9E6E0}
+.nav a,.nav button{color:#E6EFF4}
+.nav .i{color:#7DEBDC}
+.nav a:hover,.nav button:hover{background:rgba(255,255,255,.12);color:#fff}
+.s21link b{color:#fff}.s21link b em{color:#7DEBDC}
+.adminbar{background:rgba(0,0,0,.32);border-radius:14px;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);margin:0 0 10px!important;padding:8px 14px!important}
+/* foglio chiaro per pagina corso, moduli, accesso */
+.sheet{background:rgba(250,250,247,.96);border:1px solid rgba(255,255,255,.5);border-radius:28px;padding:26px 30px 30px;box-shadow:inset 0 1px 0 #fff,0 30px 60px -30px rgba(0,0,0,.55)}
+@media (max-width:640px){.sheet{border-radius:20px;padding:16px 14px 20px}}
+/* hero di vetro con titolo bianco */
+main.vetro .hero{padding:30px 34px;border-radius:30px;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.3);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 30px 60px -30px rgba(0,0,0,.55);margin:0 0 26px}
+main.vetro .hero::before{width:auto;height:auto;inset:0;right:0;top:0;border-radius:0;background:radial-gradient(ellipse at 12% -10%,rgba(255,255,255,.35),transparent 55%)}
+main.vetro .hero::after{display:none}
+main.vetro .hero h1{color:#fff;font-weight:800;font-size:clamp(2rem,5vw,2.9rem);letter-spacing:-.02em}
+main.vetro .hero p{color:#DCE8EE;font-size:1.05rem}
+main.vetro .hero .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);color:#fff}
+main.vetro .hero .pill .i{color:#7DEBDC}
+main.vetro .dhead h1,main.vetro>h2{color:#fff}
+main.vetro>h2 .i{color:#7DEBDC}
+/* filtro a pillola di vetro */
+main.vetro .hero .filters,main.vetro .filters.seg,main.vetro .dhead .filters.seg{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.24)}
+main.vetro .filters a{color:#E2EEF3}
+main.vetro .filters a .i{color:currentColor}
+main.vetro .filters a small{color:rgba(255,255,255,.7)}
+main.vetro .filters a:hover,main.vetro .dhead .filters.seg a:hover{background:rgba(255,255,255,.12)}
+main.vetro .filters a.sel{background:#fff;color:#163F62;box-shadow:0 8px 20px -10px rgba(0,0,0,.5)}
+main.vetro .filters a.sel .i{color:var(--lv,var(--teal))}
+main.vetro .filters a.sel small{color:#54637A}
+/* ogni colonna è una vetrata del suo colore, le schede bianche stanno dentro */
+main.vetro .board{gap:20px}
+main.vetro .bcol{position:relative;padding:14px 14px 4px;border-radius:28px;background:linear-gradient(180deg,color-mix(in srgb,var(--lv) 86%,rgba(255,255,255,.75)),color-mix(in srgb,var(--lv) 60%,transparent));border:1px solid rgba(255,255,255,.38);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 30px 50px -30px rgba(0,0,0,.5);transition:border-color .3s}
+main.vetro .bcol::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,rgba(255,255,255,.3),transparent 42%);pointer-events:none}
+main.vetro .bcol:hover{border-color:rgba(255,255,255,.6)}
+main.vetro .bcol>*{position:relative}
+main.vetro .board .gh{color:#fff;margin:2px 4px 14px;font-size:1.05rem}
+main.vetro .board .gh .i{color:#fff;width:30px;height:30px;padding:6px;border-radius:10px;background:rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+main.vetro .bempty{margin:0 0 10px;border:1.5px dashed rgba(255,255,255,.55);border-radius:20px;color:#fff;background:rgba(255,255,255,.1)}
+main.vetro .ccard{border:1px solid rgba(255,255,255,.9);border-radius:20px;background:rgba(255,255,255,.97)}
+main.vetro .ccard .cban{border-radius:19px 19px 0 0}
+main.vetro .fan>.ccard,main.vetro .fan>.ccard:first-child{box-shadow:inset 0 1px 0 #fff,0 18px 36px -22px rgba(0,0,0,.55)}
+main.vetro .fan>.ccard:hover,main.vetro .fan>.ccard:focus-visible{border-color:#fff;box-shadow:inset 0 1px 0 #fff,0 0 0 3px rgba(255,255,255,.55),0 30px 46px -20px rgba(0,0,0,.6)}
+main.vetro .board .fan{padding-bottom:6px}
+/* piede sul fondo scuro */
+main.vetro .foot{color:#C9DAE3;border-top-color:rgba(255,255,255,.18)}
+main.vetro .foot .i{color:#7DEBDC}
+@media (max-width:640px){main.vetro .hero{padding:20px 18px;border-radius:22px}.top{border-radius:16px}main.vetro .hero .filters,main.vetro .filters.seg{flex-wrap:wrap;border-radius:22px}}
+@media (prefers-reduced-motion:reduce){body::before{animation:none}}
+@media print{body{background:#fff}body::before{display:none}.sheet{box-shadow:none;border:0;padding:0}}
 `;
 
 const ICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 256 256\" width=\"256\" height=\"256\">\n  <rect width=\"256\" height=\"256\" fill=\"#3D8477\"/>\n  <rect x=\"50\" y=\"64\" width=\"156\" height=\"146\" rx=\"22\" fill=\"#FCFBF8\"/>\n  <path d=\"M50 86a22 22 0 0 1 22-22h112a22 22 0 0 1 22 22v18H50z\" fill=\"#2B5F55\"/>\n  <rect x=\"86\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#FCFBF8\" stroke=\"#2B5F55\" stroke-width=\"6\"/>\n  <rect x=\"154\" y=\"44\" width=\"16\" height=\"38\" rx=\"8\" fill=\"#FCFBF8\" stroke=\"#2B5F55\" stroke-width=\"6\"/>\n  <g transform=\"translate(124 158) scale(.66)\" fill=\"none\" stroke=\"#E8892B\" stroke-width=\"15\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n    <path d=\"M-20 -36V36\"/>\n    <path d=\"M-20 -36H8a17 17 0 0 1 0 34H-20\"/>\n    <path d=\"M-20 -2H12a19 19 0 0 1 0 38H-20\"/>\n    <path d=\"M-8 -36V-48M8 -36V-48M-8 36V48M8 36V48\"/>\n  </g>\n</svg>\n";
@@ -891,15 +952,17 @@ const SAFE21_TILE = '<svg class="s21" viewBox="0 0 34 34" aria-hidden="true"><re
 const FOOT = `<footer class="foot"><p class="privacy">${icon('shield')}<span>I dati degli iscritti non vengono ceduti a terzi e vengono cancellati dopo il corso.</span></p></footer>`;
 
 function page(title, body, { admin = false, wide = false, head = '' } = {}) {
+  // stile Vetrate: home e gestione direttamente sul fondo colorato, il resto su un foglio chiaro
+  const vetro = /class="(hero|dhead|board)[" ]/.test(body);
   const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg?v=2" alt="" width="34" height="34"></span><span class="bname">Eventi e Corsi<small>Bitcoin</small></span>${admin ? '<small>· Admin</small>' : ''}</a>`;
   const nav = admin
-    ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo evento</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
+    ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo evento</a><a href="${esc((publicBase() || 'https://corsi.safe21.io') + '/')}" target="_blank" rel="noopener" title="Apre il sito come lo vedono i visitatori">${icon('eye')}Sito pubblico</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
        ${adminCtx.getStore()?.umbrel ? '' : `<form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form>`}</nav>`
     : `<a class="s21link" href="https://safe21.io" title="Vai a safe21.io">${SAFE21_TILE}<b>SAFE<em>21</em></b></a>`;
   // <!--email_off-->: Cloudflare non deve nascondere le email (e gli indirizzi Lightning): lo script che le ricompone sarebbe bloccato dalla CSP
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg?v=2">${head}
-<title>${admin ? 'Gestione · ' : ''}${esc(title)}</title><style>${CSS}</style></head><body${admin ? ' class="admin"' : ''}><!--email_off--><main${wide ? ' class="wide"' : ''}>${admin ? `<div class="adminbar">${icon('cog')}<b>Gestione</b><span>Questa pagina la vedi solo tu. I visitatori vedono il sito pubblico.</span></div>` : ''}<header class="top">${brand}${nav}</header>${body}${admin ? '' : FOOT}</main><!--/email_off--></body></html>`;
+<title>${admin ? 'Gestione · ' : ''}${esc(title)}</title><style>${CSS}</style></head><body${admin ? ' class="admin"' : ''}><!--email_off--><main class="${[wide ? 'wide' : '', vetro ? 'vetro' : ''].filter(Boolean).join(' ')}">${admin ? `<div class="adminbar">${icon('cog')}<b>Gestione</b><span>Questa pagina la vedi solo tu. I visitatori vedono il sito pubblico.</span></div>` : ''}<header class="top">${brand}${nav}</header>${vetro ? `${body}${admin ? '' : FOOT}` : `<div class="sheet">${body}${admin ? '' : FOOT}</div>`}</main><!--/email_off--></body></html>`;
 }
 
 function qrSvg(url) {
