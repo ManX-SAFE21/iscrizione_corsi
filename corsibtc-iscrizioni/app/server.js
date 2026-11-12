@@ -66,10 +66,11 @@ addColumns('courses', {
 addColumns('courses', { cover: TXT, ask_company: FLAG, ask_source: FLAG, ask_waitlist: FLAG });
 addColumns('courses', { poster: TXT });
 addColumns('courses', { ev_date: TXT, ev_start: TXT, ev_end: TXT, when_mode: TXT });
+addColumns('courses', { invite_only: FLAG });
 addColumns('registrations', { payment: TXT, paid: FLAG, company: TXT, source: TXT, waitlist: FLAG });
 const COURSE_FIELDS = ['when_mode', 'ev_date', 'ev_start', 'ev_end', 'level', 'city', 'location', 'title', 'description', 'slots', 'min_n', 'max_n', 'teachers', 'deadline', 'schedule',
   'price', 'requirements', 'program', 'contact_email', 'show_location', 'phone_required', 'prepay_text', 'btc_address', 'ln_address', 'cover',
-  'ask_company', 'ask_source', 'ask_waitlist', 'poster'];
+  'ask_company', 'ask_source', 'ask_waitlist', 'poster', 'invite_only'];
 // "Come hai conosciuto questo corso?": le scelte del vecchio modulo; "Altro" ha un campo libero
 const SOURCES = ['Amico o invito diretto', 'Telegram', 'Locandina', 'WhatsApp', 'Facebook o Instagram', 'Altro'];
 
@@ -1020,6 +1021,13 @@ input[type=text],input[type=email],input[type=tel],input[type=number],input[type
   main:has(#iscrizione:target) .mcta{display:none}
   body:has(.mcta){padding-bottom:76px}
 }
+/* evento solo su invito diretto */
+.pill.inv{background:#FFF1D6;color:#7A4B00}
+.chead2 .pill.inv{background:#FFE2A8;color:#5A3700}
+.card.invite{display:flex;gap:14px;align-items:flex-start;margin:0 0 14px;padding:16px 20px;background:#FFF6E3;border:1.5px solid #F0C877;box-shadow:none}
+.card.invite>.i{width:26px;height:26px;color:#9A6200;flex:none;margin-top:2px}
+.card.invite b{display:block;font-size:1.12rem;color:#5A3700;text-transform:uppercase;letter-spacing:.04em}
+.card.invite span{display:block;color:#6B4A12;margin-top:2px}
 @media print{body{background:#fff}.mcta,.hact{display:none}}
 `;
 
@@ -1120,6 +1128,7 @@ function courseRow(c, admin = false, pos = null) {
   const alerts = admin ? [
     n >= c.min_n && c.status === 'open' ? pill('Minimo raggiunto: scegli la data', 'ok', 'bell') : '',
     nw ? pill(`${nw} in lista d'attesa`, '', 'hourglass') : '',
+    c.invite_only ? pill('Solo su invito · nascosto', 'inv', 'lock') : '',
   ].join('') : '';
   return `<a class="ccard ${levelClass(c)}" href="${admin ? '/corso/' : '/c/'}${c.slug}"${pos === null ? '' : ` style="--i:${pos}"`}>
     <span class="chd${c.cover ? ' img' : ''}">${c.cover ? `<img src="/img/${esc(c.cover)}" alt="">` : ''}${dateLeaf(c)}<span class="cht"><span class="ctag">${levelIcon(c.level)}${esc(kindName(c))}</span><b>${esc(c.title || kindName(c))}</b></span></span>
@@ -1157,8 +1166,8 @@ function courseGroups(list, only, admin) {
 }
 
 function renderList(only = '') {
-  const all = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed','closed') ORDER BY created_at DESC").all();
-  const past = getSetting('show_past', '1') === '1' ? db.prepare("SELECT * FROM courses WHERE status = 'done' ORDER BY created_at DESC").all() : [];
+  const all = db.prepare("SELECT * FROM courses WHERE status IN ('open','confirmed','closed') AND invite_only = 0 ORDER BY created_at DESC").all();
+  const past = getSetting('show_past', '1') === '1' ? db.prepare("SELECT * FROM courses WHERE status = 'done' AND invite_only = 0 ORDER BY created_at DESC").all() : [];
   const cities = new Set(all.map((c) => c.city.trim().toLowerCase())).size;
   const { filters, html: groups } = courseGroups(all, only, false);
   const today = todayRome();
@@ -1235,7 +1244,7 @@ function socialHead(c) {
   const short = desc.length > 200 ? desc.slice(0, 200).replace(/\s+\S*$/, '') + '…' : desc; // taglio a parola intera
   const img = c.cover ? `${base}/img/${c.cover}` : ['jpg', 'png', 'webp'].includes(posterExt(c)) ? `${base}/c/${c.slug}/locandina` : '';
   const m = (k, v) => `<meta property="${k}" content="${esc(v)}">`;
-  return '\n' + [m('og:type', 'website'), m('og:site_name', 'Eventi e Corsi Bitcoin · SAFE21'), m('og:title', courseName(c)), m('og:description', short),
+  return '\n' + [m('og:type', 'website'), m('og:site_name', 'Eventi e Corsi Bitcoin · SAFE21'), m('og:title', courseName(c)), m('og:description', (c.invite_only ? 'Solo su invito diretto. ' : '') + short),
     m('og:url', `${base}/c/${c.slug}`), img ? m('og:image', img) : '', `<meta name="twitter:card" content="${img ? 'summary_large_image' : 'summary'}">`].join('');
 }
 // link di condivisione: semplici indirizzi, nessuno script e nessun servizio caricato nella pagina
@@ -1333,6 +1342,7 @@ function calMenu(c) {
 
 // descrizione: il primo paragrafo è il sottotitolo (grande), il resto è testo normale.
 // I paragrafi sono separati da una riga vuota; senza righe vuote il sottotitolo è la prima riga.
+const inviteNote = (c) => c.invite_only ? `<div class="card invite">${icon('lock')}<div><b>${isEvent(c) ? 'Evento' : 'Corso'} solo su invito diretto</b><span>È riservato alle persone invitate personalmente da chi lo organizza. Se nessuno ti ha invitato, questo ${isEvent(c) ? 'evento' : 'corso'} non è per te.</span></div></div>` : '';
 function descParts(d) {
   const t = String(d || '').trim();
   if (!t) return '';
@@ -1411,7 +1421,7 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
     ${!wait && calInfo(c) ? `<div class="calafter">${calMenu(c)}</div>` : ''}
     ${paid && !wait && prepayOn(c) ? `${h2('Pagamento in anticipo', 'btc')}${payBox(c)}` : ''}
     <p><a class="btn sec" href="/">${icon('back')}Tutti gli eventi e i corsi</a></p>`;
-  const enroll = ok ? finished : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : form}`;
+  const enroll = ok ? finished : `${error ? msg('err', esc(error)) : ''}${stop ? msg('warn', stop) : (c.invite_only ? msg('warn', `<b>Solo su invito diretto.</b> Iscriviti solo se sei stato invitato da chi organizza.`) : '') + form}`;
   const cta = `<a class="btn big" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${canWait ? "Mettiti in lista d'attesa" : 'Iscriviti ora'}</a>`;
   // i riquadri in alto: le cose che contano a colpo d'occhio
   const key = (ic, k, v) => `<div class="key"><span class="ic">${icon(ic)}</span><div><b>${k}</b><span class="v">${esc(v)}</span></div></div>`;
@@ -1427,12 +1437,12 @@ function renderCourse(c, { error = '', ok = false, paid = false, wait = false, v
   const ctaTxt = canWait ? "Mettiti in lista d'attesa" : 'Iscriviti ora';
   const seatTxt = (counter(c, n).match(/margin:0">([^<]*)</) || [])[1] || '';
   const head = `<header class="chead2 h2${c.cover ? ' withimg' : ''}"><div class="htxt">
-      <p class="eyebrow">${levelIcon(c.level)}<span>${esc(kindUp)} · ${esc(c.city)}</span>${statusBadge(c, n, false)}</p>
+      <p class="eyebrow">${levelIcon(c.level)}<span>${esc(kindUp)} · ${esc(c.city)}</span>${statusBadge(c, n, false)}${c.invite_only ? pill('Solo su invito', 'inv', 'lock') : ''}</p>
       <h1 class="ch">${esc(c.title || kindName(c))}</h1>
       ${introHtml}
       <p class="subline"><span>${icon('calendar')}${esc(when)}</span>${c.price ? `<span>${icon('euro')}${esc(linesOf(c.price)[0])}</span>` : ''}</p>
       ${canCta ? `<div class="hact"><a class="hcta" href="#iscrizione">${icon(canWait ? 'users' : 'pen')}${ctaTxt}</a><span class="hseat">${seatTxt}</span></div>` : ''}
-    </div>${c.cover ? `<div class="himg"><img class="cover" src="/img/${esc(c.cover)}" alt=""></div>` : ''}</header>${noteHtml}`;
+    </div>${c.cover ? `<div class="himg"><img class="cover" src="/img/${esc(c.cover)}" alt=""></div>` : ''}</header>${inviteNote(c)}${noteHtml}`;
   const tocItems = [
     slots.length && c.status === 'open' ? ['sez-date', 'Date possibili', 'calendar'] : null,
     ['sez-dettagli', 'Dettagli', 'info'],
@@ -1613,7 +1623,7 @@ function parseCourseForm(f) {
     price: field(f, 'price', 300), requirements: field(f, 'requirements', 2000), program: field(f, 'program', 6000),
     contact_email: field(f, 'contact_email', 120).toLowerCase(),
     show_location: f.get('show_location') === 'on' ? 1 : 0, phone_required: f.get('phone_required') === 'on' ? 1 : 0,
-    ask_company: f.get('ask_company') === 'on' ? 1 : 0, ask_source: f.get('ask_source') === 'on' ? 1 : 0, ask_waitlist: f.get('ask_waitlist') === 'on' ? 1 : 0,
+    ask_company: f.get('ask_company') === 'on' ? 1 : 0, ask_source: f.get('ask_source') === 'on' ? 1 : 0, ask_waitlist: f.get('ask_waitlist') === 'on' ? 1 : 0, invite_only: f.get('invite_only') === 'on' ? 1 : 0,
     prepay_text: field(f, 'prepay_text', 1000), btc_address: field(f, 'btc_address', 100), ln_address: field(f, 'ln_address', 600),
     cover: '', poster: '', // decise dopo, da filesFrom()
   };
@@ -1649,6 +1659,7 @@ function courseFormHtml(v, action, button) {
   return `<form method="post" action="${action}" class="card" enctype="multipart/form-data">
     <fieldset class="fs"><legend>${icon('book')}Il corso</legend>
     <label>Tipo *</label><select name="level">${Object.entries(KINDS).map(([k, l]) => `<option value="${k}" ${v.level === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    ${chk('invite_only', '<b>Solo su invito diretto</b>: non compare sulla pagina principale, lo vede solo chi ha il link. Sulla pagina c\'è scritto che è riservato agli invitati')}
     <label>Titolo <small>facoltativo, es. "Don't Trust, Verify"</small></label><input type="text" name="title" maxlength="80" value="${esc(v.title)}">
     <label>Presentazione <small>due righe in cima alla pagina, es. "Dall'open source al wallet Electrum: come creare la propria cassaforte Bitcoin."</small></label><textarea name="description" maxlength="4000">${esc(v.description)}</textarea>
     <label>Docenti <small>facoltativo</small></label><input type="text" name="teachers" maxlength="120" value="${esc(v.teachers)}">
