@@ -1028,6 +1028,78 @@ input[type=text],input[type=email],input[type=tel],input[type=number],input[type
 .card.invite>.i{width:26px;height:26px;color:#9A6200;flex:none;margin-top:2px}
 .card.invite b{display:block;font-size:1.12rem;color:#5A3700;text-transform:uppercase;letter-spacing:.04em}
 .card.invite span{display:block;color:#6B4A12;margin-top:2px}
+/* ===== stile CARTA (sobrio): fondo color carta, riquadri bianchi con bordo sottile, un solo colore d'accento (verde).
+   Il tipo di corso si riconosce da una riga sottile colorata. Niente luci, puntini, animazioni o ombre forti. ===== */
+:root{--pg:#F6F5F1;--ln:#E3E0D7;--ink:#1C2430;--ink2:#5B6472;--acc:#2F6F64;--accd:#25584F;--tsh:0 1px 2px rgba(28,36,48,.05)}
+body{background:var(--pg);color:var(--ink)}
+body.admin{background:#ECEEF1}
+.top,.card,.secs,.adm-box,.toc,.sec summary,.back,.hero.bento .stat,.hero.bento .next,.hero.bento .filters,.filters.seg,.dhead .filters.seg{background:#fff;border:1px solid var(--ln);box-shadow:var(--tsh)}
+.secs .sec summary{border:0}
+body.admin .top{background:var(--ink);border-color:var(--ink)}
+.adminbar{background:#3A4658}
+/* home */
+.hero.bento .htitle{background:#fff;border:1px solid var(--ln);box-shadow:var(--tsh);color:var(--ink);min-height:0;padding:28px 30px;justify-content:center}
+.hero.bento .htitle::before{display:none}
+.hero.bento h1{color:var(--ink);font-weight:700}
+.hero.bento .htitle p{color:var(--ink2)}
+.hero.bento .stat.s2{background:#fff}
+.hero.bento .stat .i{color:var(--acc)}
+.hero.bento .stat b{font-size:2rem}
+.next small,.next .cgo{color:var(--acc)}
+.hero.bento .next:hover{transform:none;box-shadow:0 0 0 1.5px var(--acc)}
+.hero.bento .filters a .i,.filters.seg a .i{color:var(--ink2)}
+.hero.bento .filters a.sel,.filters.seg a.sel{background:var(--acc)}
+.board{gap:22px}
+.bcol{background:none;border:0;padding:0}
+.board .gh{color:var(--ink);margin:0 2px 12px;padding-bottom:10px;border-bottom:1px solid var(--ln);font-weight:600}
+.board .gh .i{width:18px;height:18px;padding:0;border-radius:0;background:none;color:var(--lv);box-shadow:none}
+.ccard,.board .ccard{border:1px solid var(--ln)}
+.board .fan>.ccard,.board .fan>.ccard:first-child{box-shadow:0 -8px 12px -10px rgba(28,36,48,.22),var(--tsh)}
+.board .fan>.ccard:hover,.board .fan>.ccard:focus-visible{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc),0 14px 24px -16px rgba(28,36,48,.35)}
+.ccard .chd{background:#fff;color:var(--ink);box-shadow:inset 0 3px 0 var(--lv);padding-top:14px}
+.ccard .chd.img::before{background:linear-gradient(180deg,rgba(255,255,255,.1) 0%,rgba(255,255,255,.75) 55%,#fff 82%)}
+.ccard .ctag{color:var(--lvt)}
+.ccard .cht b,.board .ccard .cht b{color:var(--ink)}
+.ccard .chd.img .cht{text-shadow:none}
+.cdate{box-shadow:none;border:1px solid var(--ln)}
+.cdate u{background:#F1EFE9;color:var(--ink2)}
+.cdate b,.ccard .cdate b{color:var(--ink)}
+.ccard .cmeta .i{color:var(--ink2)}
+.ccard .cgo{color:var(--acc)}
+.bar>i,.ccard .cseat .bar>i{background:var(--acc)}
+.bempty{border:1px dashed var(--ln);background:none;color:var(--ink2)}
+/* pagina del corso */
+.chead2,.chead2.h2{background:#fff;border:1px solid var(--ln);box-shadow:inset 0 3px 0 var(--lv),var(--tsh);color:var(--ink)}
+.chead2::before{display:none}
+.chead2 .eyebrow{color:var(--lvt)}
+.chead2 .ch{color:var(--ink);font-weight:700}
+.chead2 .intro{color:var(--ink)}
+.chead2 .desc{color:var(--ink2)}
+.chead2 .subline{color:var(--ink)}
+.chead2 .subline span{background:var(--pg);border:1px solid var(--ln)}
+.chead2 .subline .i{color:var(--ink2)}
+.chead2.h2 .himg{box-shadow:0 0 0 1px var(--ln)}
+.chead2.h2 .hcta{background:var(--acc);color:#fff;box-shadow:none}
+.chead2.h2 .hcta:hover{transform:none;background:var(--accd)}
+.chead2.h2 .hseat{color:var(--ink2)}
+.chead2 .pill.inv{background:#FFF1D6;color:#7A4B00}
+.psec>h2 .i,.enroll>h2 .i{width:20px;height:20px;padding:0;border-radius:0;background:none;color:var(--lv);box-shadow:none}
+.hnote>.i{color:var(--ink2)}
+.btn.big,button.big,.mcta{background:var(--acc);border-color:var(--acc)}
+.btn.big:hover,button.big:hover{background:var(--accd);border-color:var(--accd)}
+.btn.sec.big{background:#fff;color:var(--ink);border-color:var(--ln)}
+.mcta{box-shadow:0 8px 20px -10px rgba(28,36,48,.5)}
+.sn{background:var(--ink)}
+.chip{background:#F1EFE9}
+.fact .ic{background:#F1EFE9;color:var(--ink2)}
+.maplink{background:#F1EFE9}
+input[type=text],input[type=email],input[type=tel],input[type=number],input[type=password],input[type=url],input[type=date],select,textarea{background:#fff;border-color:#D6D2C7}
+.tile{background:#fff;border-color:#D6D2C7}
+.tile:has(input:checked){border-color:var(--acc);background:#EEF5F3;box-shadow:0 0 0 1px var(--acc) inset}
+.consent{background:var(--pg)}
+.secs .sec .card{background:var(--pg)}
+.bar{background:#ECE9E1}
+.foot{border-top-color:var(--ln)}
 @media print{body{background:#fff}.mcta,.hact{display:none}}
 `;
 
