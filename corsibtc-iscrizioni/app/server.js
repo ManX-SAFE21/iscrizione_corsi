@@ -1100,6 +1100,25 @@ input[type=text],input[type=email],input[type=tel],input[type=number],input[type
 .secs .sec .card{background:var(--pg)}
 .bar{background:#ECE9E1}
 .foot{border-top-color:var(--ln)}
+/* home, parte alta: "prossimo appuntamento" grande (scende fino alla riga dei filtri), numeri piccoli su una riga,
+   filtri stretti sotto il titolo */
+@media (min-width:861px){
+  .hero.bento:not(.nonext):not(.solo){grid-template-areas:'t s1 s2' 't nx nx' 'f nx nx';grid-template-rows:auto 1fr auto}
+  .hero.bento:not(.nonext):not(.solo) .filters{justify-self:stretch;justify-content:space-between;flex-wrap:wrap;border-radius:22px}
+  .hero.bento:not(.nonext):not(.solo) .filters a{padding:7px 11px}
+}
+.hero.bento:not(.nonext):not(.solo) .stat{flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;padding:11px 18px;border-radius:20px}
+.hero.bento:not(.nonext):not(.solo) .stat .i{margin:0;width:20px;height:20px}
+.hero.bento:not(.nonext):not(.solo) .stat b{font-size:1.45rem}
+.hero.bento .next{padding:24px 26px;gap:20px}
+.next .cdate{width:74px;border-radius:16px}
+.next .cdate u{font-size:.76rem;padding:6px 0 5px}
+.next .cdate b{font-size:2.1rem;padding:8px 0 10px}
+.next small{font-size:.8rem}
+.next strong{font-size:1.5rem;line-height:1.2;margin:5px 0 4px}
+.next .nx>span{font-size:1.03rem}
+.next .cgo{font-size:1.05rem}
+@media (max-width:640px){.hero.bento .next{padding:18px;gap:14px}.next strong{font-size:1.25rem}.next .cdate{width:62px}.next .cdate b{font-size:1.7rem}}
 @media print{body{background:#fff}.mcta,.hact{display:none}}
 `;
 

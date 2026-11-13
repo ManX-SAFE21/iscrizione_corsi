@@ -3,7 +3,7 @@ id: corsibtc-iscrizioni
 category: automation
 name: Eventi e Corsi
 icon: https://raw.githubusercontent.com/ManX-SAFE21/iscrizione_corsi/main/corsibtc-iscrizioni/icon.svg
-version: "1.19.0"
+version: "1.19.1"
 tagline: Iscrizioni a eventi e corsi Bitcoin, con soglia minima
 description: >-
   Gestisci le iscrizioni ai tuoi eventi e corsi Bitcoin (corsi base, medio,
@@ -24,6 +24,6 @@ gallery: []
 path: ""
 defaultUsername: ""
 defaultPassword: ""
-releaseNotes: "Nuovo stile sobrio Carta: fondo color carta, riquadri bianchi con bordo sottile, un solo colore d'accento (verde), niente luci, puntini o animazioni. Il tipo di corso si riconosce da una riga sottile colorata. Stesso stile per pagina del corso e gestione. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
+releaseNotes: "Pagina principale, parte alta: il riquadro Prossimo appuntamento è più grande (data e titolo ben leggibili), i numeri in programma e città sono più piccoli su una riga, i filtri stanno sotto il titolo. Per passare a una nuova versione usa sempre Aggiorna: disinstallare l'app cancella corsi e iscritti. La pagina pubblica resta raggiungibile solo dal tunnel Cloudflare (servizio http://corsibtc-iscrizioni_web_1:3000)."
 submitter: Manuxxx
 submission: ""
