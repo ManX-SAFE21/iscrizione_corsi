@@ -398,6 +398,8 @@ function resetNotified(courseId) {
 /* ---------- HTML ---------- */
 // icone a tratto (stile Lucide), inline: nessun file esterno, nessuno script
 const ICONS = {
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
   btc: '<path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 4.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727"/>',
   zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
   calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
@@ -1119,6 +1121,265 @@ input[type=text],input[type=email],input[type=tel],input[type=number],input[type
 .next .nx>span{font-size:1.03rem}
 .next .cgo{font-size:1.05rem}
 @media (max-width:640px){.hero.bento .next{padding:18px;gap:14px}.next strong{font-size:1.25rem}.next .cdate{width:62px}.next .cdate b{font-size:1.7rem}}
+/* ===== stile AGENDA (da lettura): una sola colonna, un corso per riga come in un calendario, testo più grande,
+   niente riquadri. Due versioni, chiara e scura: si sceglie con il tasto in alto (cookie "tema", niente script). ===== */
+.hero .stat{display:none!important}
+.hero.bento{display:block!important}
+.board{display:block!important}
+.bcol{background:none!important;border:0!important;padding:0!important}
+.bcol:has(>.bempty){display:none!important}
+.fan>.ccard{margin:0!important;transform:none!important;top:auto!important;position:static!important}
+.ccard .chd{display:contents!important}
+.cseat .bar{display:none!important}
+.hero .htitle{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;min-height:0!important}
+body{background:#fff!important;color:#1B1F24;font-size:17px}
+main{max-width:840px!important}
+.top{background:none!important;border:0!important;border-bottom:1px solid #E4E4E0!important;border-radius:0!important;box-shadow:none!important;padding-left:0!important;padding-right:0!important}
+.hero.bento{margin:34px 0 0!important}
+.hero h1{font-size:2.5rem!important;letter-spacing:-.01em}
+.hero .htitle p{font-size:1.2rem!important;line-height:1.55;max-width:32em;color:#4A5260!important;margin-top:10px}
+.hero .next{display:flex!important;margin:26px 0 30px!important;background:#F2F6F5!important;border:0!important;border-left:4px solid #2F6F64!important;border-radius:8px!important;box-shadow:none!important}
+.hero .filters{display:flex!important;flex-wrap:wrap;background:none!important;border:0!important;border-bottom:1px solid #E4E4E0!important;border-radius:0!important;box-shadow:none!important;padding:0!important;gap:4px 26px!important;justify-content:flex-start!important}
+.hero .filters a{background:none!important;color:#5B6472!important;border-radius:0!important;padding:10px 0!important;border-bottom:3px solid transparent;font-size:1.02rem;margin-bottom:-1px}
+.hero .filters a.sel{color:#1B1F24!important;border-bottom-color:#2F6F64;font-weight:700}
+.hero .filters a .i{display:none!important}
+.bcol{margin-top:38px!important}
+.board .gh{font-size:.84rem!important;font-weight:700!important;text-transform:uppercase;letter-spacing:.12em;color:var(--lvt)!important;margin:0!important;padding:0 0 10px!important;border-bottom:2px solid #1B1F24!important}
+.board .gh .i{display:none!important}
+.fan{display:block!important}
+.fan>.ccard{display:grid!important;grid-template-columns:72px 1fr auto;grid-template-areas:'d t go' 'd m go' 'd s go';column-gap:24px;row-gap:5px;align-items:start;padding:22px 0!important;background:none!important;border:0!important;border-bottom:1px solid #E4E4E0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important}
+.fan>.ccard:hover .cht b{text-decoration:underline;text-decoration-color:#2F6F64;text-underline-offset:4px}
+.ccard .cdate{grid-area:d;width:72px!important;border-radius:10px!important}
+.ccard .cht{grid-area:t;padding:0!important}
+.ccard .ctag{display:none!important}
+.ccard .cht b{font-size:1.3rem!important;line-height:1.3!important;font-weight:700}
+.ccard .cmeta{grid-area:m;display:flex!important;flex-direction:row!important;flex-wrap:wrap;gap:4px 18px!important;padding:0!important;font-size:1rem!important;color:#4A5260!important}
+.ccard .cseat{grid-area:s;padding:0!important;margin:0!important}
+.ccard .cseat small{font-size:.95rem!important;color:#5B6472!important}
+.ccard .cfoot{grid-area:go;display:flex!important;flex-direction:column!important;align-items:flex-end!important;justify-content:center;gap:10px!important;padding:0!important;margin:0!important;border:0!important;align-self:center}
+.ccard .cgo{font-size:1rem!important;font-weight:700;color:#2F6F64!important;white-space:nowrap}
+@media (max-width:640px){
+  .hero h1{font-size:2rem!important}
+  .fan>.ccard{grid-template-columns:60px 1fr;grid-template-areas:'d t' 'd m' 'd s' 'go go';column-gap:16px}
+  .ccard .cdate{width:60px!important}
+  .ccard .cfoot{flex-direction:row!important;justify-content:space-between;align-items:center!important;margin-top:10px!important;align-self:stretch}
+}
+
+/* pagina dell'evento / del corso */
+.back{display:inline-flex!important;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;margin:26px 0 0!important;color:#2F6F64!important;font-size:1rem;font-weight:700}
+/* testata */
+.chead2,.chead2.h2{display:block!important;background:none!important;border:0!important;border-bottom:2px solid #1B1F24!important;border-radius:0!important;box-shadow:none!important;padding:22px 0 30px!important;margin:0!important}
+.chead2 .htxt{padding:0!important;max-width:none!important}
+.chead2 .eyebrow{font-size:.84rem!important;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--lvt)!important;gap:12px}
+.chead2 .eyebrow>.i{display:none!important}
+.chead2 .eyebrow .pill{text-transform:none;letter-spacing:0}
+.chead2 .ch{font-size:2.35rem!important;line-height:1.2!important;letter-spacing:-.01em;margin:12px 0 0!important}
+.chead2 .intro{font-size:1.2rem!important;line-height:1.6!important;color:#333B47!important;max-width:34em;margin:16px 0 0!important}
+.chead2 .subline{display:flex!important;flex-direction:column;gap:8px!important;margin:22px 0 0!important}
+.chead2 .subline span{background:none!important;border:0!important;padding:0!important;font-size:1.1rem!important;font-weight:600;color:#1B1F24!important}
+.chead2 .subline .i{color:#2F6F64!important;width:20px;height:20px}
+.chead2 .himg{margin:24px 0 0!important;box-shadow:none!important;border-radius:10px!important;max-width:none!important;width:100%!important}
+.chead2 .hact{margin-top:26px!important;gap:16px!important}
+.chead2 .hcta{background:#2F6F64!important;color:#fff!important;border-radius:10px!important;box-shadow:none!important;padding:15px 26px!important;font-size:1.1rem!important}
+.chead2 .hseat{color:#4A5260!important;font-size:1rem!important}
+/* una colonna sola: prima il testo, in fondo il riquadro pratico */
+.cwrap{display:flex!important;flex-direction:column!important;gap:0!important}
+.cmain{order:1;width:auto!important;max-width:none!important;min-width:0}
+.aside{order:2;position:static!important;display:block!important;align-self:stretch!important;width:auto!important;max-width:none!important;margin-top:40px}
+.aside .abox{width:auto!important;max-width:none!important}
+.toc{display:none!important}
+.abox{background:#F2F6F5!important;border:0!important;border-left:4px solid #2F6F64!important;border-radius:8px!important;box-shadow:none!important;padding:22px 24px!important}
+.abox h2{font-size:1.15rem!important}
+.abox .btn.big{display:none!important}
+/* sezioni */
+.psec,.enroll{margin-top:40px!important}
+.psec>h2,.enroll>h2{font-size:.84rem!important;font-weight:700!important;text-transform:uppercase;letter-spacing:.12em;color:#5B6472!important;margin:0!important;padding:0 0 10px!important;border-bottom:1px solid #1B1F24!important}
+.psec>h2 .i,.enroll>h2 .i{display:none!important}
+.psec>.card{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important}
+.hnote{background:#FBF7EC!important;border:0!important;border-left:4px solid #C9A227!important;border-radius:8px!important;box-shadow:none!important;margin-top:26px!important}
+.facts{display:block!important;columns:auto!important;column-count:1!important;margin:0!important;padding:0!important}
+.fact{display:grid!important;grid-template-columns:190px 1fr;gap:0 20px;padding:15px 0!important;border:0!important;border-bottom:1px solid #E4E4E0!important;background:none!important;border-radius:0!important}
+.fact .ic{display:none!important}
+.fact>div{display:contents!important}
+.fact b{grid-column:1;color:#5B6472!important;font-weight:500!important;font-size:1rem!important}
+.fact .v{grid-column:2;font-size:1.08rem!important;line-height:1.55;color:#1B1F24!important;white-space:pre-line}
+.fact .maplink{grid-column:2;justify-self:start;margin-top:8px;background:none!important;padding:0!important;color:#2F6F64!important;font-weight:700}
+.prog{padding-top:14px}
+.prog p{font-size:1.12rem!important;line-height:1.7!important;margin:0 0 10px!important}
+/* modulo */
+.enrollform{background:none!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:18px 0 0!important}
+.enrollform label{font-size:1rem!important}
+.enrollform input[type=text],.enrollform input[type=email],.enrollform input[type=tel]{font-size:1.08rem!important;padding-top:13px!important;padding-bottom:13px!important;border-color:#B9BFC8!important}
+.enrollform .hint{font-size:.93rem!important}
+.tile{border-color:#B9BFC8!important;font-size:1.02rem}
+.btn.big,button.big{border-radius:10px!important;font-size:1.1rem!important;padding:16px 26px!important}
+.contact{margin-top:34px!important;font-size:1rem}
+.foot{border-top-color:#E4E4E0!important}
+@media (max-width:640px){
+  .chead2 .ch{font-size:1.8rem!important}
+  .chead2 .intro{font-size:1.1rem!important}
+  .fact{grid-template-columns:1fr}
+  .fact b,.fact .v,.fact .maplink{grid-column:1}
+  .fact b{font-size:.9rem!important;margin-bottom:2px}
+}
+/* larghezze: elenco e pagine da leggere strette; pagine di lavoro della gestione un po' più larghe */
+main{max-width:840px!important}
+body.admin main:not(.vetro){max-width:1000px!important}
+/* tasto chiaro/scuro e parte destra della testata */
+.tright{display:inline-flex;align-items:center;gap:12px}
+.tema{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border:1px solid #D3D7DD;border-radius:999px;background:#fff;color:#1B1F24!important;font-size:.92rem;font-weight:600;text-decoration:none;white-space:nowrap}
+.tema:hover{border-color:#2F6F64}
+.tema .i{width:17px;height:17px;color:#2F6F64!important}
+@media (max-width:640px){.tema span{display:none}.tema{padding:8px}.tright{gap:6px}}
+/* riga del corso: avvisi della gestione e miniatura dell'immagine */
+.fan>.ccard{grid-template-areas:'d t go' 'd m go' 'd a go' 'd s go'}
+.ccard .calert{grid-area:a;display:flex!important;flex-wrap:wrap;gap:6px;padding:2px 0!important;margin:0!important}
+.fan>.ccard:has(.chd.img){grid-template-columns:72px 1fr 132px auto;grid-template-areas:'d t im go' 'd m im go' 'd a im go' 'd s im go'}
+.ccard .chd.img>img{grid-area:im;position:static!important;inset:auto!important;width:132px!important;height:88px!important;object-fit:cover;border-radius:8px;opacity:1!important;filter:none!important;align-self:center}
+@media (max-width:640px){
+  .fan>.ccard{grid-template-areas:'d t' 'd m' 'd a' 'd s' 'go go'}
+  .fan>.ccard:has(.chd.img){grid-template-columns:60px 1fr;grid-template-areas:'im im' 'd t' 'd m' 'd a' 'd s' 'go go'}
+  .ccard .chd.img>img{width:100%!important;height:150px!important;margin-bottom:12px}
+}
+/* corsi già fatti e altre pagine semplici */
+.sheet>h1,.dhead h1{font-size:2.1rem;letter-spacing:-.01em}
+/* gestione: stessa grafica del sito, con la testata chiara */
+body.admin{background:#fff!important}
+body.admin .top{background:none!important;border:0!important;border-bottom:1px solid #E4E4E0!important}
+body.admin .top .bname,body.admin .top .brand>small{color:#1B1F24!important}
+body.admin .nav a,body.admin .nav button{color:#1B1F24!important}
+body.admin .nav .i{color:#2F6F64!important}
+body.admin .nav a:hover,body.admin .nav button:hover{background:#F2F6F5!important;color:#1B1F24!important}
+body.admin .nav .tema{margin-left:6px}
+.adminbar{background:#F2F6F5!important;color:#1B1F24!important;border-radius:8px!important;border-left:4px solid #2F6F64}
+.adminbar b{color:#1B1F24!important}
+.adminbar span{color:#4A5260!important}
+.adminbar .i{color:#2F6F64!important}
+.dhead{display:block!important;margin:30px 0 0!important}
+.dhead .filters.seg{display:flex!important;flex-wrap:wrap;background:none!important;border:0!important;border-bottom:1px solid #E4E4E0!important;border-radius:0!important;box-shadow:none!important;padding:0!important;gap:4px 26px!important;justify-content:flex-start!important;margin:18px 0 0!important}
+.dhead .filters.seg a{background:none!important;color:#5B6472!important;border-radius:0!important;padding:10px 0!important;border-bottom:3px solid transparent;font-size:1.02rem;margin-bottom:-1px}
+.dhead .filters.seg a.sel{color:#1B1F24!important;border-bottom-color:#2F6F64;font-weight:700}
+.dhead .filters.seg a .i{display:none!important}
+.ccard .chd::before,.ccard .chd::after{display:none!important}
+.req{margin:0!important;padding:6px 0 0!important}
+.req li{font-size:1.08rem!important;line-height:1.5;padding:12px 0!important;border:0!important;border-bottom:1px solid #E4E4E0!important;background:none!important;border-radius:0!important}
+.req .ic{background:#F2F6F5!important;color:#2F6F64!important}
+.prog h3{font-size:.84rem!important;letter-spacing:.1em;color:#5B6472!important;margin:16px 0 6px!important}
+.prog li{font-size:1.1rem!important;line-height:1.7!important}
+.dhead .btn{margin-top:18px}
+
+/* ----- versione scura: fondo grigio scuro (non nero), testo avorio ----- */
+body.scuro{background:#15191E!important;color:#E9E6DF!important;--ink:#E9E6DF;--ink2:#A9B1BC;--ln:#2D343D;--pg:#15191E;--acc:#74C4B4}
+body.scuro .top{border-bottom-color:#2D343D!important}
+body.scuro .top .bname,body.scuro .top .s21link b{color:#E9E6DF!important}
+body.scuro .top .bname small{color:#A9B1BC!important}
+body.scuro h1,body.scuro h2,body.scuro h3,body.scuro .hero h1{color:#E9E6DF!important}
+body.scuro .hero .htitle p{color:#B9C0CA!important}
+body.scuro .hero .next{background:#1B2B29!important;border-left-color:#74C4B4!important}
+body.scuro .hero .next strong{color:#E9E6DF!important}
+body.scuro .hero .next .nx>span{color:#B9C0CA!important}
+body.scuro .hero .next small,body.scuro .hero .next .cgo{color:#74C4B4!important}
+body.scuro .hero .filters{border-bottom-color:#2D343D!important}
+body.scuro .hero .filters a{color:#A9B1BC!important}
+body.scuro .hero .filters a.sel{color:#E9E6DF!important;border-bottom-color:#74C4B4}
+body.scuro .board .gh{color:var(--lv2,var(--lv))!important;border-bottom-color:#E9E6DF!important}
+body.scuro .fan>.ccard{border-bottom-color:#2D343D!important}
+body.scuro .ccard .cht b{color:#E9E6DF!important}
+body.scuro .fan>.ccard:hover .cht b{text-decoration-color:#74C4B4}
+body.scuro .ccard .cmeta{color:#B9C0CA!important}
+body.scuro .ccard .cmeta .i{color:#7F8894!important}
+body.scuro .ccard .cseat small{color:#A9B1BC!important}
+body.scuro .ccard .cgo{color:#74C4B4!important}
+body.scuro .cdate{background:#1F252C!important;border-color:#353D47!important}
+body.scuro .cdate u{background:#2A323B!important;color:#A9B1BC!important}
+body.scuro .cdate b,body.scuro .ccard .cdate b{color:#E9E6DF!important;background:none!important}
+body.scuro .pill{background:#252C34!important;color:#C3CAD3!important}
+body.scuro .pill.on{background:#1B2B29!important;color:#8FD6C7!important}
+body.scuro .foot{border-top-color:#2D343D!important;color:#A9B1BC!important}
+body.scuro .foot .privacy{color:#A9B1BC!important}
+/* pagina dell'evento / del corso */
+body.scuro .back{color:#74C4B4!important}
+body.scuro .chead2,body.scuro .chead2.h2{border-bottom-color:#E9E6DF!important}
+body.scuro .chead2 .eyebrow{color:var(--lv2,var(--lv))!important}
+body.scuro .chead2 .ch{color:#E9E6DF!important}
+body.scuro .chead2 .intro{color:#C9CED6!important}
+body.scuro .chead2 .subline span{color:#E9E6DF!important}
+body.scuro .chead2 .subline .i{color:#74C4B4!important}
+body.scuro .chead2 .hcta,body.scuro .btn.big,body.scuro button.big,body.scuro .mcta{background:#74C4B4!important;border-color:#74C4B4!important;color:#10201D!important}
+body.scuro .chead2 .hseat{color:#A9B1BC!important}
+body.scuro .psec>h2,body.scuro .enroll>h2{color:#A9B1BC!important;border-bottom-color:#E9E6DF!important}
+body.scuro .fact{border-bottom-color:#2D343D!important}
+body.scuro .fact b{color:#A9B1BC!important}
+body.scuro .fact .v,body.scuro .prog p{color:#E9E6DF!important}
+body.scuro .fact .maplink{color:#74C4B4!important}
+body.scuro .abox{background:#1B2B29!important;border-left-color:#74C4B4!important;color:#E9E6DF!important}
+body.scuro .abox .sub,body.scuro .abox .dl{color:#C9CED6!important}
+body.scuro .bar{background:#2D343D!important}
+body.scuro .bar>i{background:#74C4B4!important}
+body.scuro .calm summary,body.scuro .share b{color:#E9E6DF!important}
+body.scuro .calm-list a,body.scuro .share a{background:#232A32!important;color:#E9E6DF!important;border-color:#353D47!important}
+body.scuro .calm-list a small{color:#A9B1BC!important}
+body.scuro .share .mono{background:#15191E!important;color:#A9B1BC!important;border-color:#353D47!important}
+body.scuro .hnote{background:#2A2618!important;color:#E9E6DF!important}
+body.scuro .msg.warn{background:#2A2618!important;color:#EADFB8!important;border-color:#5A4E22!important}
+body.scuro .enrollform label,body.scuro .enrollform h3,body.scuro .enrollform legend{color:#E9E6DF!important}
+body.scuro .enrollform h3 small,body.scuro .enrollform .hint,body.scuro .enrollform .opt{color:#A9B1BC!important}
+body.scuro .sn{background:#E9E6DF!important;color:#15191E!important}
+body.scuro input[type=text],body.scuro input[type=email],body.scuro input[type=tel]{background:#1D2329!important;border-color:#414B57!important;color:#E9E6DF!important}
+body.scuro .inp .i{color:#7F8894!important}
+body.scuro .tile{background:#1D2329!important;border-color:#414B57!important;color:#E9E6DF!important}
+body.scuro .tile:has(input:checked){background:#1B2B29!important;border-color:#74C4B4!important;box-shadow:0 0 0 1px #74C4B4 inset!important}
+body.scuro .consent{background:#1D2329!important;color:#C9CED6!important;border-color:#353D47!important}
+body.scuro .contact{color:#A9B1BC!important}
+body.scuro .contact a{color:#74C4B4!important}
+body.scuro .step{border-color:#2D343D!important}
+body.scuro .enrollform .opt{background:#252C34!important;color:#A9B1BC!important}
+body.scuro .tema{background:#1F252C;border-color:#3A434E;color:#E9E6DF!important}
+body.scuro .tema .i{color:#74C4B4!important}
+body.scuro.admin{background:#15191E!important}
+body.scuro.admin .top{border-bottom-color:#2D343D!important}
+body.scuro.admin .top .bname,body.scuro.admin .top .brand>small{color:#E9E6DF!important}
+body.scuro.admin .nav a,body.scuro.admin .nav button{color:#E9E6DF!important}
+body.scuro.admin .nav .i{color:#74C4B4!important}
+body.scuro.admin .nav a:hover,body.scuro.admin .nav button:hover{background:#1B2B29!important;color:#E9E6DF!important}
+body.scuro .adminbar{background:#1B2B29!important;color:#E9E6DF!important;border-left-color:#74C4B4}
+body.scuro .adminbar b{color:#E9E6DF!important}
+body.scuro .adminbar span{color:#B9C0CA!important}
+body.scuro .adminbar .i{color:#74C4B4!important}
+body.scuro .dhead .filters.seg{border-bottom-color:#2D343D!important}
+body.scuro .dhead .filters.seg a{color:#A9B1BC!important}
+body.scuro .dhead .filters.seg a.sel{color:#E9E6DF!important;border-bottom-color:#74C4B4}
+body.scuro a{color:#74C4B4}
+body.scuro .card,body.scuro .secs,body.scuro .adm-box,body.scuro .sec summary{background:#1B2026;border-color:#2D343D;color:#E9E6DF;box-shadow:none}
+body.scuro .sub,body.scuro small{color:#A9B1BC}
+body.scuro label{color:#E9E6DF}
+body.scuro input,body.scuro select,body.scuro textarea{background:#1D2329!important;border-color:#414B57!important;color:#E9E6DF!important;color-scheme:dark}
+body.scuro .btn.sec,body.scuro button.sec{background:#232A32!important;border-color:#414B57!important;color:#E9E6DF!important}
+body.scuro table{color:#E9E6DF}
+body.scuro th{color:#A9B1BC;border-color:#2D343D}
+body.scuro td{border-color:#2D343D}
+body.scuro .req li{border-bottom-color:#2D343D!important;color:#E9E6DF!important}
+body.scuro .req .ic{background:#1B2B29!important;color:#74C4B4!important}
+body.scuro .prog h3{color:#A9B1BC!important}
+body.scuro .prog li{color:#E9E6DF!important}
+body.scuro .maplink{background:#232A32!important;color:#74C4B4!important}
+body.scuro button.del,body.scuro .btn.del{background:#2A1B1B!important;border-color:#6B3434!important;color:#F0A3A3!important}
+body.scuro .savebar{background:#1B2026!important;border-color:#2D343D!important;color:#B9C0CA!important;box-shadow:0 -8px 20px -12px rgba(0,0,0,.6)!important}
+body.scuro legend,body.scuro .fs legend{color:#E9E6DF!important}
+body.scuro .fs{border-color:#2D343D!important}
+body.scuro .tile b,body.scuro .tile span{color:#E9E6DF!important}
+body.scuro .tile small{color:#A9B1BC!important}
+body.scuro .btn,body.scuro button{color-scheme:dark}
+body.scuro .msg.ok{background:#1B2B29!important;color:#BFE6DD!important;border-color:#2F5B52!important}
+body.scuro .msg.err{background:#2A1B1B!important;color:#F0B8B8!important;border-color:#6B3434!important}
+body.scuro .chip,body.scuro .fact .ic{background:#232A32!important;color:#C3CAD3!important}
+body.scuro .pill.inv{background:#3A2F14!important;color:#F0D48A!important}
+body.scuro .pill.ok{background:#1B2B29!important;color:#8FD6C7!important}
+body.scuro .pill.off{background:#252C34!important;color:#C3CAD3!important}
+body.scuro hr{border-color:#2D343D}
+body.scuro .mono,body.scuro code{color:#C3CAD3}
+body.scuro .dhead .btn{background:#74C4B4!important;border-color:#74C4B4!important;color:#10201D!important}
+body.scuro .dhead .btn .i{color:#10201D!important}
 @media print{body{background:#fff}.mcta,.hact{display:none}}
 `;
 
@@ -1134,18 +1395,37 @@ function serveIcon(res, p) {
 const SAFE21_TILE = '<svg class="s21" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="#0D9488"/><g fill="#F9F8F4"><circle cx="17" cy="14" r="5"/><path d="M14 17h6l2 10H12z"/></g></svg>';
 const FOOT = `<footer class="foot"><p class="privacy">${icon('shield')}<span>I dati degli iscritti non vengono ceduti a terzi e vengono cancellati dopo il corso.</span></p></footer>`;
 
+// Tema chiaro o scuro: lo sceglie chi guarda con il tasto in alto. Resta in un cookie ("tema"), senza script.
+const reqCtx = new AsyncLocalStorage(); // { dark, path } della richiesta in corso
+function themeLink() {
+  const st = reqCtx.getStore() || {};
+  const da = encodeURIComponent(st.path || '/');
+  return st.dark
+    ? `<a class="tema" href="/tema?t=chiaro&amp;da=${da}" title="Passa allo sfondo chiaro">${icon('sun')}<span>Chiaro</span></a>`
+    : `<a class="tema" href="/tema?t=scuro&amp;da=${da}" title="Passa allo sfondo scuro">${icon('moon')}<span>Scuro</span></a>`;
+}
+function serveTheme(req, res, url) {
+  if (req.method !== 'GET' || url.pathname !== '/tema') return false;
+  let da = url.searchParams.get('da') || '/';
+  // si torna solo a una pagina di questo sito (mai a un indirizzo esterno)
+  if (!/^\/(?![\/\\])[^\s\\]*$/.test(da) || da.startsWith('/tema')) da = '/';
+  redirect(res, da, { 'Set-Cookie': `tema=${url.searchParams.get('t') === 'scuro' ? 'scuro' : 'chiaro'}; Path=/; SameSite=Lax; Max-Age=31536000` });
+  return true;
+}
+
 function page(title, body, { admin = false, wide = false, head = '' } = {}) {
+  const dark = !!reqCtx.getStore()?.dark;
   // stile Vetrate: home e gestione direttamente sul fondo colorato, il resto su un foglio chiaro
   const vetro = /class="(hero|dhead|board)[" ]/.test(body);
   const brand = `<a class="brand" href="/"><span class="mark"><img src="/icon.svg?v=2" alt="" width="34" height="34"></span><span class="bname">Eventi e Corsi<small>Bitcoin</small></span>${admin ? '<small>· Admin</small>' : ''}</a>`;
   const nav = admin
-    ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo evento</a><a href="${esc((publicBase() || 'https://corsi.safe21.io') + '/')}" target="_blank" rel="noopener" title="Apre il sito come lo vedono i visitatori">${icon('eye')}Sito pubblico</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>
+    ? `<nav class="nav"><a href="/">${icon('list')}Corsi</a><a href="/corso/nuovo">${icon('plus')}Nuovo evento</a><a href="${esc((publicBase() || 'https://corsi.safe21.io') + '/')}" target="_blank" rel="noopener" title="Apre il sito come lo vedono i visitatori">${icon('eye')}Sito pubblico</a><a href="/impostazioni">${icon('cog')}Impostazioni</a>${themeLink()}
        ${adminCtx.getStore()?.umbrel ? '' : `<form method="post" action="/logout"><button type="submit">${icon('out')}Esci</button></form>`}</nav>`
-    : `<a class="s21link" href="https://safe21.io" title="Vai a safe21.io">${SAFE21_TILE}<b>SAFE<em>21</em></b></a>`;
+    : `<span class="tright">${themeLink()}<a class="s21link" href="https://safe21.io" title="Vai a safe21.io">${SAFE21_TILE}<b>SAFE<em>21</em></b></a></span>`;
   // <!--email_off-->: Cloudflare non deve nascondere le email (e gli indirizzi Lightning): lo script che le ricompone sarebbe bloccato dalla CSP
   return `<!doctype html><html lang="it"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><link rel="icon" type="image/svg+xml" href="/icon.svg?v=2">${head}
-<title>${admin ? 'Gestione · ' : ''}${esc(title)}</title><style>${CSS}</style></head><body${admin ? ' class="admin"' : ''}><!--email_off--><main class="${[wide ? 'wide' : '', vetro ? 'vetro' : ''].filter(Boolean).join(' ')}">${admin ? `<div class="adminbar">${icon('cog')}<b>Gestione</b><span>Questa pagina la vedi solo tu. I visitatori vedono il sito pubblico.</span></div>` : ''}<header class="top">${brand}${nav}</header>${vetro ? `${body}${admin ? '' : FOOT}` : `<div class="sheet">${body}${admin ? '' : FOOT}</div>`}</main><!--/email_off--></body></html>`;
+<title>${admin ? 'Gestione · ' : ''}${esc(title)}</title><style>${CSS}</style></head><body${admin || dark ? ` class="${[admin ? 'admin' : '', dark ? 'scuro' : ''].filter(Boolean).join(' ')}"` : ''}><!--email_off--><main class="${[wide ? 'wide' : '', vetro ? 'vetro' : ''].filter(Boolean).join(' ')}">${admin ? `<div class="adminbar">${icon('cog')}<b>Gestione</b><span>Questa pagina la vedi solo tu. I visitatori vedono il sito pubblico.</span></div>` : ''}<header class="top">${brand}${nav}</header>${vetro ? `${body}${admin ? '' : FOOT}` : `<div class="sheet">${body}${admin ? '' : FOOT}</div>`}</main><!--/email_off--></body></html>`;
 }
 
 function qrSvg(url) {
@@ -1573,6 +1853,7 @@ async function handlePublic(req, res) {
   const p = url.pathname;
   if (p === '/health') return send(res, 200, 'ok', { 'Content-Type': 'text/plain' });
   if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p) || serveIcon(res, p))) return;
+  if (serveTheme(req, res, url)) return;
   if (req.method === 'GET' && p === '/') return send(res, 200, renderList(url.searchParams.get('livello') || ''));
 
   const cm = p.match(/^\/c\/([0-9a-f]{10})\/calendario\.ics$/);
@@ -2016,6 +2297,7 @@ async function adminRoutes(req, res, umbrel) {
 
   if (p === '/health') return send(res, 200, 'ok', { 'Content-Type': 'text/plain' });
   if (req.method === 'GET' && (serveFont(res, p) || serveImage(res, p) || serveIcon(res, p))) return; // le copertine sono comunque pubbliche
+  if (serveTheme(req, res, url)) return; // solo l'aspetto: non serve essere entrati
 
   if (umbrel && (p === '/login' || p === '/logout')) return redirect(res, '/'); // dall'icona di Umbrel si è già dentro
   if (p === '/login') {
@@ -2200,7 +2482,8 @@ async function adminRoutes(req, res, umbrel) {
 /* ---------- avvio ---------- */
 function wrap(handler) {
   return (req, res) => {
-    handler(req, res).catch((e) => {
+    const st = { dark: /(?:^|;\s*)tema=scuro(?:;|$)/.test(req.headers.cookie || ''), path: req.url };
+    reqCtx.run(st, () => handler(req, res)).catch((e) => {
       console.error(e);
       if (!res.headersSent) send(res, 500, page('Errore', '<h1>Si è verificato un errore</h1><p>Riprova tra poco.</p>'));
       else res.end();
