@@ -1131,8 +1131,8 @@ input[type=text],input[type=email],input[type=tel],input[type=number],input[type
 .fan>.ccard{margin:0!important;transform:none!important;top:auto!important;position:static!important}
 .ccard .chd{display:contents!important}
 .cseat .bar{display:none!important}
-.hero .htitle{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;min-height:0!important}
-body{background:#fff!important;color:#1B1F24;font-size:17px}
+.hero .htitle{background:none!important;border:0!important;box-shadow:none!important;padding:0!important;min-height:0!important;overflow:visible!important;border-radius:0!important}
+body{background:#F6F3EC!important;color:#1B1F24;font-size:17px}
 main{max-width:840px!important}
 .top{background:none!important;border:0!important;border-bottom:1px solid #E4E4E0!important;border-radius:0!important;box-shadow:none!important;padding-left:0!important;padding-right:0!important}
 .hero.bento{margin:34px 0 0!important}
@@ -1244,7 +1244,7 @@ body.admin main:not(.vetro){max-width:1000px!important}
 /* corsi già fatti e altre pagine semplici */
 .sheet>h1,.dhead h1{font-size:2.1rem;letter-spacing:-.01em}
 /* gestione: stessa grafica del sito, con la testata chiara */
-body.admin{background:#fff!important}
+body.admin{background:#F6F3EC!important}
 body.admin .top{background:none!important;border:0!important;border-bottom:1px solid #E4E4E0!important}
 body.admin .top .bname,body.admin .top .brand>small{color:#1B1F24!important}
 body.admin .nav a,body.admin .nav button{color:#1B1F24!important}
